@@ -10,7 +10,7 @@ namespace ClientAgent
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("ASD");
+            Console.WriteLine("Hallo");
         }
     }
 }
