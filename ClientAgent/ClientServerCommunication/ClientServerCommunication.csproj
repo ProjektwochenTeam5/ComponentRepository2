@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{03F34B89-AF66-4D36-9E05-7574FC29FE4B}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{7E87AF0B-6FD2-438D-A795-A6B7D6194CD8}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Server</RootNamespace>
-    <AssemblyName>Server</AssemblyName>
+    <RootNamespace>ClientServerCommunication</RootNamespace>
+    <AssemblyName>ClientServerCommunication</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,12 +39,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Acknowledge.cs" />
+    <Compile Include="AgentAccept.cs" />
+    <Compile Include="AgentDiscover.cs" />
+    <Compile Include="ClientDisconnect.cs" />
+    <Compile Include="ComponentResult.cs" />
+    <Compile Include="Error.cs" />
+    <Compile Include="Message.cs" />
+    <Compile Include="SendComponentInfos.cs" />
+    <Compile Include="ComponentInfo.cs" />
+    <Compile Include="FetchComponent.cs" />
+    <Compile Include="KeepAlive.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TCPServer.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
+    <Compile Include="TransferComponent.cs" />
+    <Compile Include="TransferJob.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
