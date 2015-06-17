@@ -45,6 +45,7 @@
     <Compile Include="ClientDisconnect.cs" />
     <Compile Include="DataConverter.cs" />
     <Compile Include="DoJobRequest.cs" />
+    <Compile Include="StatusCode.cs" />
     <Compile Include="StoreComponent.cs" />
     <Compile Include="TransferJobResponse.cs" />
     <Compile Include="Error.cs" />

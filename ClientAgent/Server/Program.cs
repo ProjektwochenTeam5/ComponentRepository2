@@ -30,14 +30,17 @@ namespace Server
             Task tcpTask = new Task(new Action(() => tcp.Run()));
             tcpTask.Start();
 
-            Console.ReadKey();
+            Console.ReadLine();
         }
 
         static void tcp_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
         {
             switch (e.MessageType)
             {
+                    
                 case 0:
+                    
+                    MessageManager.KeepAlive(e);
                     break;
                 case 1:
                     break;

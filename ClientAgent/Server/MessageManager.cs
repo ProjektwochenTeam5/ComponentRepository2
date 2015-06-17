@@ -8,5 +8,12 @@ namespace Server
 {
     public static class MessageManager
     {
+        public static void KeepAlive(MessageRecievedEventArgs e)
+        {
+            if (e.)
+            {
+                
+            }
+        }
     }
 }

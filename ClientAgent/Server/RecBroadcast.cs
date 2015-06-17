@@ -74,19 +74,12 @@ namespace Server
 
         public string GetMyIP()
         {
-            IPHostEntry host;
-            string localIP = "?";
-            host = Dns.GetHostEntry(Dns.GetHostName());
 
-            foreach (IPAddress ip in host.AddressList)
-            {
-                if (ip.AddressFamily.ToString() == "InterNetwork")
-                {
-                    localIP = ip.ToString();
-                }
-            }
+            string HostName = System.Net.Dns.GetHostName();
+            System.Net.IPHostEntry hostInfo = System.Net.Dns.GetHostByName(HostName);
+            string IpAdresse = hostInfo.AddressList[0].ToString();
 
-            return localIP;
+            return IpAdresse;
         }
     }
 }

@@ -11,14 +11,13 @@ namespace ClientServerCommunication
 {
     public static class DataConverter
     {
-        public static byte[] ConvertMessageToByteArray(int t, byte[] data)
+        public static byte[] ConvertMessageToByteArray(byte t, byte[] data)
         {
             byte[] check = new byte[] { 1, 1, 1, 1 };
             byte[] length = new byte[4];
-            byte[] type = new byte[1];
+            byte[] type = new byte[] { t };
 
             length = BitConverter.GetBytes(data.Length);
-            type = BitConverter.GetBytes(t);
 
             byte[] send = new byte[check.Length + length.Length + type.Length + data.Length];
             int index = 0;
@@ -70,5 +69,7 @@ namespace ClientServerCommunication
 
             return serializedaccept;
         }
+
+        
     }
 }

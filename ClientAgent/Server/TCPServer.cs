@@ -40,19 +40,21 @@ namespace Server
             try
             {
                 this.MyListener.Start();
+                Console.WriteLine("listener started");
 
                 while (true)
                 {
+                    Console.WriteLine("in white true of tcp accept.");
                     TcpClient client = this.MyListener.AcceptTcpClient();
                     Console.WriteLine("Client da :D");
                     Thread clientThread = new Thread(new ParameterizedThreadStart(ClientWorker));
                     clientThread.Start(client);
                 }
             }
-            catch (Exception)
+            catch (Exception e)
             {
 
-                throw;
+                Console.WriteLine("exception at starting listener: " + e.Message);
             }
         }
 
