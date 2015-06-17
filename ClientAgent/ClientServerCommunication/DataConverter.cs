@@ -13,7 +13,7 @@ namespace Server
     {
         public static byte[] ConvertMessageToByteArray(int t, byte[] data)
         {
-            byte[] check = new byte[] { 0, 0, 0, 0 };
+            byte[] check = new byte[] { 1, 1, 1, 1 };
             byte[] length = new byte[4];
             byte[] type = new byte[1];
 

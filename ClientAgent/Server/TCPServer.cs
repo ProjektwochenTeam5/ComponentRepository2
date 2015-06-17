@@ -44,7 +44,7 @@ namespace Server
                 while (true)
                 {
                     TcpClient client = this.MyListener.AcceptTcpClient();
-
+                    Console.WriteLine("Client da :D");
                     Thread clientThread = new Thread(new ParameterizedThreadStart(ClientWorker));
                     clientThread.Start(client);
                 }
