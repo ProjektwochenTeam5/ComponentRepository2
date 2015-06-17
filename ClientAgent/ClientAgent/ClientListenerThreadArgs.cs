@@ -19,7 +19,7 @@ namespace ClientAgent
         public ClientListenerThreadArgs(Client c)
             : base()
         {
-
+            this.Client = c;
         }
 
         /// <summary>
