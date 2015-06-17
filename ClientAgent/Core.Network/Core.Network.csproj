@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{393A9EFB-A0E6-41A7-A5D2-6D44FB8DDDF0}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{B1B4B865-F61C-4ED7-93EC-01C6339A82B6}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClientAgent</RootNamespace>
-    <AssemblyName>ClientAgent</AssemblyName>
+    <RootNamespace>Core.Network</RootNamespace>
+    <AssemblyName>Core.Network</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,15 +39,26 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
-    <Compile Include="ClientListenerThreadArgs.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Messages\AssemblyRequest.cs" />
+    <Compile Include="ClientInfo.cs" />
+    <Compile Include="Enums\ClientState.cs" />
+    <Compile Include="Messages\ClientUpdateRequest.cs" />
+    <Compile Include="Messages\ClientUpdateResponse.cs" />
+    <Compile Include="Component.cs" />
+    <Compile Include="ComponentEdge.cs" />
+    <Compile Include="Messages\ComponentSubmitRequest.cs" />
+    <Compile Include="Messages\ComponentSubmitResponse.cs" />
+    <Compile Include="Messages\JobRequest.cs" />
+    <Compile Include="Messages\JobResultRequest.cs" />
+    <Compile Include="Messages\JobResponse.cs" />
+    <Compile Include="Messages\JobResultResponse.cs" />
+    <Compile Include="Enums\JobState.cs" />
+    <Compile Include="Messages\KeepAliveRequest.cs" />
+    <Compile Include="Messages\KeepAliveResponse.cs" />
+    <Compile Include="Messages\LogonRequest.cs" />
+    <Compile Include="Messages\LogonResponse.cs" />
+    <Compile Include="Enums\MessageCode.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ThreadArgs.cs" />
-    <Compile Include="UdpClientThreadArgs.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
