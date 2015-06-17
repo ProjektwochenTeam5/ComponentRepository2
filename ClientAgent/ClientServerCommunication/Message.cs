@@ -9,6 +9,6 @@ namespace ClientServerCommunication
     [Serializable]
     public abstract class Message
     {
-        public int MessageID { get; set; }
+        public StatusCode MessageID { get; set; }
     }
 }
