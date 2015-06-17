@@ -42,7 +42,6 @@
     <Compile Include="Acknowledge.cs" />
     <Compile Include="AgentAccept.cs" />
     <Compile Include="AgentDiscover.cs" />
-    <Compile Include="ClientDisconnect.cs" />
     <Compile Include="DataConverter.cs" />
     <Compile Include="DoJobRequest.cs" />
     <Compile Include="StatusCode.cs" />

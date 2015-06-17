@@ -22,7 +22,13 @@ namespace ClientServerCommunication
             this.MessageID = nextID++;
         }
 
-        public StatusCode MessageType { get; set; }
+        /// <summary>
+        /// Gets the message type of the message.
+        /// </summary>
+        /// <value>
+        ///     Contains the message type of the message.
+        /// </value>
+        public abstract StatusCode MessageType { get; }
 
         /// <summary>
         /// Gets the message's ID.

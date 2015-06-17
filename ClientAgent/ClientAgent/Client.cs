@@ -3,6 +3,7 @@ namespace ClientAgent
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
     using System.Net;
     using System.Net.Sockets;
@@ -272,6 +273,10 @@ namespace ClientAgent
         {
             ClientListenerThreadArgs args = (ClientListenerThreadArgs)data;
             DateTime lastKeepAlive = DateTime.Now;
+            PerformanceCounter cpu = new PerformanceCounter();
+            cpu.CategoryName = "Processor";
+            cpu.CounterName = "% Processor Time";
+            cpu.InstanceName = "_Total";
 
             while (!args.Stopped)
             {
@@ -279,14 +284,14 @@ namespace ClientAgent
                 {
                     // keep alive
                     lastKeepAlive = DateTime.Now;
-                    args.Client.SendMessage(new KeepAlive(), 0);
+                    args.Client.SendMessage(new KeepAlive() { CPUWorkload = cpu.NextValue() }, 0);
                 }
 
                 Thread.Sleep(5);
             }
 
             args.Client.Disconnect();
-        }
+        } 
 
         /// <summary>
         /// Sends a UDP broadcast message indicating that the client searches for a server.
