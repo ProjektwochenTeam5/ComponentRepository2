@@ -4,13 +4,10 @@ namespace ClientAgent
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Runtime.Serialization.Formatters.Binary;
-    using System.Text;
     using System.Threading;
-
     using ClientServerCommunication;
 
     /// <summary>
@@ -52,6 +49,7 @@ namespace ClientAgent
         public Client(TcpClient cl)
         {
             this.ConnectionClient = cl;
+            this.Connected += this.Client_Connected;
         }
 
         /// <summary>
@@ -136,11 +134,28 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// Stops the server connection.
+        /// Disconnects from the server.
         /// </summary>
-        public void StopConnection()
+        public void Disconnect()
         {
+            this.SendMessage(new KeepAlive() { Terminate = true }, StatusCode.KeepAlive);
             this.ConnectionClient.Close();
+        }
+
+        /// <summary>
+        /// Stops all activity of the client.
+        /// </summary>
+        public void StopAll()
+        {
+            if (this.listenerThreadArgs != null)
+            {
+                this.listenerThreadArgs.Stop();
+            }
+
+            if (this.udpListenerThreadArgs != null)
+            {
+                this.udpListenerThreadArgs.Stop();
+            }
         }
 
         /// <summary>
@@ -152,7 +167,7 @@ namespace ClientAgent
         /// <param name="messageType">
         ///     The type code of the sent message.
         /// </param>
-        public void SendMessage(Message msg, byte messageType)
+        public void SendMessage(Message msg, StatusCode messageType)
         {
             MemoryStream ms = new MemoryStream();
             this.formatter.Serialize(ms, msg);
@@ -166,7 +181,7 @@ namespace ClientAgent
             b1000000 = (byte)((length / 0x1000000) % 0x100);
 
             List<byte> mes = new List<byte>();
-            mes.AddRange(new byte[] { 0, 0, 0, 0, b1000000, b10000, b100, b1, messageType });
+            mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)messageType });
             mes.AddRange(ms.ToArray());
 
             this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
@@ -200,7 +215,7 @@ namespace ClientAgent
 
             while (!args.Stopped)
             {
-                if (DateTime.Now.Subtract(lastSend).TotalSeconds > 10)
+                if (DateTime.Now.Subtract(lastSend).TotalSeconds > 5)
                 {
                     args.Client.SendDiscover(args.UdpClient);
                     lastSend = DateTime.Now;
@@ -210,14 +225,12 @@ namespace ClientAgent
                 {
                     byte[] msg = args.UdpClient.Receive(ref localRcv);
 
-                    
-
                     if (!(msg[0] == 1 && msg[1] == 1 && msg[2] == 1 && msg[3] == 1))
                     {
                         continue;
                     }
 
-                    int length = msg[4] + msg[5] * 0x100 + msg[6] * 0x10000 + msg[7] * 0x1000000;
+                    int length = msg[4] + (msg[5] * 0x100) + (msg[6] * 0x10000) + (msg[7] * 0x1000000);
                     byte type = msg[8];
 
                     if (type != 1)
@@ -233,7 +246,6 @@ namespace ClientAgent
                         body[n - 9] = msg[n];
                     }
                     
-
                     MemoryStream ms = new MemoryStream(body, false);
                     BinaryFormatter f = new BinaryFormatter();
                     
@@ -241,6 +253,9 @@ namespace ClientAgent
                     
                     Console.WriteLine(a.ServerIP);
                     args.Stop();
+                    Console.WriteLine("Trying to connect...");
+                    args.Client.ConnectTo(a.ServerIP);
+                    Console.WriteLine("Connected");
                 }
 
                 Thread.Sleep(10);
@@ -262,17 +277,15 @@ namespace ClientAgent
             {
                 if (lastKeepAlive.Subtract(DateTime.Now).TotalSeconds >= 10)
                 {
+                    // keep alive
                     lastKeepAlive = DateTime.Now;
-
                     args.Client.SendMessage(new KeepAlive(), 0);
                 }
 
                 Thread.Sleep(5);
             }
 
-            args.Client.SendMessage(new KeepAlive(), 0);
-
-            args.Client.ConnectionClient.Close();
+            args.Client.Disconnect();
         }
 
         /// <summary>
@@ -287,6 +300,19 @@ namespace ClientAgent
             msg.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 1 });
 
             cl.Send(msg.ToArray(), msg.Count, new IPEndPoint(IPAddress.Broadcast, 1234));
+        }
+
+        /// <summary>
+        /// Called when the client has connected.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
+        private void Client_Connected(object sender, EventArgs e)
+        {
         }
     }
 }
