@@ -24,6 +24,8 @@ namespace Server
             RecBroadcast b = new RecBroadcast();
             Task t = new Task(new Action(() => b.Recieve()));
             t.Start();
+
+            Console.ReadKey();
         }
     }
 }
