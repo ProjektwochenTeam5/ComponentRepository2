@@ -49,7 +49,6 @@ namespace Server
 
                 while (true)
                 {
-                    Console.WriteLine("in white true of tcp accept.");
                     TcpClient client = this.MyListener.AcceptTcpClient();
                     Console.WriteLine("Client da :D");
                     Thread clientThread = new Thread(new ParameterizedThreadStart(ClientWorker));
@@ -91,6 +90,7 @@ namespace Server
                         byte[] buffer = new byte[1024];
 
                         int recievedbytes = ns.Read(buffer, 0, buffer.Length);
+                        Console.WriteLine(recievedbytes + " bytes empfangen");
 
                         if (body == null)
                         {
@@ -111,7 +111,15 @@ namespace Server
                                 index++;
                             }
 
-                            continue;
+                            if (recievedbytes == buffer.Length)
+                            {
+                                continue;
+                            }
+                            else
+                            {
+                                this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
+                                break;
+                            }
                         }
 
                         for (int i = 0; i < recievedbytes; i++)

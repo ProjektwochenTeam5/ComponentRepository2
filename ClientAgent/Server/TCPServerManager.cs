@@ -1,5 +1,6 @@
 ﻿namespace Server
 {
+    using ClientServerCommunication;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -10,10 +11,19 @@
     {
         public TCPServer MyTCPServer { get; set; }
 
+        public Dictionary<Guid, double> CPULoads { get; set; }
+
+        public double AllClientLoad { get; set; }
+
         public TCPServerManager()
         {
             this.MyTCPServer = new TCPServer();
-            this.MyTCPServer.OnMessageRecieved += MyTCPServer_OnMessageRecieved;
+            this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
+        }
+
+        public void RunMyServer()
+        {
+            this.MyTCPServer.Run();
         }
 
         void MyTCPServer_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
@@ -21,6 +31,8 @@
             switch (e.MessageType)
             {
                 case ClientServerCommunication.StatusCode.KeepAlive:
+                    KeepAlive keepAlive = DataConverter.ConvertByteArrrayToKeepAlive(e.MessageBody);
+                    this.CalculateClientLoads(keepAlive);
                     break;
                 case ClientServerCommunication.StatusCode.AgentConnection:
                     break;
@@ -41,6 +53,11 @@
                 default:
                     break;
             }
+        }
+
+        private void CalculateClientLoads(KeepAlive keepAlive)
+        {
+            Console.WriteLine("Keep alive empfangen");
         }
     }
 }
