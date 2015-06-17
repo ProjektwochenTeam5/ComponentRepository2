@@ -42,6 +42,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="DataConverter.cs" />
+    <Compile Include="MessageManager.cs" />
     <Compile Include="MessageRecievedEventArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -55,6 +56,14 @@
     <ProjectReference Include="..\ClientServerCommunication\ClientServerCommunication.csproj">
       <Project>{7e87af0b-6fd2-438d-a795-a6b7d6194cd8}</Project>
       <Name>ClientServerCommunication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.Component\Core.Component.csproj">
+      <Project>{3cbff49b-e085-49af-8aa5-e3bab177b179}</Project>
+      <Name>Core.Component</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.Network\Core.Network.csproj">
+      <Project>{b1b4b865-f61c-4ed7-93ec-01c6339a82b6}</Project>
+      <Name>Core.Network</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

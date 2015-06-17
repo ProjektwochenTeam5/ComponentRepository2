@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace ClientServerCommunication
 {
     [Serializable]
-    public class ComponentResult : Message
+    public class TransferJobResponse : Message
     {
         public ComponentInfo Type { get; set; }
 

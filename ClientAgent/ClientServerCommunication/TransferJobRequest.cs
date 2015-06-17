@@ -7,8 +7,12 @@ using System.Threading.Tasks;
 namespace ClientServerCommunication
 {
     [Serializable]
-    public class FetchComponent : Message
+    public class TransferJobRequest : Message
     {
-        public Guid ComponentID { get; set; }
+        public byte[] Job { get; set; }
+
+        public Guid ServerID { get; set; }
+
+        public Guid ClientID { get; set; }
     }
 }

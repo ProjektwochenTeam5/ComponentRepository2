@@ -22,10 +22,26 @@ namespace Server
         public static void Main(string[] args)
         {
             RecBroadcast b = new RecBroadcast();
-            Task t = new Task(new Action(() => b.Recieve()));
-            t.Start();
+            Task udpTask = new Task(new Action(() => b.Recieve()));
+            udpTask.Start();
+
+            TCPServer tcp = new TCPServer();
+            tcp.OnMessageRecieved += tcp_OnMessageRecieved;
+            Task tcpTask = new Task(new Action(() => tcp.Run()));
+            tcpTask.Start();
 
             Console.ReadKey();
+        }
+
+        static void tcp_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
+        {
+            switch (e.MessageType)
+            {
+                case 0:
+                    break;
+                case 3:
+                    break;
+            }
         }
     }
 }

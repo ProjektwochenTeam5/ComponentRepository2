@@ -16,6 +16,7 @@ namespace Server
     using System.Threading;
     using System.Threading.Tasks;
     using ClientServerCommunication;
+    using Core.Network;
 
     /// <summary>
     /// Represnets the TCPServer class.
@@ -24,14 +25,14 @@ namespace Server
     {
         public TcpListener MyListener { get; set; }
 
-        public List<TcpClient> Clients { get; set; }
+        public Dictionary<ClientInfo, TcpClient> Clients { get; set; }
 
         public event EventHandler<MessageRecievedEventArgs> OnMessageRecieved;
 
         public TCPServer()
         {
             this.MyListener = new TcpListener(IPAddress.Any, 12345);
-            this.Clients = new List<TcpClient>();
+            this.Clients = new Dictionary<ClientInfo, TcpClient>();
         }
 
         public void Run()
@@ -58,7 +59,12 @@ namespace Server
         private void ClientWorker(object obj)
         {
             TcpClient client = (TcpClient)obj;
-            this.Clients.Add(client);
+            ClientInfo clientInfo = new ClientInfo();
+            clientInfo.ClientGuid = new Guid();
+            clientInfo.IpAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
+            clientInfo.FriendlyName = "Markus";
+            this.Clients.Add(clientInfo, client);
+
             NetworkStream ns = client.GetStream();
 
             this.SendAckToClient(ns, 3);
@@ -108,7 +114,7 @@ namespace Server
 
                         if (index >= body.Length)
                         {
-                            this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (int)messagetype));
+                            this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (int)messagetype, clientInfo));
                             break;
                         }
                     }

@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace ClientServerCommunication
 {
     [Serializable]
-    public class TransferComponent : Message
+    public class TransferComponentRequest : Message
     {
-        public byte[] Component { get; set; }
+        public Guid ComponentID { get; set; }
     }
 }
