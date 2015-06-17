@@ -16,6 +16,7 @@ namespace Server
     using System.Net.Sockets;
     using System.Reflection;
     using System.Threading.Tasks;
+    using ClientServerCommunication;
 
     public class Program
     {
@@ -26,35 +27,13 @@ namespace Server
             udpTask.Start();
 
             TCPServer tcp = new TCPServer();
-            tcp.OnMessageRecieved += tcp_OnMessageRecieved;
             Task tcpTask = new Task(new Action(() => tcp.Run()));
             tcpTask.Start();
 
             Console.ReadLine();
-        }
 
-        static void tcp_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
-        {
-            switch (e.MessageType)
-            {
-                    
-                case 0:
-                    
-                    MessageManager.KeepAlive(e);
-                    break;
-                case 1:
-                    break;
-                case 4:
-                    break;
-                case 5:
-                    break;
-                case 7:
-                    break;
-                case 8:
-                    break;
-                case 9:
-                    break;
-            }
+
+
         }
     }
 }

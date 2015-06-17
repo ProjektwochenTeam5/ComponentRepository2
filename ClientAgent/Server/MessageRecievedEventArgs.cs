@@ -1,4 +1,5 @@
-﻿using Core.Network;
+﻿using ClientServerCommunication;
+using Core.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +10,7 @@ namespace Server
 {
     public class MessageRecievedEventArgs : EventArgs
     {
-        public MessageRecievedEventArgs(byte[] message, int messagetype, ClientInfo info)
+        public MessageRecievedEventArgs(byte[] message, StatusCode messagetype, ClientInfo info)
         {
             this.MessageBody = message;
             this.MessageType = messagetype;
@@ -18,7 +19,7 @@ namespace Server
 
         public byte[] MessageBody { get; set; }
 
-        public int MessageType { get; set; }
+        public StatusCode MessageType { get; set; }
 
         public ClientInfo Info { get; set; }
     }

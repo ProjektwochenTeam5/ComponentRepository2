@@ -35,6 +35,11 @@ namespace Server
             this.Clients = new Dictionary<ClientInfo, TcpClient>();
         }
 
+        void MessageManager_OnClientWantsToQuit(object sender, ClientTerminatedEventArgs e)
+        {
+            this.Clients.Remove(e.ClientWhoWantsToQuit);
+        }
+
         public void Run()
         {
             try
@@ -48,6 +53,7 @@ namespace Server
                     TcpClient client = this.MyListener.AcceptTcpClient();
                     Console.WriteLine("Client da :D");
                     Thread clientThread = new Thread(new ParameterizedThreadStart(ClientWorker));
+                    clientThread.IsBackground = true;
                     clientThread.Start(client);
                 }
             }
@@ -69,7 +75,7 @@ namespace Server
 
             NetworkStream ns = client.GetStream();
 
-            this.SendAckToClient(ns, 3);
+            this.SendAckToClient(ns);
 
             while (true)
             {
@@ -116,7 +122,7 @@ namespace Server
 
                         if (index >= body.Length)
                         {
-                            this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (int)messagetype, clientInfo));
+                            this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
                             break;
                         }
                     }
@@ -124,10 +130,9 @@ namespace Server
             }
         }
 
-        private void SendAckToClient(NetworkStream ns, int id)
+        private void SendAckToClient(NetworkStream ns)
         {
             Acknowledge ack = new Acknowledge();
-            ack.MessageID = id;
 
             var send = DataConverter.ConvertMessageToByteArray(3, DataConverter.ConvertObjectToByteArray(ack));
 

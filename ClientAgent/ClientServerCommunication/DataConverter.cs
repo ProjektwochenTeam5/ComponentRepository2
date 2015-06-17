@@ -70,6 +70,22 @@ namespace ClientServerCommunication
             return serializedaccept;
         }
 
-        
+        public static KeepAlive ConvertByteArrrayToKeepAlive(byte[] data)
+        {
+            try
+            {
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    var ka = bf.Deserialize(ms);
+                    return ka as KeepAlive;
+                }
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+            
     }
 }
