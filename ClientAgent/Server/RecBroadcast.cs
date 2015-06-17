@@ -60,7 +60,7 @@ namespace Server
             IPEndPoint p = new IPEndPoint(myip, 12345);
             a.ServerIP = p;
             
-            var send = DataConverter.ConvertMessageToByteArray(2, DataConverter.ConvertObjectToByteArray(a));
+            var send = DataConverter.ConvertMessageToByteArray(1, DataConverter.ConvertObjectToByteArray(a));
 
             try
             {

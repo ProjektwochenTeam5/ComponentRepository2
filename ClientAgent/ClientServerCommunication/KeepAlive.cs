@@ -10,5 +10,7 @@ namespace ClientServerCommunication
     public class KeepAlive : Message
     {
         public double CPUWorkload { get; set; }
+
+        public bool Terminate { get; set; }
     }
 }
