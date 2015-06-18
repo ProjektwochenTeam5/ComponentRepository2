@@ -1,11 +1,12 @@
 ﻿namespace Server
 {
     using ClientServerCommunication;
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
+using Core.Network;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
     public class TCPServerManager
     {
@@ -31,25 +32,36 @@
             switch (e.MessageType)
             {
                 case ClientServerCommunication.StatusCode.KeepAlive:
-                    KeepAlive keepAlive = DataConverter.ConvertByteArrrayToKeepAlive(e.MessageBody);
-                    this.CalculateClientLoads(keepAlive);
-                    break;
-                case ClientServerCommunication.StatusCode.AgentConnection:
-                    break;
-                case ClientServerCommunication.StatusCode.Acknowledge:
-                    break;
+                    {
+                        KeepAlive keepAlive = DataConverter.ConvertByteArrrayToKeepAlive(e.MessageBody);
+                        this.CalculateClientLoads(keepAlive);
+                        this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
+                        break;
+                    }
+
                 case ClientServerCommunication.StatusCode.TransferComponent:
                     break;
                 case ClientServerCommunication.StatusCode.TransferJob:
                     break;
-                case ClientServerCommunication.StatusCode.SendComponentInfos:
-                    break;
                 case ClientServerCommunication.StatusCode.DoJobRequest:
                     break;
+
                 case ClientServerCommunication.StatusCode.StorComponent:
-                    break;
-                case ClientServerCommunication.StatusCode.Error:
-                    break;
+                    {
+                        StoreComponent storecomponent = DataConverter.ConvertByteArrayToStoreComponent(e.MessageBody);
+                        DataBaseWrapper db = new DataBaseWrapper();
+                        bool store = db.StoreComponent(storecomponent.Component, e.Info.FriendlyName);
+
+                        if (store)
+                        {
+                            this.MyTCPServer.SendAck(e.Info, storecomponent.MessageID);
+                        }
+                        else
+                        {
+                            this.MyTCPServer.SendError(e.Info, storecomponent.MessageID);
+                        }
+                        break;
+                    }
                 default:
                     break;
             }
@@ -57,7 +69,19 @@
 
         private void CalculateClientLoads(KeepAlive keepAlive)
         {
-            Console.WriteLine("Keep alive empfangen");
+            Console.WriteLine("Keep alive empfangen + terminnate = {0}", keepAlive.Terminate.ToString());
+        }
+
+        private void CheckIfDeleteClientAndDelete(KeepAlive ka, ClientInfo info)
+        {
+            if (ka.Terminate)
+            {
+                this.MyTCPServer.Clients.Remove(info);
+                Console.WriteLine("Client deleted!");
+            }
+            else
+            {
+            }
         }
     }
 }

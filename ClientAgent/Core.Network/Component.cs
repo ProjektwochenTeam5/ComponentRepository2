@@ -19,6 +19,7 @@ namespace Core.Network
     /// Represents a component as viewed by a server.
     /// Can describe an atomic or complex component.
     /// </summary>
+    [Serializable]
     public class Component 
     {
 
@@ -35,16 +36,28 @@ namespace Core.Network
         public string FriendlyName { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of types that describe the input arguments.
+        /// Gets or sets the collection of strings that describe the input argument types.
         /// </summary>
         /// <value>Collection of strings.</value>
         public IEnumerable<string> InputHints { get; set; }
 
         /// <summary>
-        /// Gets or sets the collection of types that describe the output arguments.
+        /// Gets or sets the collection of types that represent the output argument types.
         /// </summary>
         /// <value>Collection of strings.</value>
         public IEnumerable<string> OutputHints { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of strings that describe the input arguments.
+        /// </summary>
+        /// <value>Collection of strings.</value>
+        public IEnumerable<string> InputDescriptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of strings that describe the output arguments.
+        /// </summary>
+        /// <value>Collection of strings.</value>
+        public IEnumerable<string> OutputDescriptions { get; set; }
 
         /// <summary>
         /// Gets or sets a collection of edges which describe the graph.

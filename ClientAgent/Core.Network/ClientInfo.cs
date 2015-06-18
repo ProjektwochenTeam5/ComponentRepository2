@@ -17,6 +17,7 @@ namespace Core.Network
     /// <summary>
     /// Information about a client as viewed by a server.
     /// </summary>
+    [Serializable]
     public class ClientInfo
     {
         /// <summary>

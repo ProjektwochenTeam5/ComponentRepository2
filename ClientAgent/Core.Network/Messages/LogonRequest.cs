@@ -17,6 +17,7 @@ namespace Core.Network
     /// <summary>
     /// Sent when a server goes online to inform the other server about me.
     /// </summary>
+    [Serializable]
     public class LogonRequest 
     {
         /// <summary>

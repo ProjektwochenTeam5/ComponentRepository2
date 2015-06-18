@@ -16,6 +16,7 @@ namespace Core.Network
     /// <summary>
     /// Notify the other servers about an update of a client.
     /// </summary>
+    [Serializable]
     public class ClientUpdateRequest
     {
         /// <summary>

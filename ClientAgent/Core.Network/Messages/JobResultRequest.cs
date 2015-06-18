@@ -17,6 +17,7 @@ namespace Core.Network
     /// <summary>
     /// Sent when a job was completed, failed or could not be executed.
     /// </summary>
+    [Serializable]
     public class JobResultRequest
     {
         /// <summary>

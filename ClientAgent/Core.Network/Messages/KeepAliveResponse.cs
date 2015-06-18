@@ -17,6 +17,7 @@ namespace Core.Network
     /// <summary>
     /// Sent when a keep alive request was received.
     /// </summary>
+    [Serializable]
     public class KeepAliveResponse
     {
         /// <summary>

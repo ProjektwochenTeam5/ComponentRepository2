@@ -16,6 +16,7 @@ namespace Core.Network
     /// <summary>
     /// Confirms a received client update message.
     /// </summary>
+    [Serializable]
     public class ClientUpdateResponse
     {
         /// <summary>

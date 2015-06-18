@@ -16,6 +16,7 @@ namespace Core.Network
     /// <summary>
     /// Sent when a job result message was received.
     /// </summary>
+    [Serializable]
     public class JobResultResponse
     {
         /// <summary>

@@ -17,6 +17,7 @@ namespace Core.Network
     /// <summary>
     /// Sent when a logon request message was received.
     /// </summary>
+    [Serializable]
     public class LogonResponse 
     {
         /// <summary>

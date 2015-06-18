@@ -17,6 +17,7 @@ namespace Server
     using System.Threading.Tasks;
     using ClientServerCommunication;
     using Core.Network;
+    using Core.Component;
 
     /// <summary>
     /// Represnets the TCPServer class.
@@ -24,6 +25,8 @@ namespace Server
     public class TCPServer
     {
         public TcpListener MyListener { get; set; }
+
+        public DataBaseWrapper Wrapper { get; set; }
 
         public Dictionary<ClientInfo, TcpClient> Clients { get; set; }
 
@@ -33,6 +36,7 @@ namespace Server
         {
             this.MyListener = new TcpListener(IPAddress.Any, 12345);
             this.Clients = new Dictionary<ClientInfo, TcpClient>();
+            this.Wrapper = new DataBaseWrapper();
         }
 
         void MessageManager_OnClientWantsToQuit(object sender, ClientTerminatedEventArgs e)
@@ -74,7 +78,8 @@ namespace Server
 
             NetworkStream ns = client.GetStream();
 
-            this.SendAckToClient(ns);
+           // this.SendAckToClient(ns);
+            this.SendComponentInfos(ns);
 
             while (true)
             {
@@ -138,11 +143,67 @@ namespace Server
             }
         }
 
-        private void SendAckToClient(NetworkStream ns)
+        private void SendComponentInfos(NetworkStream ns)
+        {
+            this.Wrapper.GetAssemblies();
+            List<ComponentInfo> comp = new List<ComponentInfo>();
+            List<IComponent> l = new List<IComponent>();
+
+            foreach (var assembly in this.Wrapper.Data)
+            {
+                l.Add(this.Wrapper.ReadComponentInfoFormDll(assembly));
+            }
+
+            foreach (var icomponent in l)
+            {
+                ComponentInfo c = new ComponentInfo();
+                c.ComponentGuid = icomponent.ComponentGuid;
+                c.FriendlyName = icomponent.FriendlyName;
+                c.InputHints = icomponent.InputHints;
+                c.OutputHints = icomponent.OutputHints;
+                comp.Add(c);
+            }
+
+            SendComponentInfos sendcompinfos = new SendComponentInfos();
+            sendcompinfos.MetadataComponents = comp;
+
+            byte[] senddata = DataConverter.ConvertMessageToByteArray(6, DataConverter.ConvertObjectToByteArray(sendcompinfos));
+
+            try
+            {
+                ns.Write(senddata, 0, senddata.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private void SendAckToClient(NetworkStream ns, int belongingmessageid)
         {
             Acknowledge ack = new Acknowledge();
+            ack.BelongsTo = belongingmessageid;
 
             var send = DataConverter.ConvertMessageToByteArray(3, DataConverter.ConvertObjectToByteArray(ack));
+
+            try
+            {
+                ns.Write(send, 0, send.Length);
+                Console.WriteLine("Acknowledge sent to: ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            ns.Flush();
+        }
+
+        private void SendErrorToClient(NetworkStream ns, int belongingmessageid)
+        {
+            Error err = new Error();
+            err.BelongsTo = belongingmessageid;
+            var send = DataConverter.ConvertMessageToByteArray(9, DataConverter.ConvertObjectToByteArray(err));
 
             try
             {
@@ -160,6 +221,22 @@ namespace Server
             {
                 this.OnMessageRecieved(this, e);
             }
+        }
+
+        public void SendAck(ClientInfo clientinfo, int belongingmessageid)
+        {
+            TcpClient client = this.Clients[clientinfo];
+            NetworkStream ns = client.GetStream();
+
+            this.SendAckToClient(ns, belongingmessageid);
+        }
+
+        public void SendError(ClientInfo clientinfo, int belongingmessageid)
+        {
+            TcpClient client = this.Clients[clientinfo];
+            NetworkStream ns = client.GetStream();
+
+            this.SendErrorToClient(ns, belongingmessageid);
         }
 
     }

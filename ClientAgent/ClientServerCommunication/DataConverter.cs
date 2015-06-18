@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Component;
+using Core.Network;
 
 namespace ClientServerCommunication
 {
@@ -72,13 +74,16 @@ namespace ClientServerCommunication
 
         public static KeepAlive ConvertByteArrrayToKeepAlive(byte[] data)
         {
+            KeepAlive ka = null;
+
             try
             {
-                using (MemoryStream ms = new MemoryStream())
+                using (MemoryStream ms = new MemoryStream(data))
                 {
                     BinaryFormatter bf = new BinaryFormatter();
-                    var ka = bf.Deserialize(ms);
-                    return ka as KeepAlive;
+                    ka = (KeepAlive)bf.Deserialize(ms);
+                    return ka;
+
                 }
             }
             catch (Exception)
@@ -86,6 +91,40 @@ namespace ClientServerCommunication
                 return null;
             }
         }
+
+        public static StoreComponent ConvertByteArrayToStoreComponent(byte[] data)
+        {
+            StoreComponent sto = null;
+
+            try
+            {
+                using (MemoryStream ms = new MemoryStream(data))
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    sto = (StoreComponent)bf.Deserialize(ms);
+                    return sto;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
             
+
+        public static Component MabIComponentToNetworkComponent(IComponent comp)
+        {
+            Component c = new Component();
+            c.IsAtomic = true;
+            c.FriendlyName = comp.FriendlyName;
+            c.ComponentGuid = comp.ComponentGuid;
+            c.InputDescriptions = comp.InputDescriptions;
+            c.OutputDescriptions = comp.OutputDescriptions;
+            c.InputHints = comp.InputHints;
+            c.OutputHints = comp.OutputHints;
+
+            return c;
+        }
     }
 }

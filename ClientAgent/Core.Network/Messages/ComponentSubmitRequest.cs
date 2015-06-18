@@ -18,6 +18,7 @@ namespace Core.Network
     /// <summary>
     /// Notify the other servers about a new component.
     /// </summary>
+    [Serializable]
     public class ComponentSubmitRequest 
     {
         /// <summary>
