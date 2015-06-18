@@ -13,14 +13,15 @@ namespace Server
 {
     public class RecBroadcast
     {
-        public int UdpClientPort { get { return 1234; } }
+        public int UdpClientPort { get { return 1233; } }
 
         public void Recieve()
         {
 
             bool done = false;
-            UdpClient client = new UdpClient(this.UdpClientPort);
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, this.UdpClientPort);
+            UdpClient client = new UdpClient(groupEP);
+            client.EnableBroadcast = true;
 
             try
             {
@@ -33,8 +34,8 @@ namespace Server
 
 
                     //// TODO: Check if Messagetype == 1
-
                     //////// Send IP Back - store client
+                    groupEP.Port = 1234;
                     this.SendIP(groupEP, client);
                 }
             }

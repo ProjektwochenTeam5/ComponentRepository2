@@ -32,10 +32,12 @@ using System.Threading.Tasks;
             switch (e.MessageType)
             {
                 case ClientServerCommunication.StatusCode.KeepAlive:
-                    KeepAlive keepAlive = DataConverter.ConvertByteArrrayToKeepAlive(e.MessageBody);
-                    this.CalculateClientLoads(keepAlive);
-                    this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
-                    break;
+                    {
+                        KeepAlive keepAlive = DataConverter.ConvertByteArrrayToKeepAlive(e.MessageBody);
+                        this.CalculateClientLoads(keepAlive);
+                        this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
+                        break;
+                    }
 
                 case ClientServerCommunication.StatusCode.AgentConnection:
                     break;
@@ -50,7 +52,12 @@ using System.Threading.Tasks;
                 case ClientServerCommunication.StatusCode.DoJobRequest:
                     break;
                 case ClientServerCommunication.StatusCode.StorComponent:
-                    break;
+                    {
+                        StoreComponent storecomponent = DataConverter.ConvertByteArrayToStoreComponent(e.MessageBody);
+                        DataBaseWrapper db = new DataBaseWrapper();
+                        db.StoreComponent(storecomponent.Component);
+                        break;
+                    }
                 case ClientServerCommunication.StatusCode.Error:
                     break;
                 default:

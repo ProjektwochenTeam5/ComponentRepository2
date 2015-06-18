@@ -89,6 +89,26 @@ namespace ClientServerCommunication
                 return null;
             }
         }
+
+        public static StoreComponent ConvertByteArrayToStoreComponent(byte[] data)
+        {
+            StoreComponent sto = null;
+
+            try
+            {
+                using (MemoryStream ms = new MemoryStream(data))
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    sto = (StoreComponent)bf.Deserialize(ms);
+                    return sto;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
             
     }
 }

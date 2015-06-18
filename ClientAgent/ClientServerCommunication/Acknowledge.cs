@@ -19,5 +19,7 @@ namespace ClientServerCommunication
         {
             get { return StatusCode.Acknowledge; }
         }
+
+        public int BelongsTo { get; set; }
     }
 }

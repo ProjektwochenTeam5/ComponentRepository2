@@ -29,16 +29,24 @@ using System.Threading.Tasks;
 
         public IComponent ReadComponentInfoFormDll(Assembly dll)
         {
-            Type[] t = dll.GetTypes();
             Type componentInfo = null;
 
             var result = from type in dll.GetTypes()
                           where typeof(IComponent).IsAssignableFrom(type)
                           select type;
+
             componentInfo = result.Single();
 
             IComponent comp = (IComponent)Activator.CreateInstance(componentInfo);
             return comp;
+        }
+
+        public bool StoreComponent(byte[] dll)
+        {
+            using (FileShare)
+            {
+                
+            }
         }
     }
 }
