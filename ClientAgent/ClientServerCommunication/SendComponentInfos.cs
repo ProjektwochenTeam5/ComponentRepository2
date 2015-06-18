@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Network;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace ClientServerCommunication
     [Serializable]
     public class SendComponentInfos : Message
     {
-        public ICollection<ComponentInfo> MetadataComponents { get; set; }
+        public ICollection<Component> MetadataComponents { get; set; }
 
         /// <summary>
         /// Gets the message type of the message.

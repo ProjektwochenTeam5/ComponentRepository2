@@ -22,6 +22,10 @@ using System.Threading.Tasks;
 
             foreach (var dll in Directory.GetFiles(this.StorePath, "*dll"))
             {
+                if (Path.GetFileName(dll) == "Core.Component.dll")
+                {
+                    continue;
+                }
                 this.Data.Add(Assembly.LoadFile(dll));
             }
 
