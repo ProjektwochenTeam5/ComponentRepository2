@@ -21,6 +21,7 @@ namespace Core.Network
     /// </summary>
     public class Component 
     {
+
         /// <summary>
         /// Gets or sets the unique identifier of the component.
         /// </summary>

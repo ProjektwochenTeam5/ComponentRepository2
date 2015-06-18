@@ -42,10 +42,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClientTerminatedEventArgs.cs" />
+    <Compile Include="ExtendedComponentEdge.cs" />
     <Compile Include="MessageRecievedEventArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecBroadcast.cs" />
+    <Compile Include="ServerBroadcast.cs" />
+    <Compile Include="ServerReceiver.cs" />
+    <Compile Include="SplitJob.cs" />
     <Compile Include="TCPServer.cs" />
     <Compile Include="TCPServerManager.cs" />
   </ItemGroup>

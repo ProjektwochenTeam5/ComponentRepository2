@@ -30,6 +30,15 @@ namespace Server
             Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
             tcpTask.Start();
 
+            //ServerBroadcast serverBroadcast = new ServerBroadcast();
+            //Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());
+            //serverBroadcastTask.Start();
+
+            //ServerReceiver serverReceiver = new ServerReceiver();
+            //Task serverReceiverTask = new Task(() => serverReceiver.StartReceiving());
+            //serverReceiverTask.Start();
+
+
 
             Console.ReadLine();
         }
