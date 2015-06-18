@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Component", "Core.Comp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Network", "Core.Network\Core.Network.csproj", "{B1B4B865-F61C-4ED7-93EC-01C6339A82B6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Add", "\\thomas11\studenten\95036\Desktop\Add\Add\Add.csproj", "{E8EEFF23-9797-464D-9406-50E5E548DF25}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{B1B4B865-F61C-4ED7-93EC-01C6339A82B6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1B4B865-F61C-4ED7-93EC-01C6339A82B6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1B4B865-F61C-4ED7-93EC-01C6339A82B6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E8EEFF23-9797-464D-9406-50E5E548DF25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8EEFF23-9797-464D-9406-50E5E548DF25}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8EEFF23-9797-464D-9406-50E5E548DF25}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8EEFF23-9797-464D-9406-50E5E548DF25}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
