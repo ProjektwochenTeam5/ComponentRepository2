@@ -1,15 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace ClientAgent
 {
+    using System.Net;
+    using System.Net.Sockets;
+
+    /// <summary>
+    /// Provides a method for boadcsting messages.
+    /// </summary>
     public static class UdpBroadcast
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="port"></param>
+        /// <param name="data"></param>
         public static void SendBoadcast(int port, byte[] data)
         {
             byte current = 1;

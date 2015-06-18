@@ -12,6 +12,7 @@ namespace ClientAgent
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Threading;
     using ClientServerCommunication;
+    using Core.Network;
 
     /// <summary>
     /// Provides an abstract view on a client.
@@ -120,7 +121,7 @@ namespace ClientAgent
         private void ReceivedSendComponentInfos(MessageReceivedEventArgs e)
         {
             SendComponentInfos m = (SendComponentInfos)e.ReceivedMessage;
-            foreach (ComponentInfo c in m.MetadataComponents)
+            foreach (Component c in m.MetadataComponents)
             {
                 Console.WriteLine(c.FriendlyName);
             }

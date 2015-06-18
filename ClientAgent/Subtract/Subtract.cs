@@ -8,6 +8,7 @@ using Core.Component;
 
 namespace Subtract
 {
+    [Serializable]
     public class Subtract
         : IComponent
     {
