@@ -26,14 +26,12 @@ namespace Server
             Task udpTask = new Task(new Action(() => b.Recieve()));
             udpTask.Start();
 
-            TCPServer tcp = new TCPServer();
-            Task tcpTask = new Task(new Action(() => tcp.Run()));
+            TCPServerManager tcpservermanager = new TCPServerManager();
+            Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
             tcpTask.Start();
 
+
             Console.ReadLine();
-
-
-
         }
     }
 }
