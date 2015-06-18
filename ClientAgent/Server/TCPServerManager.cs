@@ -39,18 +39,13 @@ using System.Threading.Tasks;
                         break;
                     }
 
-                case ClientServerCommunication.StatusCode.AgentConnection:
-                    break;
-                case ClientServerCommunication.StatusCode.Acknowledge:
-                    break;
                 case ClientServerCommunication.StatusCode.TransferComponent:
                     break;
                 case ClientServerCommunication.StatusCode.TransferJob:
                     break;
-                case ClientServerCommunication.StatusCode.SendComponentInfos:
-                    break;
                 case ClientServerCommunication.StatusCode.DoJobRequest:
                     break;
+
                 case ClientServerCommunication.StatusCode.StorComponent:
                     {
                         StoreComponent storecomponent = DataConverter.ConvertByteArrayToStoreComponent(e.MessageBody);
@@ -59,16 +54,14 @@ using System.Threading.Tasks;
 
                         if (store)
                         {
-                            this.MyTCPServer.SendAck(e.Info);
+                            this.MyTCPServer.SendAck(e.Info, storecomponent.MessageID);
                         }
                         else
                         {
-                            this.MyTCPServer.SendError(e.Info);
+                            this.MyTCPServer.SendError(e.Info, storecomponent.MessageID);
                         }
                         break;
                     }
-                case ClientServerCommunication.StatusCode.Error:
-                    break;
                 default:
                     break;
             }
