@@ -9,5 +9,6 @@ namespace ClientServerCommunication
     [Serializable]
     public class ComponentInfo
     {
+
     }
 }
