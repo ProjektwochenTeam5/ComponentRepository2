@@ -79,7 +79,7 @@ namespace Server
             NetworkStream ns = client.GetStream();
 
            // this.SendAckToClient(ns);
-            this.SendComponentInfos(ns);
+         //   this.SendComponentInfos(ns);
 
             while (true)
             {
@@ -188,6 +188,25 @@ namespace Server
             try
             {
                 ns.Write(send, 0, send.Length);
+                Console.WriteLine("Acknowledge sent to: ");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            ns.Flush();
+        }
+
+        private void SendErrorToClient(NetworkStream ns)
+        {
+            Error err = new Error();
+
+            var send = DataConverter.ConvertMessageToByteArray(9, DataConverter.ConvertObjectToByteArray(err));
+
+            try
+            {
+                ns.Write(send, 0, send.Length);
             }
             catch (Exception ex)
             {
@@ -203,7 +222,21 @@ namespace Server
             }
         }
 
-        
+        public void SendAck(ClientInfo clientinfo)
+        {
+            TcpClient client = this.Clients[clientinfo];
+            NetworkStream ns = client.GetStream();
+
+            this.SendAckToClient(ns);
+        }
+
+        public void SendError(ClientInfo clientinfo)
+        {
+            TcpClient client = this.Clients[clientinfo];
+            NetworkStream ns = client.GetStream();
+
+            this.SendErrorToClient(ns);
+        }
 
     }
 }

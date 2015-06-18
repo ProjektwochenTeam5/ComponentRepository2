@@ -21,5 +21,7 @@ namespace ClientServerCommunication
         {
             get { return StatusCode.Error; }
         }
+
+        public int BelongsTo { get; set; }
     }
 }

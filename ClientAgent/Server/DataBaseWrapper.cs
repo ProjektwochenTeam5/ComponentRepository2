@@ -41,12 +41,30 @@ using System.Threading.Tasks;
             return comp;
         }
 
-        public bool StoreComponent(byte[] dll)
+        public bool StoreComponent(byte[] dll, string filename)
         {
-            using (FileShare)
+            try
             {
-                
+                System.IO.FileStream fs=
+                   new System.IO.FileStream(this.StorePath + "\\" + filename + ".dll", System.IO.FileMode.Create,
+                                            System.IO.FileAccess.Write);
+
+                fs.Write(dll, 0, dll.Length);
+
+                // close file stream
+                fs.Close();
+
+                return true;
             }
+            catch (Exception e)
+            {
+                // Error
+                Console.WriteLine("Exception caught in process: {0}",
+                                  e.ToString());
+            }
+
+            // error occured, return false
+            return false;
         }
     }
 }

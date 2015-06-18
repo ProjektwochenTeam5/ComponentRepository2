@@ -55,7 +55,16 @@ using System.Threading.Tasks;
                     {
                         StoreComponent storecomponent = DataConverter.ConvertByteArrayToStoreComponent(e.MessageBody);
                         DataBaseWrapper db = new DataBaseWrapper();
-                        db.StoreComponent(storecomponent.Component);
+                        bool store = db.StoreComponent(storecomponent.Component, e.Info.FriendlyName);
+
+                        if (store)
+                        {
+                            this.MyTCPServer.SendAck(e.Info);
+                        }
+                        else
+                        {
+                            this.MyTCPServer.SendError(e.Info);
+                        }
                         break;
                     }
                 case ClientServerCommunication.StatusCode.Error:
