@@ -148,8 +148,6 @@ namespace ClientAgent
             }
 
             this.waitingMessages.Remove(snd);
-
-            
         }
 
         /// <summary>
@@ -456,10 +454,10 @@ namespace ClientAgent
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
 
-            StoreComponent s = new StoreComponent();
+            /*StoreComponent s = new StoreComponent();
             args.Client.waitingMessages.Add(s);
             s.Component = File.ReadAllBytes("Add.dll");
-            args.Client.SendMessage(s, StatusCode.StorComponent);
+            args.Client.SendMessage(s, StatusCode.StorComponent);*/
 
             while (!args.Stopped)
             {
