@@ -43,6 +43,8 @@
   <ItemGroup>
     <Compile Include="Client.cs" />
     <Compile Include="ClientListenerThreadArgs.cs" />
+    <Compile Include="ClientMessageManager.cs" />
+    <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ThreadArgs.cs" />

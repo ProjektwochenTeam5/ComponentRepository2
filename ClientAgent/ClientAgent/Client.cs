@@ -51,6 +51,7 @@ namespace ClientAgent
         {
             this.ConnectionClient = cl;
             this.Connected += this.Client_Connected;
+            this.formatter = new BinaryFormatter();
         }
 
         /// <summary>
@@ -59,16 +60,14 @@ namespace ClientAgent
         public event EventHandler Connected;
 
         /// <summary>
-        /// Gets the <see cref="System.Net.Sockets.TcpClient"/> instance linked to the client.
+        /// Raised when the client has or was disconnected.
         /// </summary>
-        /// <value>
-        ///     Contains the <see cref="System.Net.Sockets.TcpClient"/> instance linked to the client.
-        /// </value>
-        public TcpClient ConnectionClient
-        {
-            get;
-            private set;
-        }
+        public event EventHandler Disconnected;
+
+        /// <summary>
+        /// Raised when the client received a TCP message.
+        /// </summary>
+        public event EventHandler<MessageReceivedEventArgs> ReceivedTCPMessage;
 
         /// <summary>
         /// Gets a value indicating whether the client is connected.
@@ -82,6 +81,18 @@ namespace ClientAgent
             {
                 return this.ConnectionClient.Connected;
             }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="System.Net.Sockets.TcpClient"/> instance linked to the client.
+        /// </summary>
+        /// <value>
+        ///     Contains the <see cref="System.Net.Sockets.TcpClient"/> instance linked to the client.
+        /// </value>
+        protected TcpClient ConnectionClient
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -182,7 +193,7 @@ namespace ClientAgent
             b1000000 = (byte)((length / 0x1000000) % 0x100);
 
             List<byte> mes = new List<byte>();
-            mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)messageType });
+            mes.AddRange(new byte[] { 0, 0, 0, 0, b1000000, b10000, b100, b1, (byte)messageType });
             mes.AddRange(ms.ToArray());
 
             this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
@@ -272,7 +283,7 @@ namespace ClientAgent
         private static void ListenerThread(object data)
         {
             ClientListenerThreadArgs args = (ClientListenerThreadArgs)data;
-            DateTime lastKeepAlive = DateTime.Now;
+            DateTime lastKeepAlive = new DateTime(0);
             PerformanceCounter cpu = new PerformanceCounter();
             cpu.CategoryName = "Processor";
             cpu.CounterName = "% Processor Time";
@@ -280,9 +291,10 @@ namespace ClientAgent
 
             while (!args.Stopped)
             {
-                if (lastKeepAlive.Subtract(DateTime.Now).TotalSeconds >= 10)
+                // send keep alive
+                if (DateTime.Now.Subtract(lastKeepAlive).TotalSeconds >= 10)
                 {
-                    // keep alive
+                    Console.WriteLine("Keep Alive {0}", DateTime.Now);
                     lastKeepAlive = DateTime.Now;
                     args.Client.SendMessage(new KeepAlive() { CPUWorkload = cpu.NextValue() }, 0);
                 }
@@ -318,6 +330,9 @@ namespace ClientAgent
         /// </param>
         private void Client_Connected(object sender, EventArgs e)
         {
+            this.listenerThread = new Thread(ListenerThread);
+            this.listenerThreadArgs = new ClientListenerThreadArgs(this);
+            this.listenerThread.Start(this.listenerThreadArgs);
         }
     }
 }
