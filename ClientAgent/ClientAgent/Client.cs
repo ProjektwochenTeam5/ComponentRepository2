@@ -84,6 +84,18 @@ namespace ClientAgent
         }
 
         /// <summary>
+        /// Gets the IP end point of the connected end point.
+        /// </summary>
+        /// <value>
+        ///     Contains the IP end point of the connected end point.
+        /// </value>
+        public IPEndPoint ConnectedEndPoint
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
         /// Gets the <see cref="System.Net.Sockets.TcpClient"/> instance linked to the client.
         /// </summary>
         /// <value>
@@ -136,13 +148,13 @@ namespace ClientAgent
             try
             {
                 this.ConnectionClient.Connect(pt);
+                this.ConnectedEndPoint = pt;
+                this.OnConnected(EventArgs.Empty);
             }
             catch (SocketException)
             {
                 throw;
             }
-
-            this.OnConnected(EventArgs.Empty);
         }
 
         /// <summary>
@@ -193,7 +205,7 @@ namespace ClientAgent
             b1000000 = (byte)((length / 0x1000000) % 0x100);
 
             List<byte> mes = new List<byte>();
-            mes.AddRange(new byte[] { 0, 0, 0, 0, b1000000, b10000, b100, b1, (byte)messageType });
+            mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)messageType });
             mes.AddRange(ms.ToArray());
 
             this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
@@ -210,6 +222,34 @@ namespace ClientAgent
             if (this.Connected != null)
             {
                 this.Connected(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="Disconnected"/> event.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
+        protected void OnDisconnected(EventArgs e)
+        {
+            if (this.Disconnected != null)
+            {
+                this.Disconnected(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ReceivedTCPMessage"/> event.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains the received message.
+        /// </param>
+        protected void OnReceivedTCPMessage(MessageReceivedEventArgs e)
+        {
+            if (this.ReceivedTCPMessage != null)
+            {
+                this.ReceivedTCPMessage(this, e);
             }
         }
 
@@ -237,17 +277,16 @@ namespace ClientAgent
                 {
                     byte[] msg = args.UdpClient.Receive(ref localRcv);
 
-                    if (!(msg[0] == 1 && msg[1] == 1 && msg[2] == 1 && msg[3] == 1))
+                    if (msg[0] != 1 || msg[1] != 1 || msg[2] != 1 || msg[3] != 3)
                     {
                         continue;
                     }
 
                     int length = msg[4] + (msg[5] * 0x100) + (msg[6] * 0x10000) + (msg[7] * 0x1000000);
-                    byte type = msg[8];
+                    StatusCode type = (StatusCode)msg[8];
 
-                    if (type != 1)
+                    if (type != StatusCode.Acknowledge)
                     {
-                        Console.WriteLine("Wrong message received. Expected '1'.");
                         continue;
                     }
 
@@ -257,17 +296,16 @@ namespace ClientAgent
                     {
                         body[n - 9] = msg[n];
                     }
-                    
-                    MemoryStream ms = new MemoryStream(body, false);
-                    BinaryFormatter f = new BinaryFormatter();
-                    
-                    AgentAccept a = (AgentAccept)f.Deserialize(ms);
-                    
-                    Console.WriteLine(a.ServerIP);
-                    args.Stop();
-                    Console.WriteLine("Trying to connect...");
-                    args.Client.ConnectTo(a.ServerIP);
-                    Console.WriteLine("Connected");
+
+                    using (MemoryStream ms = new MemoryStream(body, false))
+                    {
+                        AgentAccept a = (AgentAccept)args.Client.formatter.Deserialize(ms);
+                        Console.WriteLine(a.ServerIP);
+                        args.Stop();
+                        Console.WriteLine("Trying to connect...");
+                        args.Client.ConnectTo(a.ServerIP);
+                        Console.WriteLine("Connected");
+                    }
                 }
 
                 Thread.Sleep(10);
@@ -283,6 +321,7 @@ namespace ClientAgent
         private static void ListenerThread(object data)
         {
             ClientListenerThreadArgs args = (ClientListenerThreadArgs)data;
+            NetworkStream str = args.Client.ConnectionClient.GetStream();
             DateTime lastKeepAlive = new DateTime(0);
             PerformanceCounter cpu = new PerformanceCounter();
             cpu.CategoryName = "Processor";
@@ -299,11 +338,107 @@ namespace ClientAgent
                     args.Client.SendMessage(new KeepAlive() { CPUWorkload = cpu.NextValue() }, 0);
                 }
 
+                while (str.DataAvailable)
+                {
+                    byte[] hdr = new byte[9];
+
+                    int hlen = str.Read(hdr, 0, 9);
+                    uint bodylen;
+                    StatusCode messagType;
+
+                    // go to next iteration if header lengh != 9
+                    if (!ParseHeader(hdr, out bodylen, out messagType))
+                    {
+                        break;
+                    }
+
+                    byte[] body = new byte[bodylen];
+                    int rcvbody = str.Read(body, 0, (int)bodylen);
+
+                    using (MemoryStream ms = new MemoryStream(body))
+                    {
+                        Message rcv = (Message)args.Client.formatter.Deserialize(ms);
+                        args.Client.OnReceivedTCPMessage(new MessageReceivedEventArgs(rcv, args.Client.ConnectedEndPoint));
+                    }
+                }
+
                 Thread.Sleep(5);
             }
 
             args.Client.Disconnect();
-        } 
+        }
+
+        /// <summary>
+        /// Parses a byte array and returns whether the byte array is a valid header.
+        /// </summary>
+        /// <param name="header">
+        ///     The byte array that shall be parsed.
+        /// </param>
+        /// <param name="length">
+        ///     The length of the following body.
+        /// </param>
+        /// <param name="status">
+        ///     The message status.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the specified byte array is a valid header.
+        /// </returns>
+        private static bool ParseHeader(byte[] header, out uint length, out StatusCode status)
+        {
+            length = 0;
+            status = StatusCode.KeepAlive;
+
+            if (header.Length != 9)
+            {
+                return false;
+            }
+
+            if (header[0] != 0 || header[1] != 0 || header[2] != 0 || header[3] != 0)
+            {
+                return false;
+            }
+
+            length = (uint)(header[4] + (header[5] * 0x100) + (header[6] * 0x10000) + (header[7] * 0x1000000));
+            
+            status = (StatusCode)header[8];
+            return true;
+        }
+
+        /// <summary>
+        /// Parses a byte array and returns whether the byte array is a valid UDP server message header.
+        /// </summary>
+        /// <param name="header">
+        ///     The byte array that shall be parsed.
+        /// </param>
+        /// <param name="length">
+        ///     The length of the following body.
+        /// </param>
+        /// <param name="status">
+        ///     The message status.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the specified byte array is a valid UDP server message header.
+        /// </returns>
+        private static bool ParseUDPHeader(byte[] header, out uint length, out StatusCode status)
+        {
+            length = 0;
+            status = StatusCode.KeepAlive;
+
+            if (header.Length != 9)
+            {
+                return false;
+            }
+
+            if (header[0] != 1 || header[1] != 1 || header[2] != 1 || header[3] != 1)
+            {
+                return false;
+            }
+
+            length = (uint)(header[4] + (header[5] * 0x100) + (header[6] * 0x10000) + (header[7] * 0x1000000));
+
+            status = (StatusCode)header[8];
+            return true;
+        }
 
         /// <summary>
         /// Sends a UDP broadcast message indicating that the client searches for a server.
