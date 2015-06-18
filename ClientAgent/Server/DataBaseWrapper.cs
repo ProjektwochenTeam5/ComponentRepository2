@@ -28,7 +28,6 @@ using System.Threading.Tasks;
                 }
                 this.Data.Add(Assembly.LoadFile(dll));
             }
-
         }
 
         public IComponent ReadComponentInfoFormDll(Assembly dll)
