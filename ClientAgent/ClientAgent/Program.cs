@@ -15,13 +15,19 @@
             TcpClient c = new TcpClient(new IPEndPoint(IPAddress.Any, 12345));
             Client cl = new Client(c);
             cl.Connected += cl_Connected;
+            cl.ReceivedTCPMessage += cl_ReceivedTCPMessage;
             cl.StartConnectionSearch();
             Console.WriteLine("Started Connection Search!\nPress [ENTER] to stop...");
             Console.ReadLine();
 
             cl.StopAll();
 
+            Console.WriteLine("Stopped!");
             Console.ReadLine();
+        }
+
+        static void cl_ReceivedTCPMessage(object sender, MessageReceivedEventArgs e)
+        {
         }
 
         static void cl_Connected(object sender, EventArgs e)

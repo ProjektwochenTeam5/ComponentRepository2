@@ -17,6 +17,7 @@ namespace Core.Network
     /// <summary>
     /// Send frequently to all other servers to update them on the server state.
     /// </summary>
+    [Serializable]
     public class KeepAliveRequest 
     {
         /// <summary>

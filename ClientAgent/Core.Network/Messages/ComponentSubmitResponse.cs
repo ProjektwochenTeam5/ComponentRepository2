@@ -16,6 +16,7 @@ namespace Core.Network
     /// <summary>
     /// Confirms a received component submit message.
     /// </summary>
+    [Serializable]
     public class ComponentSubmitResponse
     {
         /// <summary>

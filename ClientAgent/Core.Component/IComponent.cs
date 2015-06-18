@@ -47,6 +47,18 @@ namespace Core.Component
         IEnumerable<string> OutputHints { get;  }
 
         /// <summary>
+        /// Gets or sets the collection of strings that describe the input arguments.
+        /// </summary>
+        /// <value>Collection of strings.</value>
+        IEnumerable<string> InputDescriptions { get; set; }
+
+        /// <summary>
+        /// Gets or sets the collection of strings that describe the output arguments.
+        /// </summary>
+        /// <value>Collection of strings.</value>
+        IEnumerable<string> OutputDescriptions { get; set; }
+
+        /// <summary>
         /// Executes the implementation of the component.
         /// </summary>
         /// <param name="values">Collection of input arguments.</param>

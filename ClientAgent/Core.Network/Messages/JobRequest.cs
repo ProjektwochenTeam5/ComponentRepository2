@@ -18,6 +18,7 @@ namespace Core.Network
     /// <summary>
     /// Sent when a job should be executed.
     /// </summary>
+    [Serializable]
     public class JobRequest
     {
         /// <summary>

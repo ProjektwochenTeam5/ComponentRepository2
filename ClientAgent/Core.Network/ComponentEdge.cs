@@ -26,6 +26,7 @@ namespace Core.Network
     ///  OutputValueId = 1.
     ///  InputValueId = 2.
     /// </example>
+    [Serializable]
     public class ComponentEdge
     {
         /// <summary>
@@ -40,7 +41,7 @@ namespace Core.Network
         /// <value>A unique identifier.</value>
         /// <remarks>
         /// Identifies the component within a component graph.
-        /// Intended use: Notify the client about a partial component state change.
+        /// Use Guid.Empty to identifiy an output value within the output values enumerable for a component.
         /// </remarks>
         public Guid InternalOutputComponentGuid { get; set; }
 
@@ -50,7 +51,7 @@ namespace Core.Network
         /// <value>A unique identifier.</value>
         /// <remarks>
         /// Identifies the component within a component graph.
-        /// Intended use: Notify the client about a partial component state change.
+        /// Use Guid.Empty to identifiy the an input value within the input values enumerable for a component.
         /// </remarks>
         public Guid InternalInputComponentGuid { get; set; }
 

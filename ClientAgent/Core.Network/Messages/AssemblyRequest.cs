@@ -18,6 +18,7 @@ namespace Core.Network
     /// The Response is BINARY ENCODED!
     /// When there is a problem with the assembly (e.g. cannot be found) the length is set to 0.
     /// </summary>
+    [Serializable]
     public class AssemblyRequest
     {
         /// <summary>

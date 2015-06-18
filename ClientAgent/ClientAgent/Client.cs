@@ -3,8 +3,10 @@ namespace ClientAgent
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq;
     using System.Net;
     using System.Net.Sockets;
     using System.Runtime.Serialization.Formatters.Binary;
@@ -42,6 +44,11 @@ namespace ClientAgent
         private BinaryFormatter formatter;
 
         /// <summary>
+        /// The list of messages waiting for an acknowledgement.
+        /// </summary>
+        private List<Message> waitingMessages;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Client"/> class.
         /// </summary>
         /// <param name="cl">
@@ -50,8 +57,109 @@ namespace ClientAgent
         public Client(TcpClient cl)
         {
             this.ConnectionClient = cl;
+            this.waitingMessages = new List<Message>();
+            this.StoredComponents = new ReadOnlyCollection<ComponentInfo>(new ComponentInfo[0]);
             this.Connected += this.Client_Connected;
+            this.ReceivedTCPMessage += this.Client_ReceivedTCPMessage;
             this.formatter = new BinaryFormatter();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Client_ReceivedTCPMessage(object sender, MessageReceivedEventArgs e)
+        {
+            switch (e.ReceivedMessage.MessageType)
+            {
+                case StatusCode.SendComponentInfos:
+                    this.ReceivedSendComponentInfos(e);
+                    break;
+
+                case StatusCode.Acknowledge:
+                    this.ReceivedAcknowledge(e);
+                    break;
+
+                case StatusCode.Error:
+                    Console.WriteLine(((Error)e.ReceivedMessage).Message);
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Processes a received error.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains the received message.
+        /// </param>
+        private void ReceivedEror(MessageReceivedEventArgs e)
+        {
+            Error received = e.ReceivedMessage as Error;
+            if (received == null)
+            {
+                return;
+            }
+
+            Console.WriteLine("Received Error for {0}: {1}", received.BelongsTo, received.Message);
+
+            Message snd = this.waitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
+
+            if (snd == null)
+            {
+                return;
+            }
+
+            this.waitingMessages.Remove(snd);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        private void ReceivedSendComponentInfos(MessageReceivedEventArgs e)
+        {
+            SendComponentInfos m = (SendComponentInfos)e.ReceivedMessage;
+            foreach (ComponentInfo c in m.MetadataComponents)
+            {
+                Console.WriteLine(c.FriendlyName);
+            }
+        }
+
+        /// <summary>
+        /// Processes a received acknowledge message.
+        /// </summary>
+        /// <param name="e"></param>
+        private void ReceivedAcknowledge(MessageReceivedEventArgs e)
+        {
+            Acknowledge received = e.ReceivedMessage as Acknowledge;
+            if (received == null)
+            {
+                return;
+            }
+
+            Console.WriteLine("Received Acknowledge for {0}!", received.BelongsTo);
+
+            Message snd = this.waitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
+
+            if (snd == null)
+            {
+                return;
+            }
+
+            this.waitingMessages.Remove(snd);
+
+            
+        }
+
+        /// <summary>
+        /// Processes a received Store Components message.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains the received message.
+        /// </param>
+        private void ReceivedStoreComponents(MessageReceivedEventArgs e)
+        {
         }
 
         /// <summary>
@@ -81,6 +189,18 @@ namespace ClientAgent
             {
                 return this.ConnectionClient.Connected;
             }
+        }
+
+        /// <summary>
+        /// Gets the list of the stored components.
+        /// </summary>
+        /// <value>
+        ///     Contains the list of the stored components.
+        /// </value>
+        public ReadOnlyCollection<ComponentInfo> StoredComponents
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -269,7 +389,15 @@ namespace ClientAgent
             {
                 if (DateTime.Now.Subtract(lastSend).TotalSeconds > 5)
                 {
-                    args.Client.SendDiscover(args.UdpClient);
+                    try
+                    {
+                        args.Client.SendDiscover(args.UdpClient);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                    
                     lastSend = DateTime.Now;
                 }
 
@@ -277,7 +405,7 @@ namespace ClientAgent
                 {
                     byte[] msg = args.UdpClient.Receive(ref localRcv);
 
-                    if (msg[0] != 1 || msg[1] != 1 || msg[2] != 1 || msg[3] != 3)
+                    if (msg[0] != 1 || msg[1] != 1 || msg[2] != 1 || msg[3] != 1)
                     {
                         continue;
                     }
@@ -285,7 +413,7 @@ namespace ClientAgent
                     int length = msg[4] + (msg[5] * 0x100) + (msg[6] * 0x10000) + (msg[7] * 0x1000000);
                     StatusCode type = (StatusCode)msg[8];
 
-                    if (type != StatusCode.Acknowledge)
+                    if (type != StatusCode.AgentConnection)
                     {
                         continue;
                     }
@@ -327,6 +455,11 @@ namespace ClientAgent
             cpu.CategoryName = "Processor";
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
+
+            StoreComponent s = new StoreComponent();
+            args.Client.waitingMessages.Add(s);
+            s.Component = File.ReadAllBytes("Add.dll");
+            args.Client.SendMessage(s, StatusCode.StorComponent);
 
             while (!args.Stopped)
             {
@@ -393,7 +526,7 @@ namespace ClientAgent
                 return false;
             }
 
-            if (header[0] != 0 || header[1] != 0 || header[2] != 0 || header[3] != 0)
+            if (header[0] != 1 || header[1] != 1 || header[2] != 1 || header[3] != 1)
             {
                 return false;
             }
@@ -451,7 +584,8 @@ namespace ClientAgent
             List<byte> msg = new List<byte>();
             msg.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 1 });
 
-            cl.Send(msg.ToArray(), msg.Count, new IPEndPoint(IPAddress.Broadcast, 1234));
+            UdpBroadcast.SendBoadcast(1233, msg.ToArray());
+            ////cl.Send(msg.ToArray(), msg.Count, new IPEndPoint(IPAddress.Broadcast, 1234));
         }
 
         /// <summary>
