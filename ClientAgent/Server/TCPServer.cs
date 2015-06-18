@@ -32,6 +32,8 @@ namespace Server
 
         public event EventHandler<MessageRecievedEventArgs> OnMessageRecieved;
 
+        public event EventHandler<ClientFetchedEventArgs> OnClientFetched;
+
         public TCPServer()
         {
             this.MyListener = new TcpListener(IPAddress.Any, 12345);
@@ -78,8 +80,9 @@ namespace Server
 
             NetworkStream ns = client.GetStream();
 
+            this.FireOnClientFetched(new ClientFetchedEventArgs(clientInfo.ClientGuid));
            // this.SendAckToClient(ns);
-            this.SendComponentInfos(ns);
+            //this.SendComponentInfos(ns);
 
             while (true)
             {
@@ -143,74 +146,6 @@ namespace Server
             }
         }
 
-        private void SendComponentInfos(NetworkStream ns)
-        {
-            this.Wrapper.GetAssemblies();
-            List<Component> comp = new List<Component>();
-            List<IComponent> l = new List<IComponent>();
-
-            foreach (var assembly in this.Wrapper.Data)
-            {
-                l.Add(this.Wrapper.ReadComponentInfoFormDll(assembly));
-            }
-
-            foreach (var icomponent in l)
-            {
-                comp.Add(DataConverter.MapIComponentToNetworkComponent(icomponent));
-            }
-
-            SendComponentInfos sendcompinfos = new SendComponentInfos();
-            sendcompinfos.MetadataComponents = comp;
-
-            byte[] senddata = DataConverter.ConvertMessageToByteArray(6, DataConverter.ConvertObjectToByteArray(sendcompinfos));
-
-            try
-            {
-                ns.Write(senddata, 0, senddata.Length);
-                Console.WriteLine("Send Component Infos");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        public void SendComponentInfos()
-        {
-            this.Wrapper.GetAssemblies();
-            List<Component> comp = new List<Component>();
-            List<IComponent> l = new List<IComponent>();
-
-            foreach (var assembly in this.Wrapper.Data)
-            {
-                l.Add(this.Wrapper.ReadComponentInfoFormDll(assembly));
-            }
-
-            foreach (var icomponent in l)
-            {
-               comp.Add(DataConverter.MapIComponentToNetworkComponent(icomponent));
-            }
-
-            SendComponentInfos sendcompinfos = new SendComponentInfos();
-            sendcompinfos.MetadataComponents = comp;
-
-            byte[] senddata = DataConverter.ConvertMessageToByteArray(6, DataConverter.ConvertObjectToByteArray(sendcompinfos));
-
-            foreach (var item in this.Clients.Values)
-            {
-                NetworkStream ns = item.GetStream();
-                try
-                {
-                    ns.Write(senddata, 0, senddata.Length);
-                    Console.WriteLine("Send Component Infos");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-        }
-
         private void SendAckToClient(NetworkStream ns, int belongingmessageid)
         {
             Acknowledge ack = new Acknowledge();
@@ -255,6 +190,14 @@ namespace Server
             }
         }
 
+        public void FireOnClientFetched(ClientFetchedEventArgs e)
+        {
+            if (this.OnClientFetched != null)
+            {
+                this.OnClientFetched(this, e);
+            }
+        }
+
         public void SendAck(ClientInfo clientinfo, int belongingmessageid)
         {
             TcpClient client = this.Clients[clientinfo];
@@ -271,5 +214,37 @@ namespace Server
             this.SendErrorToClient(ns, belongingmessageid);
         }
 
+        public void SendMessage(byte[] message, Guid clientID)
+        {
+            TcpClient client = this.Clients.Where(x => x.Key.ClientGuid == clientID).Single().Value;
+            NetworkStream stream = client.GetStream();
+
+            try
+            {
+                stream.Write(message, 0, message.Length);
+                Console.WriteLine("Sending Message!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void SendMessageToAll(byte[] message)
+        {
+            foreach (var item in this.Clients)
+            {
+                NetworkStream stream = item.Value.GetStream();
+                try
+                {
+                    stream.Write(message, 0, message.Length);
+                    Console.WriteLine("Sending Message!");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+        }
     }
 }

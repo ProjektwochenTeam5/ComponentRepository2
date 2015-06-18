@@ -22,13 +22,15 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            RecBroadcast b = new RecBroadcast();
-            Task udpTask = new Task(new Action(() => b.Recieve()));
-            udpTask.Start();
+            GUI.Do();
 
-            TCPServerManager tcpservermanager = new TCPServerManager();
-            Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
-            tcpTask.Start();
+            //RecBroadcast b = new RecBroadcast();
+            //Task udpTask = new Task(new Action(() => b.Recieve()));
+            //udpTask.Start();
+
+            //TCPServerManager tcpservermanager = new TCPServerManager();
+            //Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
+            //tcpTask.Start();
 
             //ServerBroadcast serverBroadcast = new ServerBroadcast();
             //Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());
@@ -37,8 +39,6 @@ namespace Server
             //ServerReceiver serverReceiver = new ServerReceiver();
             //Task serverReceiverTask = new Task(() => serverReceiver.StartReceiving());
             //serverReceiverTask.Start();
-
-
 
             Console.ReadLine();
         }

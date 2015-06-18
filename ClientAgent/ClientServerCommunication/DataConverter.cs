@@ -111,14 +111,15 @@ namespace ClientServerCommunication
                 return null;
             }
         }
-            
 
-        public static Component MapIComponentToNetworkComponent(IComponent comp)
+
+        public static Component MapIComponentToNetworkComponent(IComponent comp, Guid g)
         {
+
             Component c = new Component();
             c.IsAtomic = true;
             c.FriendlyName = comp.FriendlyName;
-            c.ComponentGuid = comp.ComponentGuid;
+            c.ComponentGuid = g;
 
             if (comp.InputDescriptions != null)
             {
