@@ -9,7 +9,7 @@ namespace ClientServerCommunication
     [Serializable]
     public class SendComponentInfos : Message
     {
-        public Dictionary<Guid,ComponentInfo> MetadataComponents { get; set; }
+        public ICollection<ComponentInfo> MetadataComponents { get; set; }
 
         /// <summary>
         /// Gets the message type of the message.

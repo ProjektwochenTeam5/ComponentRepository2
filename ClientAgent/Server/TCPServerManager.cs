@@ -60,7 +60,7 @@ using System.Threading.Tasks;
 
         private void CalculateClientLoads(KeepAlive keepAlive)
         {
-            Console.WriteLine("Keep alive empfangen");
+            Console.WriteLine("Keep alive empfangen + terminnate = {0}", keepAlive.Terminate.ToString());
         }
 
         private void CheckIfDeleteClientAndDelete(KeepAlive ka, ClientInfo info)
