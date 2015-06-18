@@ -179,9 +179,10 @@ namespace Server
             }
         }
 
-        private void SendAckToClient(NetworkStream ns)
+        private void SendAckToClient(NetworkStream ns, int belongingmessageid)
         {
             Acknowledge ack = new Acknowledge();
+            ack.BelongsTo = belongingmessageid;
 
             var send = DataConverter.ConvertMessageToByteArray(3, DataConverter.ConvertObjectToByteArray(ack));
 
@@ -198,10 +199,10 @@ namespace Server
             ns.Flush();
         }
 
-        private void SendErrorToClient(NetworkStream ns)
+        private void SendErrorToClient(NetworkStream ns, int belongingmessageid)
         {
             Error err = new Error();
-
+            err.BelongsTo = belongingmessageid;
             var send = DataConverter.ConvertMessageToByteArray(9, DataConverter.ConvertObjectToByteArray(err));
 
             try
@@ -222,20 +223,20 @@ namespace Server
             }
         }
 
-        public void SendAck(ClientInfo clientinfo)
+        public void SendAck(ClientInfo clientinfo, int belongingmessageid)
         {
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();
 
-            this.SendAckToClient(ns);
+            this.SendAckToClient(ns, belongingmessageid);
         }
 
-        public void SendError(ClientInfo clientinfo)
+        public void SendError(ClientInfo clientinfo, int belongingmessageid)
         {
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();
 
-            this.SendErrorToClient(ns);
+            this.SendErrorToClient(ns, belongingmessageid);
         }
 
     }
