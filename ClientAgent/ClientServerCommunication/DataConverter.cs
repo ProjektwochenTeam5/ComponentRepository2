@@ -113,16 +113,58 @@ namespace ClientServerCommunication
         }
             
 
-        public static Component MabIComponentToNetworkComponent(IComponent comp)
+        public static Component MapIComponentToNetworkComponent(IComponent comp)
         {
             Component c = new Component();
             c.IsAtomic = true;
             c.FriendlyName = comp.FriendlyName;
             c.ComponentGuid = comp.ComponentGuid;
-            c.InputDescriptions = comp.InputDescriptions;
-            c.OutputDescriptions = comp.OutputDescriptions;
-            c.InputHints = comp.InputHints;
-            c.OutputHints = comp.OutputHints;
+
+            if (comp.InputDescriptions != null)
+            {
+                List<string> inde = new List<string>();
+
+                foreach (var item in comp.InputDescriptions)
+                {
+                    inde.Add(item);
+                }
+            }
+            else
+            {
+                c.InputDescriptions = null;
+            }
+
+            if (comp.OutputDescriptions != null)
+            {
+                List<string> outde = new List<string>();
+
+                foreach (var item in comp.OutputDescriptions)
+                {
+                    outde.Add(item);
+                }
+            }
+            else
+            {
+                c.OutputDescriptions = null;
+            }
+
+            List<string> inhi = new List<string>();
+
+            foreach (var item in comp.InputHints)
+            {
+                inhi.Add(item);
+            }
+
+            List<string> outhi = new List<string>();
+
+            foreach (var item in comp.OutputHints)
+            {
+                outhi.Add(item);
+                
+            }
+
+            c.InputHints = inhi;
+            c.OutputHints = outhi;
 
             return c;
         }

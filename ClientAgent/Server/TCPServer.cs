@@ -146,7 +146,7 @@ namespace Server
         private void SendComponentInfos(NetworkStream ns)
         {
             this.Wrapper.GetAssemblies();
-            List<ComponentInfo> comp = new List<ComponentInfo>();
+            List<Component> comp = new List<Component>();
             List<IComponent> l = new List<IComponent>();
 
             foreach (var assembly in this.Wrapper.Data)
@@ -156,12 +156,7 @@ namespace Server
 
             foreach (var icomponent in l)
             {
-                ComponentInfo c = new ComponentInfo();
-                c.ComponentGuid = icomponent.ComponentGuid;
-                c.FriendlyName = icomponent.FriendlyName;
-                c.InputHints = icomponent.InputHints;
-                c.OutputHints = icomponent.OutputHints;
-                comp.Add(c);
+                comp.Add(DataConverter.MapIComponentToNetworkComponent(icomponent));
             }
 
             SendComponentInfos sendcompinfos = new SendComponentInfos();
@@ -172,10 +167,47 @@ namespace Server
             try
             {
                 ns.Write(senddata, 0, senddata.Length);
+                Console.WriteLine("Send Component Infos");
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void SendComponentInfos()
+        {
+            this.Wrapper.GetAssemblies();
+            List<Component> comp = new List<Component>();
+            List<IComponent> l = new List<IComponent>();
+
+            foreach (var assembly in this.Wrapper.Data)
+            {
+                l.Add(this.Wrapper.ReadComponentInfoFormDll(assembly));
+            }
+
+            foreach (var icomponent in l)
+            {
+               comp.Add(DataConverter.MapIComponentToNetworkComponent(icomponent));
+            }
+
+            SendComponentInfos sendcompinfos = new SendComponentInfos();
+            sendcompinfos.MetadataComponents = comp;
+
+            byte[] senddata = DataConverter.ConvertMessageToByteArray(6, DataConverter.ConvertObjectToByteArray(sendcompinfos));
+
+            foreach (var item in this.Clients.Values)
+            {
+                NetworkStream ns = item.GetStream();
+                try
+                {
+                    ns.Write(senddata, 0, senddata.Length);
+                    Console.WriteLine("Send Component Infos");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
             }
         }
 
@@ -189,7 +221,7 @@ namespace Server
             try
             {
                 ns.Write(send, 0, send.Length);
-                Console.WriteLine("Acknowledge sent to: ");
+                Console.WriteLine("Acknowledge sent");
             }
             catch (Exception ex)
             {

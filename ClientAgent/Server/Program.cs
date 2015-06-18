@@ -17,8 +17,6 @@ namespace Server
     using System.Reflection;
     using System.Threading.Tasks;
     using ClientServerCommunication;
-    using System.IO;
-    using Core.Component;
 
     public class Program
     {
@@ -31,6 +29,16 @@ namespace Server
             TCPServerManager tcpservermanager = new TCPServerManager();
             Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
             tcpTask.Start();
+
+            //ServerBroadcast serverBroadcast = new ServerBroadcast();
+            //Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());
+            //serverBroadcastTask.Start();
+
+            //ServerReceiver serverReceiver = new ServerReceiver();
+            //Task serverReceiverTask = new Task(() => serverReceiver.StartReceiving());
+            //serverReceiverTask.Start();
+
+
 
             Console.ReadLine();
         }

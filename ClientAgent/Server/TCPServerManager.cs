@@ -55,6 +55,7 @@ using System.Threading.Tasks;
                         if (store)
                         {
                             this.MyTCPServer.SendAck(e.Info, storecomponent.MessageID);
+                            this.MyTCPServer.SendComponentInfos();
                         }
                         else
                         {
@@ -69,7 +70,7 @@ using System.Threading.Tasks;
 
         private void CalculateClientLoads(KeepAlive keepAlive)
         {
-            Console.WriteLine("Keep alive empfangen + terminnate = {0}", keepAlive.Terminate.ToString());
+            Console.WriteLine("Keep alive recieved and terminate = {0}", keepAlive.Terminate.ToString());
         }
 
         private void CheckIfDeleteClientAndDelete(KeepAlive ka, ClientInfo info)
