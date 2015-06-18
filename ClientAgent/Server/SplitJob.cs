@@ -9,7 +9,7 @@ namespace Server
 {
     public static class SplitJob
     {
-        public void Split(Component job)
+        public static void Split(Component job)
         {
             if (job.IsAtomic)
             {
