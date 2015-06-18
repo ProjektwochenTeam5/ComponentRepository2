@@ -16,11 +16,12 @@
             Client cl = new Client(c);
             cl.Connected += cl_Connected;
             cl.StartConnectionSearch();
-            Console.WriteLine("Started Connection Search!");
+            Console.WriteLine("Started Connection Search!\nPress [ENTER] to stop...");
             Console.ReadLine();
 
+            cl.StopAll();
 
-            Environment.Exit(0);
+            Console.ReadLine();
         }
 
         static void cl_Connected(object sender, EventArgs e)
