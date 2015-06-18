@@ -79,7 +79,7 @@ namespace Server
             NetworkStream ns = client.GetStream();
 
            // this.SendAckToClient(ns);
-         //   this.SendComponentInfos(ns);
+            this.SendComponentInfos(ns);
 
             while (true)
             {

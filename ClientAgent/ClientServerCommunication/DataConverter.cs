@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text;
 using System.Threading.Tasks;
+using Core.Component;
+using Core.Network;
 
 namespace ClientServerCommunication
 {
@@ -110,5 +112,19 @@ namespace ClientServerCommunication
             }
         }
             
+
+        public static Component MabIComponentToNetworkComponent(IComponent comp)
+        {
+            Component c = new Component();
+            c.IsAtomic = true;
+            c.FriendlyName = comp.FriendlyName;
+            c.ComponentGuid = comp.ComponentGuid;
+            c.InputDescriptions = comp.InputDescriptions;
+            c.OutputDescriptions = comp.OutputDescriptions;
+            c.InputHints = comp.InputHints;
+            c.OutputHints = comp.OutputHints;
+
+            return c;
+        }
     }
 }

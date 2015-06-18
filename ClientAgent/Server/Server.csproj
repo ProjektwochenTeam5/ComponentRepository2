@@ -69,6 +69,8 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Store\AddComponent.dll" />
+    <Content Include="Store\Core.Component.dll" />
+    <Content Include="Store\Subtract.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

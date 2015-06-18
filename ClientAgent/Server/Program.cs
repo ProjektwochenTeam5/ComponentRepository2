@@ -24,14 +24,17 @@ namespace Server
     {
         public static void Main(string[] args)
         {
-            RecBroadcast b = new RecBroadcast();
-            Task udpTask = new Task(new Action(() => b.Recieve()));
-            udpTask.Start();
+            //RecBroadcast b = new RecBroadcast();
+            //Task udpTask = new Task(new Action(() => b.Recieve()));
+            //udpTask.Start();
 
-            TCPServerManager tcpservermanager = new TCPServerManager();
-            Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
-            tcpTask.Start();
+            //TCPServerManager tcpservermanager = new TCPServerManager();
+            //Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
+            //tcpTask.Start();
 
+            DataBaseWrapper db = new DataBaseWrapper();
+            db.GetAssemblies();
+            IComponent d = db.ReadComponentInfoFormDll(db.Data.ElementAt(0));
 
             Console.ReadLine();
         }
