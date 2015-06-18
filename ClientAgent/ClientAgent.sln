@@ -15,11 +15,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core.Network", "Core.Networ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Subtract", "Subtract\Subtract.csproj", "{C92AAF7A-EC54-41CA-9031-9CE180AF11E4}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Component Add", "Component Add", "{F1E9F347-1790-4FE6-BE51-821AFD82AB48}"
-	ProjectSection(SolutionItems) = preProject
-		\\thomas11\studenten\95036\Desktop\Add\Add\Add.cs = \\thomas11\studenten\95036\Desktop\Add\Add\Add.cs
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
