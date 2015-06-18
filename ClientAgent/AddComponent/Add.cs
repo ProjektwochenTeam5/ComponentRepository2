@@ -9,52 +9,52 @@ namespace AddComponent
 {
     public class Add : IComponent
     {
-        public Add()
-        {
-            this.ComponentGuid = new Guid();
-            this.InputHints = new List<string>();
-            this.OutputHints = new List<string>();
-
-            this.InputHints.ToList().Add(typeof(int).ToString());
-            this.InputHints.ToList().Add(typeof(int).ToString());
-
-            this.OutputHints.ToList().Add(typeof(int).ToString());
-        }
-
         public Guid ComponentGuid
         {
-            get;
-            private set;
+            get { return new Guid(); }
         }
 
         public string FriendlyName
         {
-            get;
-            private set;
+            get { return "Addieren"; }
         }
 
         public IEnumerable<string> InputHints
         {
-            get;
-            private set;
+            get
+            {
+                List<string> inputs = new List<string>();
+                inputs.Add(typeof(int).ToString());
+                inputs.Add(typeof(int).ToString());
+
+                foreach (var item in inputs)
+                {
+                    yield return item;
+                }
+            }
         }
 
         public IEnumerable<string> OutputHints
         {
-            get;
-            private set;
+            get { yield return typeof(int).ToString(); }
         }
 
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            int result = 0;
-
+            int first = 0;
+            bool anfang = true;
             foreach (var item in values)
             {
-                result += (int)item;
+                if (anfang)
+                {
+                    first = (int)item;
+                    anfang = false;
+                }
+                else
+                {
+                    yield return first + (int)item;
+                }
             }
-
-            yield return result;
         }
     }
 }

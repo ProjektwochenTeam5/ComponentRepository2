@@ -17,6 +17,8 @@ namespace Server
     using System.Reflection;
     using System.Threading.Tasks;
     using ClientServerCommunication;
+    using System.IO;
+    using Core.Component;
 
     public class Program
     {
