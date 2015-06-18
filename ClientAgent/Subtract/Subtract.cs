@@ -1,27 +1,37 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Core.Component;
-
+﻿
 namespace Subtract
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Core.Component;
+
+    /// <summary>
+    /// 
+    /// </summary>
     [Serializable]
     public class Subtract
         : IComponent
     {
+        /// <summary>
+        /// 
+        /// </summary>
         public Guid ComponentGuid
         {
             get { return new Guid(); }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string FriendlyName
         {
             get { return "Subtract"; }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<string> InputHints
         {
             get
@@ -35,6 +45,9 @@ namespace Subtract
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<string> OutputHints
         {
             get
@@ -48,18 +61,29 @@ namespace Subtract
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<string> InputDescriptions
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public IEnumerable<string> OutputDescriptions
         {
             get;
             set;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="values"></param>
+        /// <returns></returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
             if (values.Count() != 2)

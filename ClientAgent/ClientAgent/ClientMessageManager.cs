@@ -7,6 +7,7 @@ namespace ClientAgent
     using System.Text;
     using System.Threading.Tasks;
     using ClientServerCommunication;
+    using Core.Network;
 
     /// <summary>
     /// Manages messages received by a client.
@@ -21,7 +22,7 @@ namespace ClientAgent
         /// </param>
         public ClientMessageManager(Client managed)
         {
-            this.ReceivedMessages = new Dictionary<int, Message>(512);
+            this.WaitingMessages = new List<Message>(512);
             this.ManagedClient = managed;
             this.ManagedClient.ReceivedTCPMessage += this.ManagedClient_ReceivedTCPMessage;
         }
@@ -32,7 +33,7 @@ namespace ClientAgent
         /// <value>
         ///     Contains the received messages with their IDs.
         /// </value>
-        public Dictionary<int, Message> ReceivedMessages
+        public List<Message> WaitingMessages
         {
             get;
             private set;
@@ -61,7 +62,81 @@ namespace ClientAgent
         /// </param>
         private void ManagedClient_ReceivedTCPMessage(object sender, MessageReceivedEventArgs e)
         {
-            this.ReceivedMessages.Add(e.ReceivedMessage.MessageID, e.ReceivedMessage);
+            switch (e.ReceivedMessage.MessageType)
+            {
+                case StatusCode.Error:
+                    this.ReceivedEror(e);
+                    break;
+
+                case StatusCode.Acknowledge:
+                    this.ReceivedAcknowledge(e);
+                    break;
+
+                case StatusCode.SendComponentInfos:
+                    this.ReceivedSendComponentInfos(e);
+                    break;
+            }
+
+            this.WaitingMessages.Add(e.ReceivedMessage);
+        }
+
+        /// <summary>
+        /// Processes a received error.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains the received message.
+        /// </param>
+        private void ReceivedEror(MessageReceivedEventArgs e)
+        {
+            Error received = e.ReceivedMessage as Error;
+            if (received == null)
+            {
+                return;
+            }
+
+            Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
+
+            if (snd == null)
+            {
+                return;
+            }
+
+            this.WaitingMessages.Remove(snd);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        private void ReceivedSendComponentInfos(MessageReceivedEventArgs e)
+        {
+            SendComponentInfos m = (SendComponentInfos)e.ReceivedMessage;
+            foreach (Component c in m.MetadataComponents)
+            {
+                Console.WriteLine(c.FriendlyName);
+            }
+        }
+
+        /// <summary>
+        /// Processes a received acknowledge message.
+        /// </summary>
+        /// <param name="e"></param>
+        private void ReceivedAcknowledge(MessageReceivedEventArgs e)
+        {
+            Acknowledge received = e.ReceivedMessage as Acknowledge;
+            if (received == null)
+            {
+                return;
+            }
+
+            Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
+
+            if (snd == null)
+            {
+                return;
+            }
+
+            this.WaitingMessages.Remove(snd);
         }
     }
 }
