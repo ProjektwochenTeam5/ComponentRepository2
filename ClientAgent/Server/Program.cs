@@ -17,6 +17,7 @@ namespace Server
     using System.Reflection;
     using System.Threading.Tasks;
     using ClientServerCommunication;
+    using Core.Network;
 
     public class Program
     {
@@ -39,6 +40,8 @@ namespace Server
             //ServerReceiver serverReceiver = new ServerReceiver();
             //Task serverReceiverTask = new Task(() => serverReceiver.StartReceiving());
             //serverReceiverTask.Start();
+
+            SplitJob.Split(new Component());
 
             Console.ReadLine();
         }
