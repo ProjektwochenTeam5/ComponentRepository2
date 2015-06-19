@@ -24,13 +24,13 @@ namespace Server
         {
             GUI.Do();
 
-            //RecBroadcast b = new RecBroadcast();
-            //Task udpTask = new Task(new Action(() => b.Recieve()));
-            //udpTask.Start();
+            RecBroadcast b = new RecBroadcast();
+            Task udpTask = new Task(new Action(() => b.Recieve()));
+            udpTask.Start();
 
-            //TCPServerManager tcpservermanager = new TCPServerManager();
-            //Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
-            //tcpTask.Start();
+            TCPServerManager tcpservermanager = new TCPServerManager();
+            Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
+            tcpTask.Start();
 
             //ServerBroadcast serverBroadcast = new ServerBroadcast();
             //Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());

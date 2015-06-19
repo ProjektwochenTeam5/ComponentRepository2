@@ -12,6 +12,11 @@ namespace ClientServerCommunication
         public byte[] Component { get; set; }
 
         /// <summary>
+        /// The friendly name of the component to store.
+        /// </summary>
+        public string FriendlyName { get; set; }
+
+        /// <summary>
         /// Gets the message type of the message.
         /// </summary>
         /// <value>

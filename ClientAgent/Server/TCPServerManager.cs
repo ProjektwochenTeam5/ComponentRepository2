@@ -71,7 +71,7 @@
             ///////////////// Componentlist fertig
 
             SendComponentInfos sendcompinfos = new SendComponentInfos();
-            sendcompinfos.MetadataComponents = componenlist;
+            sendcompinfos.MetadataComponents = componentlist;
 
             byte[] senddata = DataConverter.ConvertMessageToByteArray(6, DataConverter.ConvertObjectToByteArray(sendcompinfos));
 
@@ -80,20 +80,23 @@
 
         public void RunMyServer()
         {
-            this.Dlls = new Dictionary<Guid, string>();
-            this.MyTCPServer.Run();
             this.MyTCPServer.Wrapper.GetAssemblies();
+            this.Dlls = new Dictionary<Guid, string>();
 
             foreach (var item in this.MyTCPServer.Wrapper.Data)
             {
-                this.Dlls.Add(new Guid(), item.Location);
+                Guid g;
+                this.Dlls.Add(g = Guid.NewGuid(), item.Location);
             }
+
+            this.MyTCPServer.Run();
         }
 
         private void AddDllToDictionary(string filename)
         {
             string path = this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll";
-            this.Dlls.Add(new Guid(), path);
+            Guid g;
+            this.Dlls.Add(g = Guid.NewGuid(), path);
         }
 
         private void MyTCPServer_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
@@ -119,7 +122,7 @@
                     {
                         StoreComponent storecomponent = DataConverter.ConvertByteArrayToStoreComponent(e.MessageBody);
                         DataBaseWrapper db = new DataBaseWrapper();
-                        bool store = db.StoreComponent(storecomponent.Component, e.Info.FriendlyName);
+                        bool store = db.StoreComponent(storecomponent.Component, );
 
                         if (store)
                         {

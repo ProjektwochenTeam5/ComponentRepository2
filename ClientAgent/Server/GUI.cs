@@ -19,17 +19,19 @@ namespace Server
             Console.SetWindowSize(Console.LargestWindowWidth - 50, Console.LargestWindowHeight - 25);
 
 
-            for (int i = 0; i < Console.WindowHeight; i++)
+            for (int i = 0; i < Console. BufferHeight; i++)
             {
                 Console.SetCursorPosition(Console.WindowWidth - 20, i);
                 Console.Write("|");
             }
 
-            for (int i = 0; i < Console.WindowHeight; i++)
+            for (int i = 0; i < Console.BufferHeight; i++)
             {
                 Console.SetCursorPosition(Console.WindowWidth - 19, i);
                 Console.Write("|");
             }
+
+            Console.SetCursorPosition(Console.WindowWidth - 18, 3);
 
             for (int i = 0; i < Console.WindowWidth; i++)
             {
