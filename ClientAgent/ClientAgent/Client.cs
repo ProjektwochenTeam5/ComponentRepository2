@@ -358,10 +358,10 @@ namespace ClientAgent
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
 
-            /*StoreComponent i = new StoreComponent();
-            i.Component = File.ReadAllBytes("Add2.dll");
-            i.FriendlyName = "Add2";
-            args.Client.SendMessage(i);*/
+            StoreComponent i = new StoreComponent();
+            i.Component = File.ReadAllBytes("Add.dll");
+            i.FriendlyName = "Add";
+            args.Client.SendMessage(i);
 
             while (!args.Stopped)
             {

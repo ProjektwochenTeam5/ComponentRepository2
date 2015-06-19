@@ -1,0 +1,15 @@
+﻿<Window x:Class="UserInterface.ComponentCreateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="ComponentCreateWindow" Height="200" Width="300" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel FocusManager.FocusedElement="{Binding ElementName=txtFriendlyName}">
+        <Button x:Name="Save_B" Content="Save" DockPanel.Dock="Bottom" Height="25" Margin="5" Click="Save_B_Click"/>
+        
+        <StackPanel>
+            <Label Content="Friendly Name"/>
+            <TextBox x:Name="txtFriendlyName" Height="23" TextWrapping="Wrap" Margin="5" TextChanged="txtFriendlyName_TextChanged" KeyDown="txtFriendlyName_KeyDown" />
+            <TextBlock x:Name="txtInfo" Height="23" Foreground="Tomato" Margin="5"/>
+        </StackPanel>
+    </DockPanel>
+</Window>
