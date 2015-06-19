@@ -1,0 +1,8 @@
+﻿<UserControl x:Class="UserInterface.InputControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel Orientation="Vertical" Height="30">
+        <Polygon Points="0 0, 15 8, 0 15" Stroke="Green" Fill="YellowGreen" HorizontalAlignment="Right"/>
+        <Label x:Name="lblDesc" Content="{Binding Path=Description}" FontSize="10" Padding="1" HorizontalContentAlignment="Right" Foreground="White"/>
+    </StackPanel>
+</UserControl>

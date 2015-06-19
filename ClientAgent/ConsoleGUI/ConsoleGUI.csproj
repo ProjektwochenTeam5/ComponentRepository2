@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{393A9EFB-A0E6-41A7-A5D2-6D44FB8DDDF0}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{E292D312-E896-405F-980D-6D46491C4914}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClientAgent</RootNamespace>
-    <AssemblyName>ClientAgent</AssemblyName>
+    <RootNamespace>ConsoleGUI</RootNamespace>
+    <AssemblyName>ConsoleGUI</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,34 +39,30 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
-    <Compile Include="ClientListenerThreadArgs.cs" />
-    <Compile Include="ClientMessageManager.cs" />
-    <Compile Include="MessageReceivedEventArgs.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Controls\CheckBox.cs" />
+    <Compile Include="Controls\DrawThreadArgs.cs" />
+    <Compile Include="IO\ConsoleInput.cs" />
+    <Compile Include="IO\ConsoleRenderer.cs" />
+    <Compile Include="Controls\Control.cs" />
+    <Compile Include="IO\IInputReceiver.cs" />
+    <Compile Include="IO\IInputSource.cs" />
+    <Compile Include="IO\InputReceivedEventArgs.cs" />
+    <Compile Include="IO\InputThreadArgs.cs" />
+    <Compile Include="IO\IRenderable.cs" />
+    <Compile Include="IO\IRenderer.cs" />
+    <Compile Include="Controls\Label.cs" />
+    <Compile Include="Controls\Menu.cs" />
+    <Compile Include="Controls\MenuButton.cs" />
+    <Compile Include="Pixel.cs" />
+    <Compile Include="Position.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Rectangle.cs" />
+    <Compile Include="Controls\TextBox.cs" />
     <Compile Include="ThreadArgs.cs" />
-    <Compile Include="UdpBroadcast.cs" />
-    <Compile Include="UdpClientThreadArgs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <Folder Include="UI\" />
   </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ClientServerCommunication\ClientServerCommunication.csproj">
-      <Project>{7e87af0b-6fd2-438d-a795-a6b7d6194cd8}</Project>
-      <Name>ClientServerCommunication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ConsoleGUI\ConsoleGUI.csproj">
-      <Project>{e292d312-e896-405f-980d-6d46491c4914}</Project>
-      <Name>ConsoleGUI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.Network\Core.Network.csproj">
-      <Project>{b1b4b865-f61c-4ed7-93ec-01c6339a82b6}</Project>
-      <Name>Core.Network</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

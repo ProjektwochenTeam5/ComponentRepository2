@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{393A9EFB-A0E6-41A7-A5D2-6D44FB8DDDF0}</ProjectGuid>
-    <OutputType>Exe</OutputType>
+    <ProjectGuid>{8355CD6C-D752-471D-9288-F9EE794792CE}</ProjectGuid>
+    <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ClientAgent</RootNamespace>
-    <AssemblyName>ClientAgent</AssemblyName>
+    <RootNamespace>Sqrt</RootNamespace>
+    <AssemblyName>Sqrt</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -41,34 +39,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client.cs" />
-    <Compile Include="ClientListenerThreadArgs.cs" />
-    <Compile Include="ClientMessageManager.cs" />
-    <Compile Include="MessageReceivedEventArgs.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Squrt.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ThreadArgs.cs" />
-    <Compile Include="UdpBroadcast.cs" />
-    <Compile Include="UdpClientThreadArgs.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\ClientServerCommunication\ClientServerCommunication.csproj">
-      <Project>{7e87af0b-6fd2-438d-a795-a6b7d6194cd8}</Project>
-      <Name>ClientServerCommunication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\ConsoleGUI\ConsoleGUI.csproj">
-      <Project>{e292d312-e896-405f-980d-6d46491c4914}</Project>
-      <Name>ConsoleGUI</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Core.Network\Core.Network.csproj">
-      <Project>{b1b4b865-f61c-4ed7-93ec-01c6339a82b6}</Project>
-      <Name>Core.Network</Name>
+    <ProjectReference Include="..\Core.Component\Core.Component.csproj">
+      <Project>{3cbff49b-e085-49af-8aa5-e3bab177b179}</Project>
+      <Name>Core.Component</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

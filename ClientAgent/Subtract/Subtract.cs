@@ -18,7 +18,7 @@ namespace Subtract
         /// </summary>
         public Guid ComponentGuid
         {
-            get { return new Guid(); }
+            get { return default(Guid); }
         }
 
         /// <summary>

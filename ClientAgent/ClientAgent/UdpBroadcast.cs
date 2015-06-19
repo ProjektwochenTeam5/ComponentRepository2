@@ -10,10 +10,14 @@ namespace ClientAgent
     public static class UdpBroadcast
     {
         /// <summary>
-        /// 
+        /// Sends
         /// </summary>
-        /// <param name="port"></param>
-        /// <param name="data"></param>
+        /// <param name="port">
+        ///     
+        /// </param>
+        /// <param name="data">
+        ///     
+        /// </param>
         public static void SendBoadcast(int port, byte[] data)
         {
             byte current = 1;

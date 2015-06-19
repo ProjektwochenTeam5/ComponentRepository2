@@ -189,5 +189,18 @@ namespace ClientServerCommunication
 
             return c;
         }
+
+        public static byte[] ConvertDllToByteArray(string path)
+        {
+            try
+            {
+                return File.ReadAllBytes(path);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
     }
 }
