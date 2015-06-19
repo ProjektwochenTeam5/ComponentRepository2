@@ -1,0 +1,19 @@
+﻿<UserControl x:Class="UserInterface.MyCompControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid x:Name="grid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="35"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="35"/>
+        </Grid.ColumnDefinitions>
+        
+        <StackPanel x:Name="stkInput" Grid.Column="0"/>
+        
+        <Border x:Name="background" Background="Silver" BorderBrush="Black" BorderThickness="1" Margin="1 0" Grid.Column="1">
+            <Label x:Name="lblName" HorizontalAlignment="Center" VerticalAlignment="Center">&lt;NoName&gt;</Label>
+        </Border>
+        
+        <StackPanel x:Name="stkOutput" Grid.Column="2"/>
+    </Grid>
+</UserControl>
