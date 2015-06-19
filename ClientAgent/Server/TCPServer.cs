@@ -51,7 +51,7 @@ namespace Server
             try
             {
                 this.MyListener.Start();
-                Console.WriteLine("listener started");
+                Console.WriteLine("TCP Listener started");
 
                 while (true)
                 {

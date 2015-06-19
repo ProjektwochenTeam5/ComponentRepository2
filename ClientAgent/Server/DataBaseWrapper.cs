@@ -57,6 +57,7 @@ using System.Threading.Tasks;
                 // close file stream
                 fs.Close();
 
+                Console.WriteLine(filename + " Component succsessfully stored!");
                 return true;
             }
             catch (Exception e)

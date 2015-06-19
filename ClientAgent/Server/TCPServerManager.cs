@@ -122,7 +122,7 @@
                     {
                         StoreComponent storecomponent = DataConverter.ConvertByteArrayToStoreComponent(e.MessageBody);
                         DataBaseWrapper db = new DataBaseWrapper();
-                        bool store = db.StoreComponent(storecomponent.Component, );
+                        bool store = db.StoreComponent(storecomponent.Component, storecomponent.FriendlyName);
 
                         if (store)
                         {
