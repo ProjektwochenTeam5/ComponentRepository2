@@ -275,9 +275,30 @@ namespace ConsoleGUI.Controls
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public override bool Receive(string s)
         {
             return false;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public void Draw()
+        {
+            Pixel[,] px = this.GetPixels();
+
+            foreach (IRenderer r in this.Renderers)
+            {
+                Rectangle draw = new ConsoleGUI.Rectangle(0, r.Height - 2, r.Width, 2);
+                Thread t = new Thread(this.DrawThread);
+                DrawThreadArgs d = new DrawThreadArgs(r, px, draw);
+                t.Start(d);
+            }
         }
 
         /// <summary>

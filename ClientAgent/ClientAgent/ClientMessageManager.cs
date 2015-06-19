@@ -110,16 +110,24 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// Raises the <see cref="MessageErrorReceived"/> event.
+        /// Raises the <see cref="ReceivedErrorMessage"/> event.
         /// </summary>
         /// <param name="e">
         ///     Contains the received message.
         /// </param>
-        protected void OnMessageerrorReceived(MessageReceivedEventArgs e)
+        protected void OnReceivedErrorMessage(MessageReceivedEventArgs e)
         {
             if (this.ReceivedErrorMessage != null)
             {
                 this.ReceivedErrorMessage(this, e);
+            }
+        }
+
+        protected void OnReceivedSendComponentInfo(MessageReceivedEventArgs e)
+        {
+            if (this.ReceivedSendComponentInfoMessage != null)
+            {
+                this.ReceivedSendComponentInfoMessage(this, e);
             }
         }
 

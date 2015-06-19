@@ -242,13 +242,13 @@ namespace ConsoleGUI.Controls
         /// <param name="rect">
         ///     The target rectangle.
         /// </param>
-        public void Draw(Rectangle rect)
+        public virtual void Draw(Rectangle rect)
         {
             Pixel[,] px = this.GetPixels();
 
             foreach (IRenderer r in this.Renderers)
             {
-                Thread t = new Thread(DrawThread);
+                Thread t = new Thread(this.DrawThread);
                 DrawThreadArgs d = new DrawThreadArgs(r, px, rect);
                 t.Start(d);
             }
@@ -330,7 +330,7 @@ namespace ConsoleGUI.Controls
         /// <param name="data">
         ///     The arguments passed to the thread.
         /// </param>
-        private static void DrawThread(object data)
+        protected virtual void DrawThread(object data)
         {
             DrawThreadArgs args = (DrawThreadArgs)data;
             args.AssignedRenderer.Draw(args.DrawContent, args.TargetRectangle);
