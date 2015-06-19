@@ -184,7 +184,7 @@ namespace ClientAgent
         /// </summary>
         public void Disconnect()
         {
-            this.SendMessage(new KeepAlive() { Terminate = true }, StatusCode.KeepAlive);
+            this.SendMessage(new KeepAlive() { Terminate = true });
             this.ConnectionClient.Close();
         }
 
@@ -210,10 +210,7 @@ namespace ClientAgent
         /// <param name="msg">
         ///     The message that shall be sent.
         /// </param>
-        /// <param name="messageType">
-        ///     The type code of the sent message.
-        /// </param>
-        public void SendMessage(Message msg, StatusCode messageType)
+        public void SendMessage(Message msg)
         {
             MemoryStream ms = new MemoryStream();
             this.formatter.Serialize(ms, msg);
@@ -227,10 +224,13 @@ namespace ClientAgent
             b1000000 = (byte)((length / 0x1000000) % 0x100);
 
             List<byte> mes = new List<byte>();
-            mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)messageType });
+            mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)msg.MessageType });
             mes.AddRange(ms.ToArray());
 
-            this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
+            if (this.ConnectionClient.Connected)
+            {
+                this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
+            }
         }
 
         /// <summary>
@@ -358,10 +358,10 @@ namespace ClientAgent
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
 
-            /*StoreComponent s = new StoreComponent();
-            args.Client.waitingMessages.Add(s);
-            s.Component = File.ReadAllBytes("Add.dll");
-            args.Client.SendMessage(s, StatusCode.StorComponent);*/
+            /*StoreComponent i = new StoreComponent();
+            i.Component = File.ReadAllBytes("Add2.dll");
+            i.FriendlyName = "Add2";
+            args.Client.SendMessage(i);*/
 
             while (!args.Stopped)
             {
@@ -370,7 +370,7 @@ namespace ClientAgent
                 {
                     Console.WriteLine("Keep Alive {0}", DateTime.Now);
                     lastKeepAlive = DateTime.Now;
-                    args.Client.SendMessage(new KeepAlive() { CPUWorkload = cpu.NextValue() }, 0);
+                    args.Client.SendMessage(new KeepAlive() { CPUWorkload = cpu.NextValue() });
                 }
 
                 while (str.DataAvailable)

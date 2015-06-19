@@ -14,6 +14,7 @@
         {
             TcpClient c = new TcpClient(new IPEndPoint(IPAddress.Any, 12345));
             Client cl = new Client(c);
+            ClientMessageManager mgr = new ClientMessageManager(cl);
             cl.Connected += cl_Connected;
             cl.ReceivedTCPMessage += cl_ReceivedTCPMessage;
             cl.StartConnectionSearch();
