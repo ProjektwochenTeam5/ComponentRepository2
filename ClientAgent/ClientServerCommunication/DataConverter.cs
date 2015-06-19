@@ -112,6 +112,26 @@ namespace ClientServerCommunication
             }
         }
 
+        public static TransferComponentRequest ConvertByteArrayToTransferComponentRequest(byte[] data)
+        {
+            TransferComponentRequest request = null;
+
+            try
+            {
+                using (MemoryStream ms = new MemoryStream(data))
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    request = (TransferComponentRequest)bf.Deserialize(ms);
+                    return request;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+
 
         public static Component MapIComponentToNetworkComponent(IComponent comp, Guid g)
         {

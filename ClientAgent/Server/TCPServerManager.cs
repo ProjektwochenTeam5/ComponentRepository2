@@ -18,10 +18,13 @@
 
         public Dictionary<Guid, string> Dlls { get; set; }
 
+        public Dictionary<Guid, Component> Components { get; set; }
+
         public double AllClientLoad { get; set; }
 
         public TCPServerManager()
         {
+            this.Components = new Dictionary<Guid, Component>();
             this.MyTCPServer = new TCPServer();
             this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
@@ -39,7 +42,6 @@
 
         private byte[] BuildInfos()
         {
-
             this.MyTCPServer.Wrapper.GetAssemblies();
             Dictionary<IComponent, Guid> componentdic = new Dictionary<IComponent, Guid>();
 
@@ -66,6 +68,14 @@
             foreach (var item in componentdic)
             {
                 componentlist.Add(DataConverter.MapIComponentToNetworkComponent(item.Key, item.Value));
+            }
+
+            foreach (var item in componentlist)
+            {
+                if (!this.Components.Keys.Contains(item.ComponentGuid))
+                {
+                    this.Components.Add(item.ComponentGuid, item);
+                }
             }
 
             ///////////////// Componentlist fertig
@@ -112,7 +122,18 @@
                     }
 
                 case ClientServerCommunication.StatusCode.TransferComponent:
-                    break;
+                    {
+                        TransferComponentRequest request = DataConverter.ConvertByteArrayToTransferComponentRequest(e.MessageBody);
+                        bool contains = this.Components.Keys.Contains(request.ComponentID);
+
+                        if (contains)
+                        {
+                            this.GiveTranserComponentResponse(e.Info, request.ComponentID);
+                        }
+
+                        break;                        
+                    }
+
                 case ClientServerCommunication.StatusCode.TransferJob:
                     break;
                 case ClientServerCommunication.StatusCode.DoJobRequest:
@@ -139,6 +160,12 @@
                 default:
                     break;
             }
+        }
+
+        private void GiveTranserComponentResponse(ClientInfo clientInfo, Guid guid)
+        {
+            Component component = this.Components[guid];
+            
         }
 
         private void SendInfosToAllClients()
