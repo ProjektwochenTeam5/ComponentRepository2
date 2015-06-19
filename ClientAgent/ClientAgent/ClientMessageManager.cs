@@ -165,9 +165,11 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
+        /// Proceses a received Transfer Component Response message.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">
+        ///     Contains the received message.
+        /// </param>
         private void ReceivedTransferComponentResponse(MessageReceivedEventArgs e)
         {
             TransferComponentResponse r = e.ReceivedMessage as TransferComponentResponse;
@@ -238,9 +240,24 @@ namespace ClientAgent
 
             this.storedComponentInfos = new Collection<Component>(m.MetadataComponents.ToList());
 
+            Console.WriteLine("{0}|{1}", "Friendly Name".PadRight(40), "Guid");
+
             foreach (Component c in m.MetadataComponents)
             {
-                Console.WriteLine(c.FriendlyName);
+                try
+                {
+                    Console.WriteLine("{0}|{1}", c.FriendlyName.PadRight(40), c.ComponentGuid);
+                }
+                catch
+                {
+                }
+            }
+
+            Console.WriteLine("\nTotal elements found: {0}\n", m.MetadataComponents.Count);
+
+            /*if (m.MetadataComponents.Count <= 0)
+            {
+                return;
             }
 
             Component cm = m.MetadataComponents.First();
@@ -248,8 +265,10 @@ namespace ClientAgent
             TransferComponentRequest rq = new TransferComponentRequest();
             rq.ComponentID = cm.ComponentGuid;
             this.WaitingMessages.Add(rq);
-            this.ManagedClient.SendMessage(rq);
+            this.ManagedClient.SendMessage(rq);*/
         }
+
+        static bool sent = false;
 
         /// <summary>
         /// Processes a received acknowledge message.
@@ -265,7 +284,17 @@ namespace ClientAgent
                 return;
             }
 
+            Console.WriteLine("Acknowledge {0}!", received.BelongsTo);
             Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
+
+            if (!sent)
+            {
+                sent = true;
+                StoreComponent i2 = new StoreComponent();
+                i2.Component = File.ReadAllBytes("Mod.dll");
+                i2.FriendlyName = "Modulo";
+                this.ManagedClient.SendMessage(i2);
+            }
 
             if (snd == null)
             {

@@ -26,11 +26,6 @@ namespace ConsoleGUI.Controls
         private Rectangle rectangleProperty;
 
         /// <summary>
-        /// Contains the value for the <see cref="Menu.Visible"/> property.
-        /// </summary>
-        private bool visibleProperty;
-
-        /// <summary>
         /// Contains the value for the <see cref="Menu.Focused"/> property.
         /// </summary>
         private bool focusedProperty;
@@ -50,13 +45,12 @@ namespace ConsoleGUI.Controls
         public Menu(ICollection<IRenderer> outputs, IInputSource src, Menu parent = null) : base(outputs)
         {
             this.Buttons = new List<MenuButton>(12);
-            this.Controls = new List<IRenderable>();
             this.InputReceivers = new List<IInputReceiver>();
             this.BackgroundColor = ConsoleColor.Blue;
             this.BorderForegroundColor = ConsoleColor.White;
             this.ForegroundColor = ConsoleColor.White;
             this.rectangleProperty = new Rectangle(0, 0, outputs.First().Width, 2);
-            this.Parent = parent;
+            this.OwnerMenu = parent;
             this.Input = src;
             src.InputReceived += this.Receive;
         }
@@ -72,7 +66,7 @@ namespace ConsoleGUI.Controls
         /// <value>
         ///     Contains the menu that opened the current menu.
         /// </value>
-        public Menu Parent
+        public Menu OwnerMenu
         {
             get;
             private set;
@@ -88,18 +82,6 @@ namespace ConsoleGUI.Controls
         {
             get;
             set;
-        }
-
-        /// <summary>
-        /// Gets the list of controls in the menu.
-        /// </summary>
-        /// <value>
-        ///     Contains the list of controls in the menu.
-        /// </value>
-        public List<IRenderable> Controls
-        {
-            get;
-            private set;
         }
 
         /// <summary>
@@ -232,10 +214,10 @@ namespace ConsoleGUI.Controls
             this.Focused = false;
             this.Visible = false;
 
-            if (this.Parent != null)
+            if (this.OwnerMenu != null)
             {
-                this.Parent.Focused = true;
-                this.Parent.Visible = true;
+                this.OwnerMenu.Focused = true;
+                this.OwnerMenu.Visible = true;
             }
         }
 

@@ -14,6 +14,8 @@ namespace ConsoleGUI.Controls
     using System.Linq;
     using System.Threading;
     using ConsoleGUI.IO;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
 
     /// <summary>
     /// Provides a base class for all controls. This class is abstract.
@@ -62,6 +64,8 @@ namespace ConsoleGUI.Controls
                 throw new ArgumentException();
             }
 
+            this.Controls = new ObservableCollection<IRenderable>();
+            this.Controls.CollectionChanged += this.Controls_CollectionChanged;
             this.Renderers = outputs;
         }
 
@@ -89,6 +93,26 @@ namespace ConsoleGUI.Controls
         /// Raised when the <see cref="ZIndex"/> property was changed.
         /// </summary>
         public event EventHandler ZIndexchanged;
+
+        /// <summary>
+        /// Raised when the <see cref="Controls"/> property was modified.
+        /// </summary>
+        public event NotifyCollectionChangedEventHandler ControlsChanged;
+
+        /// <summary>
+        /// Gets the list of owned controls.
+        /// </summary>
+        public ObservableCollection<IRenderable> Controls
+        {
+            get;
+            private set;
+        }
+
+        public Control Owner
+        {
+            get;
+            private set;
+        }
 
         /// <summary>
         /// Gets or sets the background color of the control.
@@ -325,6 +349,18 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
+        /// Raises the <see cref="ControlsChanged"/> event.
+        /// </summary>
+        /// <param name="e"></param>
+        protected void OnControlsChanged(NotifyCollectionChangedEventArgs e)
+        {
+            if (this.ControlsChanged != null)
+            {
+                this.ControlsChanged(this, e);
+            }
+        }
+
+        /// <summary>
         /// The thread that draws the control.
         /// </summary>
         /// <param name="data">
@@ -334,6 +370,16 @@ namespace ConsoleGUI.Controls
         {
             DrawThreadArgs args = (DrawThreadArgs)data;
             args.AssignedRenderer.Draw(args.DrawContent, args.TargetRectangle);
+        }
+
+        /// <summary>
+        /// Called when the <see cref="Controls"/> collection was modified.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void Controls_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+
         }
     }
 }
