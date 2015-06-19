@@ -10,6 +10,7 @@
 namespace ConsoleGUI.Controls
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Threading;
     using ConsoleGUI.IO;
@@ -17,7 +18,7 @@ namespace ConsoleGUI.Controls
     /// <summary>
     /// Provides a menu.
     /// </summary>
-    public class Menu : IRenderable
+    public class Menu : Control
     {
         /// <summary>
         /// Contains the value for the <see cref="Menu.Rectangle"/> property.
@@ -46,7 +47,7 @@ namespace ConsoleGUI.Controls
         /// <param name="parent">
         ///     The menu that opened the new instance.
         /// </param>
-        public Menu(IRenderer renderer, IInputSource src, Menu parent = null)
+        public Menu(ICollection<IRenderer> outputs, IInputSource src, Menu parent = null) : base(outputs)
         {
             this.Buttons = new List<MenuButton>(12);
             this.Controls = new List<IRenderable>();
@@ -54,17 +55,11 @@ namespace ConsoleGUI.Controls
             this.BackgroundColor = ConsoleColor.Blue;
             this.BorderForegroundColor = ConsoleColor.White;
             this.ForegroundColor = ConsoleColor.White;
-            this.rectangleProperty = new Rectangle(0, 0, renderer.Width, 2);
-            this.Renderer = renderer;
+            this.rectangleProperty = new Rectangle(0, 0, outputs.First().Width, 2);
             this.Parent = parent;
             this.Input = src;
             src.InputReceived += this.Receive;
         }
-
-        /// <summary>
-        /// Raised when the <see cref="Menu.Visible"/> property was changed.
-        /// </summary>
-        public event EventHandler VisibleChanged;
 
         /// <summary>
         /// Raised when the <see cref="Menu.Focused"/> property was changed.
@@ -132,48 +127,12 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// Gets or sets the menu's background color.
-        /// </summary>
-        /// <value>
-        ///     Contains the menu's background color.
-        /// </value>
-        public ConsoleColor BackgroundColor
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the menu's foreground color.
-        /// </summary>
-        /// <value>
-        ///     Contains the menu's foreground color.
-        /// </value>
-        public ConsoleColor ForegroundColor
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Gets or sets the menu's border color.
         /// </summary>
         /// <value>
         ///     Contains the menu's border color.
         /// </value>
         public ConsoleColor BorderForegroundColor
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
-        /// Gets or sets the z position of the menu.
-        /// </summary>
-        /// <value>
-        ///     Contains the z position of the menu.
-        /// </value>
-        public int Z
         {
             get;
             set;
@@ -200,57 +159,6 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the menu is visible.
-        /// </summary>
-        /// <value>
-        ///     Contains a value indicating whether the menu is visible.
-        /// </value>
-        public bool Visible
-        {
-            get
-            {
-                return this.visibleProperty;
-            }
-
-            set
-            {
-                this.visibleProperty = value;
-                this.OnVisibleChanged(EventArgs.Empty);
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the rectangle of the menu.
-        /// </summary>
-        /// <value>
-        ///     Contains the rectangle of the menu.
-        /// </value>
-        public Rectangle Rectangle
-        {
-            get
-            {
-                return this.rectangleProperty;
-            }
-
-            set
-            {
-                this.rectangleProperty = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets the renderer for this menu.
-        /// </summary>
-        /// <value>
-        ///     Contains the renderer for this menu.
-        /// </value>
-        public IRenderer Renderer
-        {
-            get;
-            private set;
-        }
-
-        /// <summary>
         /// Gets the input source for this menu.
         /// </summary>
         /// <value>
@@ -268,9 +176,9 @@ namespace ConsoleGUI.Controls
         /// <returns>
         ///     Returns a 2-dimensional <see cref="Pixel"/> array containing the rendered menu.
         /// </returns>
-        public Pixel[,] GetPixels()
+        public override Pixel[,] GetPixels()
         {
-            Pixel[,] px = new Pixel[this.Renderer.Width, this.rectangleProperty.Height];
+            Pixel[,] px = new Pixel[this.rectangleProperty.Width, this.rectangleProperty.Height];
 
             // upper border
             for (int x = 0; x < this.rectangleProperty.Width; x++)
@@ -339,10 +247,12 @@ namespace ConsoleGUI.Controls
             this.Visible = true;
             this.Focused = true;
 
-            this.Renderer.Clear(ConsoleColor.DarkBlue);
-
-            this.Renderer.Draw(this.Renderer.Render(this.Controls.ToArray()), new Rectangle(0, 0, this.Renderer.Width, this.Renderer.Height - 2));
-            this.Renderer.Draw(this.GetPixels(), new Rectangle(0, this.Renderer.Height - 2, this.Renderer.Width, 2));
+            foreach (IRenderer r in this.Renderers)
+            {
+                r.Clear(ConsoleColor.DarkBlue);
+                r.Draw(r.Render(this.Controls.ToArray()), new Rectangle(0, 0, r.Width, r.Height - 2));
+                r.Draw(this.GetPixels(), new Rectangle(0, r.Height - 2, r.Width, 2));
+            }
         }
 
         /// <summary>
@@ -354,6 +264,20 @@ namespace ConsoleGUI.Controls
             {
                 Thread.Sleep(10);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="k"></param>
+        public override bool Receive(ConsoleKeyInfo k)
+        {
+            return false;
+        }
+
+        public override bool Receive(string s)
+        {
+            return false;
         }
 
         /// <summary>
@@ -407,20 +331,6 @@ namespace ConsoleGUI.Controls
         /// </param>
         protected virtual void ProcessMenuSpecific(InputReceivedEventArgs e)
         {
-        }
-
-        /// <summary>
-        /// Raises the <see cref="Menu.VisibleChanged"/> event.
-        /// </summary>
-        /// <param name="e">
-        ///     Contains additional information for this event.
-        /// </param>
-        protected void OnVisibleChanged(EventArgs e)
-        {
-            if (this.VisibleChanged != null)
-            {
-                this.VisibleChanged(this, e);
-            }
         }
 
         /// <summary>

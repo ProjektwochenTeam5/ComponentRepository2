@@ -158,7 +158,7 @@ namespace ConsoleGUI.Controls
         /// <returns>
         ///     Returns a value indicating whether the key was accepted.
         /// </returns>
-        public bool Receive(ConsoleKeyInfo k)
+        public override bool Receive(ConsoleKeyInfo k)
         {
             if (char.IsLetterOrDigit(k.KeyChar) ||
                 char.IsPunctuation(k.KeyChar) ||
@@ -214,7 +214,7 @@ namespace ConsoleGUI.Controls
         /// <returns>
         ///     Returns a value indicating whether the string was accepted.
         /// </returns>
-        public bool Receive(string s)
+        public override bool Receive(string s)
         {
             return false;
         }

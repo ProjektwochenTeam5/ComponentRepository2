@@ -229,6 +229,7 @@ namespace ClientAgent
             }
 
             this.storedComponentInfos = new Collection<Component>(m.MetadataComponents.ToList());
+
             foreach (Component c in m.MetadataComponents)
             {
                 Console.WriteLine(c.FriendlyName);

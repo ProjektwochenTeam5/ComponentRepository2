@@ -28,11 +28,8 @@ namespace ConsoleGUI.Controls
         /// <param name="output">
         ///     
         /// </param>
-        /// <param name="input">
-        ///     
-        /// </param>
-        public CheckBox(ICollection<IRenderer> output, ICollection<IInputSource> input)
-            : base(output, input)
+        public CheckBox(ICollection<IRenderer> output)
+            : base(output)
         {
         }
 
