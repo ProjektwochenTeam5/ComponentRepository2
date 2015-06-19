@@ -17,12 +17,28 @@ namespace Server
     using System.Reflection;
     using System.Threading.Tasks;
     using ClientServerCommunication;
+    using ConsoleGUI.IO;
+    using ConsoleGUI.Controls;
+    using System.Collections.ObjectModel;
 
     public class Program
     {
         public static void Main(string[] args)
         {
             GUI.Do();
+            //ConsoleRenderer r = new ConsoleRenderer();
+            //ConsoleInput i = new ConsoleInput();
+            //i.StartReading();
+
+            //Menu m = new Menu(new Collection<IRenderer>() { r }, i);
+            //MenuButton btn = new MenuButton() { Enabled = true, LinkedKey = ConsoleKey.F1, Text = "F1 Quit", Visible = true };
+            //btn.ButtonKeyPressed += btn_ButtonKeyPressed;
+            //m.Buttons.Add(btn);
+            //m.Visible = true;
+            //m.Focused = true;
+            //m.Draw();
+            //i.InputReceived += i_InputReceived;
+
 
             RecBroadcast b = new RecBroadcast();
             Task udpTask = new Task(new Action(() => b.Recieve()));
@@ -39,8 +55,19 @@ namespace Server
             //ServerReceiver serverReceiver = new ServerReceiver();
             //Task serverReceiverTask = new Task(() => serverReceiver.StartReceiving());
             //serverReceiverTask.Start();
-
+           
+            //m.WaitForClose();
             Console.ReadLine();
+        }
+
+        static void i_InputReceived(object sender, InputReceivedEventArgs e)
+        {
+            Console.Write(e.ReceivedKey.KeyChar);
+        }
+
+        static void btn_ButtonKeyPressed(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
         }
     }
 }

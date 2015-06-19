@@ -22,7 +22,7 @@ namespace Server
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, this.UdpClientPort);
             UdpClient client = new UdpClient(groupEP);
             client.EnableBroadcast = true;
-            Console.WriteLine("UDP waiting for Broadcast!");
+            Console.WriteLine("--> UDP waiting for Broadcast!");
 
             try
             {

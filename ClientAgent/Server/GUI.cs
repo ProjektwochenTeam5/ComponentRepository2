@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using ConsoleGUI.Controls;
+using ConsoleGUI.IO;
 
 namespace Server
 {
@@ -10,41 +12,22 @@ namespace Server
     {
         public static void Do()
         {
+            Random r = new Random();
+
+            int first = r.Next(0, 16);
+            int second = r.Next(0, 16);
+            while (first == second)
+            {
+                second = r.Next(0, 16);
+            }
+
             Console.Clear();
-            Console.BackgroundColor = ConsoleColor.Blue;
-            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = (ConsoleColor)first;
+            Console.ForegroundColor = (ConsoleColor)second;
             Console.Clear();
             Console.CursorVisible = false;
 
-            Console.SetWindowSize(Console.LargestWindowWidth - 50, Console.LargestWindowHeight - 25);
-
-
-            for (int i = 0; i < Console. BufferHeight; i++)
-            {
-                Console.SetCursorPosition(Console.WindowWidth - 20, i);
-                Console.Write("|");
-            }
-
-            for (int i = 0; i < Console.BufferHeight; i++)
-            {
-                Console.SetCursorPosition(Console.WindowWidth - 19, i);
-                Console.Write("|");
-            }
-
-            Console.SetCursorPosition(Console.WindowWidth - 18, 3);
-
-            for (int i = 0; i < Console.WindowWidth; i++)
-            {
-                Console.SetCursorPosition(i, Console.WindowHeight - 10);
-                Console.Write("=");
-            }
-
-            for (int i = 0; i < Console.WindowWidth; i++)
-            {
-                Console.SetCursorPosition(i, Console.WindowHeight - 9);
-                Console.Write("=");
-            }
-
+            Console.SetWindowSize(Console.LargestWindowWidth - 90, Console.LargestWindowHeight - 35);
             Console.SetCursorPosition(0, 0);
         }
     }

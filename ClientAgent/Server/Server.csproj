@@ -64,6 +64,10 @@
       <Project>{7e87af0b-6fd2-438d-a795-a6b7d6194cd8}</Project>
       <Name>ClientServerCommunication</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ConsoleGUI\ConsoleGUI.csproj">
+      <Project>{e292d312-e896-405f-980d-6d46491c4914}</Project>
+      <Name>ConsoleGUI</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.Component\Core.Component.csproj">
       <Project>{3cbff49b-e085-49af-8aa5-e3bab177b179}</Project>
       <Name>Core.Component</Name>

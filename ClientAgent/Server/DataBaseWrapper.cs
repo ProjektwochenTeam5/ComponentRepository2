@@ -38,6 +38,7 @@ using System.Threading.Tasks;
                           where typeof(IComponent).IsAssignableFrom(type)
                           select type;
 
+
             componentInfo = result.Single();
 
             IComponent comp = (IComponent)Activator.CreateInstance(componentInfo);
@@ -57,7 +58,7 @@ using System.Threading.Tasks;
                 // close file stream
                 fs.Close();
 
-                Console.WriteLine(filename + " Component succsessfully stored!");
+                Console.WriteLine("--> " + filename + " Component succsessfully stored!");
                 return true;
             }
             catch (Exception e)

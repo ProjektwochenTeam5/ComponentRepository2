@@ -1,4 +1,5 @@
-﻿// --------------------------------------------------------------
+﻿
+// --------------------------------------------------------------
 // <copyright file="Position.cs" company="David Eiwen">
 // (c) by David Eiwen. All Rights reserved.
 // </copyright>

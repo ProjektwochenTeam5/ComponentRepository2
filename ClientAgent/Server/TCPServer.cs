@@ -51,7 +51,7 @@ namespace Server
             try
             {
                 this.MyListener.Start();
-                Console.WriteLine("TCP Listener started");
+                Console.WriteLine("--> TCP Listener started");
 
                 while (true)
                 {
@@ -98,7 +98,7 @@ namespace Server
                         byte[] buffer = new byte[1024];
 
                         int recievedbytes = ns.Read(buffer, 0, buffer.Length);
-                        Console.WriteLine(recievedbytes + " bytes empfangen");
+                        Console.WriteLine(recievedbytes + " bytes recieved");
 
                         if (body == null)
                         {

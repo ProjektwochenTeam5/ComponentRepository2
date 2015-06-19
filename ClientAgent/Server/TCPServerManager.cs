@@ -128,11 +128,11 @@
 
                         if (contains)
                         {
-                            this.GiveTranserComponentResponse(e.Info, request.ComponentID);
+                            this.GiveTranserComponentResponse(e.Info, request.ComponentID, request.MessageID);
                         }
                         else
                         {
-                            Console.WriteLine("Don't have this component in store!");
+                            Console.WriteLine("We don't have this component in store!");
                         }
 
                         break;                        
@@ -166,15 +166,29 @@
             }
         }
 
-        private void GiveTranserComponentResponse(ClientInfo clientInfo, Guid guid)
+        private void GiveTranserComponentResponse(ClientInfo clientInfo, Guid guid, int requestid)
         {
-            string path = this.Dlls[guid];
+            string path = string.Empty;
+            try
+            {
+                 path = this.Dlls[guid];
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("We don't have this dll");
+                return;
+            }
 
             byte[] data = DataConverter.ConvertDllToByteArray(path);
             TransferComponentResponse response = new TransferComponentResponse();
             response.Component = data;
+            response.BelongsTo = requestid;
 
-            byte[] send = DataConverter.ConvertObjectToByteArray(response);
+            byte[] body = DataConverter.ConvertObjectToByteArray(response);
+
+            byte[] send = DataConverter.ConvertMessageToByteArray(4, body);
+
             this.MyTCPServer.SendMessage(send, clientInfo.ClientGuid);
         }
 
