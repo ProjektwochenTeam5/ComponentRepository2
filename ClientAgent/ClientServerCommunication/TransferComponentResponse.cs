@@ -21,5 +21,10 @@ namespace ClientServerCommunication
         {
             get { return StatusCode.TransferComponent; }
         }
+
+        /// <summary>
+        /// The Id of the Request the answer belongs to.
+        /// </summary>
+        public int BelongsTo { get; set; }
     }
 }

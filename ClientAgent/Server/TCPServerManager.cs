@@ -130,6 +130,10 @@
                         {
                             this.GiveTranserComponentResponse(e.Info, request.ComponentID);
                         }
+                        else
+                        {
+                            Console.WriteLine("Don't have this component in store!");
+                        }
 
                         break;                        
                     }
@@ -164,8 +168,14 @@
 
         private void GiveTranserComponentResponse(ClientInfo clientInfo, Guid guid)
         {
-            Component component = this.Components[guid];
-            
+            string path = this.Dlls[guid];
+
+            byte[] data = DataConverter.ConvertDllToByteArray(path);
+            TransferComponentResponse response = new TransferComponentResponse();
+            response.Component = data;
+
+            byte[] send = DataConverter.ConvertObjectToByteArray(response);
+            this.MyTCPServer.SendMessage(send, clientInfo.ClientGuid);
         }
 
         private void SendInfosToAllClients()
