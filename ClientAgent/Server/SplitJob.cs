@@ -15,75 +15,77 @@ namespace Server
 
         public static void Split(DoJobRequest jobreq)
         {
-            var addGuid = Guid.NewGuid();
-            var inpGuid = Guid.NewGuid();
-            var outGuid = Guid.NewGuid();
+            var job = jobreq.Job.JobComponent;
 
-            var intaddGuid1 = Guid.NewGuid();
-            var intaddGuid2 = Guid.NewGuid();
-            var intinpGuid1 = Guid.NewGuid();
-            var intinpGuid2 = Guid.NewGuid();
-            var intinpGuid3 = Guid.NewGuid();
-            var intoutGuid = Guid.NewGuid();
+            //var addGuid = Guid.NewGuid();
+            //var inpGuid = Guid.NewGuid();
+            //var outGuid = Guid.NewGuid();
 
-            //////////////// Testjob
-            Component job = new Component();
-            job.ComponentGuid = new Guid();
-            job.FriendlyName = "Addieren von 3 Zahlen";
-            job.InputDescriptions = new List<string>() {"zahl1", "zahl2", "zahl3"};
-            job.OutputDescriptions = new List<string>() { "zahl" };
-            job.InputHints = new List<string>() { typeof(int).ToString(), typeof(int).ToString(), typeof(int).ToString() };
-            job.IsAtomic = false;
-            job.Edges = new List<ComponentEdge>();
+            //var intaddGuid1 = Guid.NewGuid();
+            //var intaddGuid2 = Guid.NewGuid();
+            //var intinpGuid1 = Guid.NewGuid();
+            //var intinpGuid2 = Guid.NewGuid();
+            //var intinpGuid3 = Guid.NewGuid();
+            //var intoutGuid = Guid.NewGuid();
 
-            var edge1 = new ComponentEdge();
-            edge1.InputComponentGuid = addGuid;
-            edge1.OutputComponentGuid = inpGuid;
-            edge1.InternalInputComponentGuid = intaddGuid1;
-            edge1.InternalOutputComponentGuid = intinpGuid1;
-            edge1.InputValueID = 1;
-            edge1.OutputValueID = 1;
+            ////////////////// Testjob
+            //Component job = new Component();
+            //job.ComponentGuid = new Guid();
+            //job.FriendlyName = "Addieren von 3 Zahlen";
+            //job.InputDescriptions = new List<string>() {"zahl1", "zahl2", "zahl3"};
+            //job.OutputDescriptions = new List<string>() { "zahl" };
+            //job.InputHints = new List<string>() { typeof(int).ToString(), typeof(int).ToString(), typeof(int).ToString() };
+            //job.IsAtomic = false;
+            //job.Edges = new List<ComponentEdge>();
 
-            var edge2 = new ComponentEdge();
-            edge2.InputComponentGuid = addGuid;
-            edge2.OutputComponentGuid = inpGuid;
-            edge2.InternalInputComponentGuid = intaddGuid1;
-            edge2.InternalOutputComponentGuid = intinpGuid2;
-            edge2.InputValueID = 2;
-            edge2.OutputValueID = 1;
+            //var edge1 = new ComponentEdge();
+            //edge1.InputComponentGuid = addGuid;
+            //edge1.OutputComponentGuid = inpGuid;
+            //edge1.InternalInputComponentGuid = intaddGuid1;
+            //edge1.InternalOutputComponentGuid = intinpGuid1;
+            //edge1.InputValueID = 1;
+            //edge1.OutputValueID = 1;
 
-            var edge3 = new ComponentEdge();
-            edge3.InputComponentGuid = addGuid;
-            edge3.OutputComponentGuid = addGuid;
-            edge3.InternalInputComponentGuid = intaddGuid2;
-            edge3.InternalOutputComponentGuid = intaddGuid1;
-            edge3.InputValueID = 1;
-            edge3.OutputValueID = 1;
+            //var edge2 = new ComponentEdge();
+            //edge2.InputComponentGuid = addGuid;
+            //edge2.OutputComponentGuid = inpGuid;
+            //edge2.InternalInputComponentGuid = intaddGuid1;
+            //edge2.InternalOutputComponentGuid = intinpGuid2;
+            //edge2.InputValueID = 2;
+            //edge2.OutputValueID = 1;
 
-            var edge4 = new ComponentEdge();
-            edge4.InputComponentGuid = addGuid;
-            edge4.OutputComponentGuid = inpGuid;
-            edge4.InternalInputComponentGuid = intaddGuid2;
-            edge4.InternalOutputComponentGuid = intinpGuid3;
-            edge4.InputValueID = 2;
-            edge4.OutputValueID = 1;
+            //var edge3 = new ComponentEdge();
+            //edge3.InputComponentGuid = addGuid;
+            //edge3.OutputComponentGuid = addGuid;
+            //edge3.InternalInputComponentGuid = intaddGuid2;
+            //edge3.InternalOutputComponentGuid = intaddGuid1;
+            //edge3.InputValueID = 1;
+            //edge3.OutputValueID = 1;
 
-            var edge5 = new ComponentEdge();
-            edge5.InputComponentGuid = outGuid;
-            edge5.OutputComponentGuid = addGuid;
-            edge5.InternalInputComponentGuid = intoutGuid;
-            edge5.InternalOutputComponentGuid = intaddGuid2;
-            edge5.InputValueID = 1;
-            edge5.OutputValueID = 1;
+            //var edge4 = new ComponentEdge();
+            //edge4.InputComponentGuid = addGuid;
+            //edge4.OutputComponentGuid = inpGuid;
+            //edge4.InternalInputComponentGuid = intaddGuid2;
+            //edge4.InternalOutputComponentGuid = intinpGuid3;
+            //edge4.InputValueID = 2;
+            //edge4.OutputValueID = 1;
 
-            List<ComponentEdge> myedges = new List<ComponentEdge>();
+            //var edge5 = new ComponentEdge();
+            //edge5.InputComponentGuid = outGuid;
+            //edge5.OutputComponentGuid = addGuid;
+            //edge5.InternalInputComponentGuid = intoutGuid;
+            //edge5.InternalOutputComponentGuid = intaddGuid2;
+            //edge5.InputValueID = 1;
+            //edge5.OutputValueID = 1;
 
-            myedges.Add(edge1);
-            myedges.Add(edge2);
-            myedges.Add(edge3);
-            myedges.Add(edge4);
-            myedges.Add(edge5);
-            job.Edges = myedges.AsEnumerable();
+            //List<ComponentEdge> myedges = new List<ComponentEdge>();
+
+            //myedges.Add(edge1);
+            //myedges.Add(edge2);
+            //myedges.Add(edge3);
+            //myedges.Add(edge4);
+            //myedges.Add(edge5);
+            //job.Edges = myedges.AsEnumerable();
 
             
 
