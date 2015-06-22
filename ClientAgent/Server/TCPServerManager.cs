@@ -115,7 +115,7 @@
             {
                 case ClientServerCommunication.StatusCode.KeepAlive:
                     {
-                        KeepAlive keepAlive = DataConverter.ConvertByteArrrayToKeepAlive(e.MessageBody);
+                        KeepAlive keepAlive = (KeepAlive)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
                         this.CalculateClientLoads(keepAlive);
                         this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
                         break;
@@ -123,7 +123,7 @@
 
                 case ClientServerCommunication.StatusCode.TransferComponent:
                     {
-                        TransferComponentRequest request = DataConverter.ConvertByteArrayToTransferComponentRequest(e.MessageBody);
+                        TransferComponentRequest request = (TransferComponentRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
                         bool contains = this.Components.Keys.Contains(request.ComponentID);
 
                         if (contains)
@@ -141,11 +141,16 @@
                 case ClientServerCommunication.StatusCode.TransferJob:
                     break;
                 case ClientServerCommunication.StatusCode.DoJobRequest:
-                    break;
+                    {
+                        DoJobRequest request = (DoJobRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                        SplitJob.Split(request);
+
+                        break;
+                    }
 
                 case ClientServerCommunication.StatusCode.StorComponent:
                     {
-                        StoreComponent storecomponent = DataConverter.ConvertByteArrayToStoreComponent(e.MessageBody);
+                        StoreComponent storecomponent = (StoreComponent)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
                         DataBaseWrapper db = new DataBaseWrapper();
                         bool store = db.StoreComponent(storecomponent.Component, storecomponent.FriendlyName);
 

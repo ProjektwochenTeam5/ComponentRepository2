@@ -132,6 +132,26 @@ namespace ClientServerCommunication
             }
         }
 
+        public static Message ConvertByteArrayToMessage(byte[] data)
+        {
+            Message m = null;
+
+            try
+            {
+                using (MemoryStream ms = new MemoryStream(data))
+                {
+                    BinaryFormatter bf = new BinaryFormatter();
+                    m = (Message)bf.Deserialize(ms);
+                    return m;
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.Message);
+                return null;
+            }
+        }
+
         public static Component MapIComponentToNetworkComponent(IComponent comp, Guid g)
         {
 
