@@ -16,7 +16,7 @@ namespace ConvertStringToDouble
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for converting double to string.
+    /// This is the component class for converting string to double.
     /// </summary>
     public class ConvertStringToDouble
     {

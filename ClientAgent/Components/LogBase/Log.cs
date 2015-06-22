@@ -16,7 +16,7 @@ namespace Log
     using Core.Component;
 
     /// <summary>
-    /// This is the component class to logarithmise with base.
+    /// This is the component class to logarithmise with a variable base.
     /// </summary>
     public class Log
     {    
@@ -112,7 +112,6 @@ namespace Log
             {
                 return new object[] { new ArgumentException() };
             }
-
             else
             {
                 double result = Math.Log(num, log_base);

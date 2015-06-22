@@ -16,7 +16,7 @@ namespace Power
     using Core.Component;
 
     /// <summary>
-    /// This is the component class to logarithmise natural.
+    /// This is the component class to do a natural logarithm natural.
     /// </summary>
     public class Logn : IComponent
     {
