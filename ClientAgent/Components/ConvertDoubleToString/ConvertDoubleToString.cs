@@ -9,8 +9,8 @@ namespace ConvertDoubleToString
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Collections.ObjectModel;
+    using System.Linq;    
     using System.Text;
     using System.Threading.Tasks;
     using Core.Component;
@@ -29,8 +29,7 @@ namespace ConvertDoubleToString
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();           
-            
+            this.OutputDescriptions = new List<string>();          
         }
 
         /// <summary>

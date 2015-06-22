@@ -9,8 +9,8 @@ namespace ConsoleOutput
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;    
     using System.Linq;
-    using System.Collections.ObjectModel;
     using System.Text;
     using System.Threading.Tasks;
     using Core.Component;
@@ -29,8 +29,7 @@ namespace ConsoleOutput
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new List<string>();
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();         
-                        
+            this.OutputDescriptions = new List<string>();     
         }
 
         /// <summary>

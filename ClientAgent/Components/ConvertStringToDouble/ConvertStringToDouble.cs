@@ -16,7 +16,7 @@ namespace ConvertStringToDouble
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for converting integer to string.
+    /// This is the component class for converting double to string.
     /// </summary>
     public class ConvertStringToDouble
     {
@@ -26,8 +26,8 @@ namespace ConvertStringToDouble
         public ConvertStringToDouble()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new [] {typeof(string).ToString() });
-            this.OutputHints = new ReadOnlyCollection<string>(new [] { typeof(double).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
         }
@@ -100,6 +100,11 @@ namespace ConvertStringToDouble
         /// <returns>Collection of output arguments.</returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
+            if (values.Count() != 1)
+            {
+                yield return new object[] { new ArgumentException() };
+            }
+
             double num;
             yield return
                 values.Count() == 1 &&

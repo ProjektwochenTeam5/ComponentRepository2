@@ -9,18 +9,18 @@ namespace Power
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Collections.ObjectModel;
+    using System.Linq;    
     using System.Text;
     using System.Threading.Tasks;
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for dividing two numeric values.
+    /// This is the component class for raising a number to a given power.
     /// </summary>
     public class Power : IComponent
     {
-    /// <summary>
+        /// <summary>
         /// Initializes a new instance of the <see cref="Power"/> class.
         /// </summary>
         public Power()
@@ -114,8 +114,7 @@ namespace Power
             double exp = 0;
             double result = Math.Pow(num, exp);
 
-            return new object[] { result };
-            
+            return new object[] { result };            
         }
     }
 }
