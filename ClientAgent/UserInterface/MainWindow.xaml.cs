@@ -233,7 +233,7 @@ namespace UserInterface
         }
 
         /// <summary>
-        /// 
+        /// If toggle link is not checked, sets the clicked component as the selected item.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -361,10 +361,7 @@ namespace UserInterface
             }
 
             // reset HasMatching...-Properties of components
-            foreach (MyComponent c in this.availableComps)
-            {
-                c.SetSelectedComponent(null);
-            }
+            ResetMatchingItems();
 
             this.selectedItem.IsSelected = false;
             this.selectedItem = null;
@@ -428,14 +425,26 @@ namespace UserInterface
             }
 
             // reset HasMatching...-Properties of components
-            foreach (MyComponent c in this.availableComps)
-            {
-                c.SetSelectedComponent(null);
-            }
+            ResetMatchingItems();
 
             this.compLayout.Remove(this.selectedItem);
             this.ComponentCanvas.Children.Remove(this.selectedItem);
             this.selectedItem = null;
+        }
+
+        /// <summary>
+        /// Clears the matching input and matching output lists and
+        /// resets the HasMatching... properties of all available components.
+        /// </summary>
+        private void ResetMatchingItems()
+        {
+            this.matchingIn.Clear();
+            this.matchingOut.Clear();
+
+            foreach (MyComponent c in this.availableComps)
+            {
+                c.SetSelectedComponent(null);
+            }
         }
 
         /// <summary>
@@ -451,10 +460,7 @@ namespace UserInterface
             this.selectedLink = null;
 
             // reset HasMatching...-Properties of components
-            foreach (MyComponent c in this.availableComps)
-            {
-                c.SetSelectedComponent(null);
-            }
+            ResetMatchingItems();
         }
         
         /// <summary>
