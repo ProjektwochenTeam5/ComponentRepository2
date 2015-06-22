@@ -16,7 +16,7 @@ namespace Log
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for multiplying a number with e.
+    /// This is the component class for e.
     /// </summary>
     public class EFunction
     {  
@@ -50,7 +50,7 @@ namespace Log
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Use e function"; }
+            get { return "E function"; }
         }
 
         /// <summary>
