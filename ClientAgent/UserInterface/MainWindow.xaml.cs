@@ -16,25 +16,56 @@ namespace UserInterface
     public partial class MainWindow : Window
     {
         /// <summary>
-        /// The item to drag when clicked on.
+        /// The component to drag when clicked on.
         /// </summary>
         private MyCompControl movingItem = null;
 
+        /// <summary>
+        /// The component selected by the user.
+        /// </summary>
         private MyCompControl selectedItem = null;
 
+        /// <summary>
+        /// The link selected by the user.
+        /// </summary>
         private Link selectedLink = null;
 
         /// <summary>
+        /// The mouse position relative to the moving item.
         /// Only valid if movingItem != null.
         /// </summary>
         private Point movingItemInnerPosition;
-
-
+        
+        /// <summary>
+        /// The collection containing all available components.
+        /// </summary>
         private ObservableCollection<MyComponent> availableComps = new ObservableCollection<MyComponent>();
+
+        /// <summary>
+        /// The collection containing the components which are set as favorites by the user.
+        /// </summary>
         private ObservableCollection<MyComponent> favorites = new ObservableCollection<MyComponent>();
+
+        /// <summary>
+        /// The collection containing all components which have an input hint that matches the any output of the selected item.
+        /// Is empty if no component is selected.
+        /// </summary>
         private ObservableCollection<MyComponent> matchingIn = new ObservableCollection<MyComponent>();
+
+        /// <summary>
+        /// The collection containing all components which have an output hint that matches the any input of the selected item.
+        /// Is empty if no component is selected.
+        /// </summary>
         private ObservableCollection<MyComponent> matchingOut = new ObservableCollection<MyComponent>();
+
+        /// <summary>
+        /// The list containing all components which are visible on the canvas.
+        /// </summary>
         private List<MyCompControl> compLayout = new List<MyCompControl>();
+
+        /// <summary>
+        /// The list containing all edges which make up the job.
+        /// </summary>
         private List<Link> edgeLayout = new List<Link>();
 
         public MainWindow()
@@ -92,6 +123,11 @@ namespace UserInterface
             #endregion Test components
         }
 
+        /// <summary>
+        /// If there is a moving item, moves it on the canvas and all connected lines.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ComponentCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             // If there is a moving item, drag it and its connected lines
@@ -151,6 +187,11 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// If toggle link is not checked sets the connected link as the selected link and highlights it if it exists.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void component_OnInputMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             InputControl target = e.Source as InputControl;
@@ -165,6 +206,12 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// If toggle link is checked and the input hints match, sets the drop effects to link.
+        /// If the input hints do not match, sets the drop effects to none.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void component_OnInputDragOver(object sender, DragEventArgs e)
         {
             InputControl target = e.Source as InputControl;
@@ -183,6 +230,11 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// If toggle link is checked and the input hints match, connects the drag source output to the input.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void component_OnInputDrop(object sender, DragEventArgs e)
         {
             InputControl target = e.Source as InputControl;
@@ -210,6 +262,12 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// If toggle link is checked and the pressed output is not already connected, sets the output as the drag source.
+        /// If toggle link is not checked sets the selected link and highlights it.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void component_OnOutputMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             OutputControl srcOutput = (OutputControl)e.Source;
@@ -235,7 +293,7 @@ namespace UserInterface
         /// <summary>
         /// If toggle link is not checked, sets the clicked component as the selected item.
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">The <see cref="MyCompControl"/> instance which was clicked.</param>
         /// <param name="e"></param>
         private void component_OnBGMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
@@ -495,6 +553,11 @@ namespace UserInterface
             DeleteSelectedItem();
         }
 
+        /// <summary>
+        /// Adds the selected component to the layout on the canvas.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void ComponentsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
             ListView senderView = (ListView)sender;
@@ -519,17 +582,33 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Deselects the selected link and the selected item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void toggleLink_Checked(object sender, RoutedEventArgs e)
         {
             DeselectLink();
             DeselectItem();
         }
 
+        /// <summary>
+        /// Calls DeleteAll method.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnDeleteAll_Click(object sender, RoutedEventArgs e)
         {
             DeleteAll();
         }
 
+        /// <summary>
+        /// Checks if all inputs and outputs are connected and converts the layout to a job.
+        /// TODO do anything with the job.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnCreateJob_Click(object sender, RoutedEventArgs e)
         {
             MyCompControl comp = null;
@@ -544,6 +623,7 @@ namespace UserInterface
                 return;
             }
 
+            // check if all inputs and outputs are connected
             for (int i = 0; everythingConnected && i < compLayout.Count; i++)
             {
                 comp = compLayout[i];
@@ -583,6 +663,10 @@ namespace UserInterface
                 MessageBoxImage.Information);
         }
 
+        /// <summary>
+        /// Converts the current layout which is visible on the canvas to a component.
+        /// </summary>
+        /// <returns>The component defined by the edge layout.</returns>
         private Component ConvertLayoutToComponent()
         {
             Component combinedComp = new Component();
@@ -639,6 +723,12 @@ namespace UserInterface
             return combinedComp;
         }
 
+        /// <summary>
+        /// Adds a new component which contains the functionality of the visible layout of the canvas.
+        /// Clears the canvas if the user wishes to.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnCreateComp_Click(object sender, RoutedEventArgs e)
         {
             if (this.edgeLayout.Count > 0)
@@ -673,6 +763,11 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Adds the associated component to the list of favorites if it is not already contained.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FavoriteCheckBox_Checked(object sender, RoutedEventArgs e)
         {
             CheckBox s = (CheckBox)sender;
@@ -684,6 +779,11 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Removes the associated component from the list of favorites if it is contained.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void FavoriteCheckBox_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox s = (CheckBox)sender;

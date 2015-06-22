@@ -8,6 +8,10 @@ using System.Threading.Tasks;
 
 namespace UserInterface
 {
+    /// <summary>
+    /// This class serves as a wrapper for the <see cref="Core.Network.Component"/> class.
+    /// Adds the functionality to set objects of this type as a favorite.
+    /// </summary>
     public class MyComponent : INotifyPropertyChanged
     {
         public event PropertyChangedEventHandler PropertyChanged;
