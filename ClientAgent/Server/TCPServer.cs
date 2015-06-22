@@ -56,7 +56,6 @@ namespace Server
                 while (true)
                 {
                     TcpClient client = this.MyListener.AcceptTcpClient();
-                    Console.WriteLine("Client da :D");
                     Thread clientThread = new Thread(new ParameterizedThreadStart(ClientWorker));
                     clientThread.IsBackground = true;
                     clientThread.Start(client);
@@ -73,7 +72,7 @@ namespace Server
         {
             TcpClient client = (TcpClient)obj;
             ClientInfo clientInfo = new ClientInfo();
-            clientInfo.ClientGuid = new Guid();
+            clientInfo.ClientGuid = Guid.NewGuid();
             clientInfo.IpAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
             clientInfo.FriendlyName = "Markus";
             this.Clients.Add(clientInfo, client);
@@ -81,8 +80,7 @@ namespace Server
             NetworkStream ns = client.GetStream();
 
             this.FireOnClientFetched(new ClientFetchedEventArgs(clientInfo.ClientGuid));
-           // this.SendAckToClient(ns);
-            //this.SendComponentInfos(ns);
+            Console.WriteLine("----> Client fetched! FriendlyName: {0} - ClientID: {1}", clientInfo.FriendlyName, clientInfo.ClientGuid);
 
             while (true)
             {
