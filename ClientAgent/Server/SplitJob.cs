@@ -96,7 +96,7 @@ namespace Server
             if (job.IsAtomic)
             {
                 // an client schiken (Auftrag)
-
+                SendJobToClient(job, null);
             }
             else
             {
@@ -212,6 +212,8 @@ namespace Server
                         }
 
                         // input Data mittels JobRequest an client schicken.
+                        var comp = this.GetComponentById(nextCompGuid);
+                        this.SendJobToClient(comp, inputData);
 
                         /////////// TEST METHODENAUFRUF
                         int result = Add(inputData);
