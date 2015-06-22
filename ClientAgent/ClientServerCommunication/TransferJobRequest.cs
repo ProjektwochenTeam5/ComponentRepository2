@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Network;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,11 +10,15 @@ namespace ClientServerCommunication
     [Serializable]
     public class TransferJobRequest : Message
     {
-        public DoJobRequest Job { get; set; }
+        public Guid ComponentGuid { get; set; }
 
         public Guid ServerID { get; set; }
-
-        public Guid ClientID { get; set; }
+        
+        /// <summary>
+        /// Gets or sets a collection of input arguments.
+        /// </summary>
+        /// <value>Collection of objects.</value>
+        public IEnumerable<object> InputData { get; set; }
 
         /// <summary>
         /// Gets the message type of the message.
