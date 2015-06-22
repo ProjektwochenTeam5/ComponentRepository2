@@ -1,39 +1,35 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="Sub.cs" company="FHWN"> 
+// <copyright file="EFunction.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace Sub
+namespace Log
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for subtracting two numeric values.
+    /// This is the component class for multiplying a number with e.
     /// </summary>
-    public class Sub : IComponent
-    {
+    public class EFunction
+    {  
         /// <summary>
-        /// Initializes a new instance of the <see cref="Sub"/> class.
+        /// Initializes a new instance of the <see cref="EFunction"/> class.
         /// </summary>
-        public Sub()
+        public EFunction()
         {
             this.ComponentGuid = new Guid();
             this.InputHints = new List<string>();
-            this.OutputHints = new List<string>();
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
-
-            this.InputHints.ToList().Add(typeof(int).ToString());
-            this.InputHints.ToList().Add(typeof(int).ToString());
-
-            this.OutputHints.ToList().Add(typeof(int).ToString());
         }
 
         /// <summary>
@@ -49,12 +45,12 @@ namespace Sub
         }
 
         /// <summary>
-        /// Gets the display name for the component.
+        /// Gets the display name for the component. 
         /// </summary>
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Substraction"; }
+            get { return "Use e function"; }
         }
 
         /// <summary>
@@ -104,19 +100,13 @@ namespace Sub
         /// <returns>Collection of output arguments.</returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            if (values.Count() != 2)
+            if (values.Count() != 1)
             {
-                yield return new object[] { new ArgumentException() };
+                return new object[] { new ArgumentException() };
             }
 
-            int result = 0;
-
-            foreach (var item in values)
-            {
-                result -= (int)item;
-            }
-
-            yield return result;
-        }       
+            double e = Math.E;
+            return new object[] { e };
+        }
     }
 }
