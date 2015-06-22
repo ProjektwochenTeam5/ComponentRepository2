@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Core.Network;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -9,7 +10,7 @@ namespace ClientServerCommunication
     [Serializable]
     public class DoJobRequest : Message
     {
-        public byte[] Job { get; set; }
+        public JobRequest Job { get; set; }
 
         public Guid? TargetDisplay { get; set; }
 

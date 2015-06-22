@@ -132,7 +132,6 @@ namespace ClientServerCommunication
             }
         }
 
-
         public static Component MapIComponentToNetworkComponent(IComponent comp, Guid g)
         {
 
