@@ -30,6 +30,11 @@ namespace Power
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
+
+            this.InputHints.ToList().Add(typeof(int).ToString());
+            this.InputHints.ToList().Add(typeof(int).ToString());
+
+            this.OutputHints.ToList().Add(typeof(int).ToString());
         }
 
         /// <summary>

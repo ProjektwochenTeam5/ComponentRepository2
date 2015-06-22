@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="EFunction.cs" company="FHWN"> 
+// <copyright file="ConvertStringToUint.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace EFunction
+namespace ConvertStringToUint
 {
     using System;
     using System.Collections.Generic;
@@ -16,18 +16,18 @@ namespace EFunction
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for multiplying a number with e.
+    /// This is the component class for converting string to an unsigned integer.
     /// </summary>
-    public class EFunction
-    {  
+    public class ConvertStringToUint : IComponent
+    {
         /// <summary>
-        /// Initializes a new instance of the <see cref="EFunction"/> class.
+        /// Initializes a new instance of the <see cref="ConvertStringToUint"/> class.
         /// </summary>
-        public EFunction()
+        public ConvertStringToUint()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new List<string>();
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
         }
@@ -45,12 +45,12 @@ namespace EFunction
         }
 
         /// <summary>
-        /// Gets the display name for the component. 
+        /// Gets the display name for the component.
         /// </summary>
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Use e function"; }
+            get { return "Convert string to uint"; }
         }
 
         /// <summary>
@@ -105,8 +105,13 @@ namespace EFunction
                 return new object[] { new ArgumentException() };
             }
 
-            double e = Math.E;
-            return new object[] { e };
+            bool parseOK;
+            string st = null;
+            uint i;
+
+            parseOK = uint.TryParse(st, out i);
+
+            return new object[] { i };
         }
     }
 }
