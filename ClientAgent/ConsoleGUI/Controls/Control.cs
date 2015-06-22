@@ -5,17 +5,20 @@
 // <summary>
 // This file contains the abstract <see cref="Control"/> class.
 // </summary>
+// <author>
+// David Eiwen
+// </author>
 // --------------------------------------------------------------
 
 namespace ConsoleGUI.Controls
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Collections.Specialized;
     using System.Linq;
     using System.Threading;
     using ConsoleGUI.IO;
-    using System.Collections.ObjectModel;
-    using System.Collections.Specialized;
 
     /// <summary>
     /// Provides a base class for all controls. This class is abstract.
@@ -108,6 +111,12 @@ namespace ConsoleGUI.Controls
             private set;
         }
 
+        /// <summary>
+        /// Gets the owner of the control.
+        /// </summary>
+        /// <value>
+        ///     Contains the owner of the control.
+        /// </value>
         public Control Owner
         {
             get;
@@ -183,7 +192,6 @@ namespace ConsoleGUI.Controls
             set
             {
                 this.zproperty = value;
-
                 this.OnZIndexChanged(EventArgs.Empty);
             }
         }
@@ -351,7 +359,9 @@ namespace ConsoleGUI.Controls
         /// <summary>
         /// Raises the <see cref="ControlsChanged"/> event.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
         protected void OnControlsChanged(NotifyCollectionChangedEventArgs e)
         {
             if (this.ControlsChanged != null)
@@ -375,11 +385,14 @@ namespace ConsoleGUI.Controls
         /// <summary>
         /// Called when the <see cref="Controls"/> collection was modified.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
         private void Controls_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
-
         }
     }
 }

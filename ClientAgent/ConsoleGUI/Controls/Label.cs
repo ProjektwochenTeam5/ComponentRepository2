@@ -14,6 +14,7 @@ namespace ConsoleGUI.Controls
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using ConsoleGUI;
     using ConsoleGUI.IO;
 
     /// <summary>
@@ -21,6 +22,11 @@ namespace ConsoleGUI.Controls
     /// </summary>
     public class Label : Control
     {
+        /// <summary>
+        /// The value for the <see cref="Text"/> property.
+        /// </summary>
+        private string textProperty;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Label"/> class.
         /// </summary>
@@ -33,7 +39,13 @@ namespace ConsoleGUI.Controls
             this.Rectangle = new Rectangle(0, 0, 8, 1);
             this.BackgroundColor = ConsoleColor.DarkBlue;
             this.ForegroundColor = ConsoleColor.White;
+            this.TextChanged += this.Label_TextChanged;
         }
+
+        /// <summary>
+        /// Raised when the <see cref="Text"/> property was changed.
+        /// </summary>
+        public event EventHandler TextChanged;
 
         /// <summary>
         /// Gets or sets the text of the label.
@@ -43,8 +55,16 @@ namespace ConsoleGUI.Controls
         /// </value>
         public string Text
         {
-            get;
-            set;
+            get
+            {
+                return this.textProperty;
+            }
+
+            set
+            {
+                this.textProperty = value;
+                this.OnTextChanged(EventArgs.Empty);
+            }
         }
 
         /// <summary>
@@ -97,6 +117,34 @@ namespace ConsoleGUI.Controls
         public override bool Receive(string s)
         {
             return false;
+        }
+
+        /// <summary>
+        /// Raises the <see cref="TextChanged"/> event.
+        /// </summary>
+        /// <param name="e">
+        ///    Contains additional information for this event.
+        /// </param>
+        protected void OnTextChanged(EventArgs e)
+        {
+            if (this.TextChanged != null)
+            {
+                this.TextChanged(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Called when the <see cref="Text"/> property was changed.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional infomation for this event.
+        /// </param>
+        private void Label_TextChanged(object sender, EventArgs e)
+        {
+            this.Draw(this.Rectangle);
         }
     }
 }

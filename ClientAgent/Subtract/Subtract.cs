@@ -1,4 +1,11 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="Subtract.cs" company="FHWN>
+// Copyright (c) FHWN. All rights reserved.
+// </copyright>
+// <summary>Component class.</summary>
+// <author>Matthias Böhm</author>
+// --------------------------------------------------------------
+
 namespace Subtract
 {
     using System;
@@ -86,12 +93,8 @@ namespace Subtract
         /// <returns></returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            if (values.Count() != 2)
-            {
-                throw new ArgumentException();
-            }
-
-            yield return (int)values.First() - (int)values.Last();
+            yield return values.Count() == 2 ?
+                (int)values.First() - (int)values.Last() : new ArgumentException() as object;
         }
     }
 }

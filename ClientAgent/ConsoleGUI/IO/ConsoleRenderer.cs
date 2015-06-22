@@ -5,6 +5,9 @@
 // <summary>
 // This file contains the <see cref="ConsoleRenderer"/> class.
 // </summary>
+// <author>
+// David Eiwen
+// </author>
 // --------------------------------------------------------------
 
 namespace ConsoleGUI.IO

@@ -50,6 +50,7 @@
     <Compile Include="ThreadArgs.cs" />
     <Compile Include="UdpBroadcast.cs" />
     <Compile Include="UdpClientThreadArgs.cs" />
+    <Compile Include="UI\ClientMenu.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
