@@ -15,7 +15,7 @@ namespace Server
 
         public static void Split(DoJobRequest jobreq)
         {
-            var job = jobreq.Job.JobComponent;
+            var job = jobreq.Job;
 
             //var addGuid = Guid.NewGuid();
             //var inpGuid = Guid.NewGuid();
