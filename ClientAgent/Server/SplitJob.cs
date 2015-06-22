@@ -1,4 +1,5 @@
-﻿using Core.Network;
+﻿using ClientServerCommunication;
+using Core.Network;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,7 @@ namespace Server
     {
         private static List<ExtendedComponentEdge> edges;
 
-        public static void Split(Component job)
+        public static void Split(DoJobRequest jobreq)
         {
             var addGuid = Guid.NewGuid();
             var inpGuid = Guid.NewGuid();
@@ -26,7 +27,7 @@ namespace Server
             var intoutGuid = Guid.NewGuid();
 
             //////////////// Testjob
-            job = new Component();
+            Component job = new Component();
             job.ComponentGuid = new Guid();
             job.FriendlyName = "Addieren von 3 Zahlen";
             job.InputDescriptions = new List<string>() {"zahl1", "zahl2", "zahl3"};
