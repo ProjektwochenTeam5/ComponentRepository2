@@ -25,6 +25,7 @@
         public TCPServerManager()
         {
             this.Components = new Dictionary<Guid, Component>();
+            this.CPULoads = new Dictionary<Guid, double>();
             this.MyTCPServer = new TCPServer();
             this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
@@ -37,10 +38,10 @@
 
         private void SendComponentInfosToClient(Guid clientID)
         {
-            this.MyTCPServer.SendMessage(this.BuildInfos(), clientID);
+            this.MyTCPServer.SendMessage(this.BuildComponentInfos(), clientID);
         }
 
-        private byte[] BuildInfos()
+        private byte[] BuildComponentInfos()
         {
             this.MyTCPServer.Wrapper.GetAssemblies();
             Dictionary<IComponent, Guid> componentdic = new Dictionary<IComponent, Guid>();
@@ -116,7 +117,8 @@
                 case ClientServerCommunication.StatusCode.KeepAlive:
                     {
                         KeepAlive keepAlive = (KeepAlive)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                        this.CalculateClientLoads(keepAlive);
+                        Console.WriteLine("Keep alive recieved || Terminate = {0} || Workload = {1}", keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
+                        this.CalculateClientLoads(keepAlive, e.Info.ClientGuid);
                         this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
                         break;
                     }
@@ -199,12 +201,12 @@
 
         private void SendInfosToAllClients()
         {
-            this.MyTCPServer.SendMessageToAll(this.BuildInfos());
+            this.MyTCPServer.SendMessageToAll(this.BuildComponentInfos());
         }
 
-        private void CalculateClientLoads(KeepAlive keepAlive)
+        private void CalculateClientLoads(KeepAlive keepAlive, Guid clientId)
         {
-            Console.WriteLine("Keep alive recieved || Terminate = {0}", keepAlive.Terminate.ToString());
+            this.CPULoads[clientId] = keepAlive.CPUWorkload;
         }
 
         private void CheckIfDeleteClientAndDelete(KeepAlive ka, ClientInfo info)

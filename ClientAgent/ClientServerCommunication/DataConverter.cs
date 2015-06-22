@@ -72,66 +72,6 @@ namespace ClientServerCommunication
             return serializedaccept;
         }
 
-        public static KeepAlive ConvertByteArrrayToKeepAlive(byte[] data)
-        {
-            KeepAlive ka = null;
-
-            try
-            {
-                using (MemoryStream ms = new MemoryStream(data))
-                {
-                    BinaryFormatter bf = new BinaryFormatter();
-                    ka = (KeepAlive)bf.Deserialize(ms);
-                    return ka;
-
-                }
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
-        public static StoreComponent ConvertByteArrayToStoreComponent(byte[] data)
-        {
-            StoreComponent sto = null;
-
-            try
-            {
-                using (MemoryStream ms = new MemoryStream(data))
-                {
-                    BinaryFormatter bf = new BinaryFormatter();
-                    sto = (StoreComponent)bf.Deserialize(ms);
-                    return sto;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
-            }
-        }
-
-        public static TransferComponentRequest ConvertByteArrayToTransferComponentRequest(byte[] data)
-        {
-            TransferComponentRequest request = null;
-
-            try
-            {
-                using (MemoryStream ms = new MemoryStream(data))
-                {
-                    BinaryFormatter bf = new BinaryFormatter();
-                    request = (TransferComponentRequest)bf.Deserialize(ms);
-                    return request;
-                }
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.Message);
-                return null;
-            }
-        }
-
         public static Message ConvertByteArrayToMessage(byte[] data)
         {
             Message m = null;
