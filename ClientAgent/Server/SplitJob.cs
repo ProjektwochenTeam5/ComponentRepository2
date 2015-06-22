@@ -15,6 +15,9 @@ namespace Server
 
         public static void Split(DoJobRequest jobreq)
         {
+            var job = jobreq.Job;
+
+            /*
             var addGuid = Guid.NewGuid();
             var inpGuid = Guid.NewGuid();
             var outGuid = Guid.NewGuid();
@@ -84,7 +87,7 @@ namespace Server
             myedges.Add(edge4);
             myedges.Add(edge5);
             job.Edges = myedges.AsEnumerable();
-
+            */
             
 
             ///////////////////// Temporär - gesamte Liste von DLLs usw. 
@@ -94,7 +97,7 @@ namespace Server
             if (job.IsAtomic)
             {
                 // an client schiken (Auftrag)
-
+                
             }
             else
             {

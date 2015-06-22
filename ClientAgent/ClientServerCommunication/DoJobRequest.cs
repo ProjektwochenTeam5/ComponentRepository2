@@ -10,7 +10,7 @@ namespace ClientServerCommunication
     [Serializable]
     public class DoJobRequest : Message
     {
-        public JobRequest Job { get; set; }
+        public Component Job { get; set; }
 
         public Guid? TargetDisplay { get; set; }
 
