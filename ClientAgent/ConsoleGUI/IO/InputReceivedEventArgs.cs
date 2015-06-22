@@ -5,6 +5,9 @@
 // <summary>
 // This file contains the <see cref="InputReceivedEventArgs"/> class.
 // </summary>
+// <author>
+// David Eiwen
+// </author>
 // --------------------------------------------------------------
 
 namespace ConsoleGUI.IO

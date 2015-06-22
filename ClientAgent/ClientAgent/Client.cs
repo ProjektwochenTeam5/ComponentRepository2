@@ -1,4 +1,15 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="Client.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the <see cref="Client"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ClientAgent
 {
     using System;
@@ -358,10 +369,12 @@ namespace ClientAgent
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
 
+            /*
             StoreComponent i = new StoreComponent();
             i.Component = File.ReadAllBytes("Add.dll");
             i.FriendlyName = "Add";
             args.Client.SendMessage(i);
+             */
 
             while (!args.Stopped)
             {

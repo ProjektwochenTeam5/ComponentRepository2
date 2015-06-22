@@ -10,8 +10,9 @@
 namespace ConsoleGUI.Controls
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+    using System.Linq;
     using System.Threading;
     using ConsoleGUI.IO;
 
@@ -33,7 +34,7 @@ namespace ConsoleGUI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="Menu"/> class.
         /// </summary>
-        /// <param name="renderer">
+        /// <param name="outputs">
         ///     The renderer used to render the menu.
         /// </param>
         /// <param name="src">
@@ -52,7 +53,12 @@ namespace ConsoleGUI.Controls
             this.rectangleProperty = new Rectangle(0, 0, outputs.First().Width, 2);
             this.OwnerMenu = parent;
             this.Input = src;
+
+            // Events
             src.InputReceived += this.Receive;
+            this.VisibleChanged += this.Menu_VisibleChanged;
+            this.ForegroundColorChanged += this.Menu_ColorChanged;
+            this.BackgroundColorChanged += this.Menu_ColorChanged;
         }
 
         /// <summary>
@@ -162,6 +168,19 @@ namespace ConsoleGUI.Controls
         {
             Pixel[,] px = new Pixel[this.rectangleProperty.Width, this.rectangleProperty.Height];
 
+            if (!this.Visible)
+            {
+                for (int y = 0; y < this.rectangleProperty.Height; y++)
+                {
+                    for (int x = 0; x < this.rectangleProperty.Width; x++)
+                    {
+                        px[x, y] = new Pixel(ConsoleColor.Black, ConsoleColor.White, ' ');
+                    }
+                }
+
+                return px;
+            }
+
             // upper border
             for (int x = 0; x < this.rectangleProperty.Width; x++)
             {
@@ -173,17 +192,12 @@ namespace ConsoleGUI.Controls
 
             foreach (MenuButton btn in this.Buttons)
             {
-                char c = ' ';
-
                 for (int n = 0; n < btn.Text.Length && curX < this.rectangleProperty.Width; n++)
                 {
-                    if (btn.Visible)
-                    {
-                        c = btn.Text[n];
-                    }
-
-                    px[curX, this.rectangleProperty.Height - 1] = new Pixel(this.BackgroundColor, this.ForegroundColor, c);
-                    curX++;
+                    px[curX++, this.rectangleProperty.Height - 1] = new Pixel(
+                        this.BackgroundColor,
+                        this.ForegroundColor,
+                        btn.Visible ? btn.Text[n] : ' ');
                 }
 
                 if (curX >= this.rectangleProperty.Width)
@@ -213,6 +227,11 @@ namespace ConsoleGUI.Controls
         {
             this.Focused = false;
             this.Visible = false;
+            foreach (Control c in this.Controls.ToArray())
+            {
+                c.Visible = false;
+                this.Controls.Remove(c);
+            }
 
             if (this.OwnerMenu != null)
             {
@@ -231,9 +250,21 @@ namespace ConsoleGUI.Controls
 
             foreach (IRenderer r in this.Renderers)
             {
-                r.Clear(ConsoleColor.DarkBlue);
+                /*r.Clear(ConsoleColor.DarkBlue);
                 r.Draw(r.Render(this.Controls.ToArray()), new Rectangle(0, 0, r.Width, r.Height - 2));
-                r.Draw(this.GetPixels(), new Rectangle(0, r.Height - 2, r.Width, 2));
+                r.Draw(this.GetPixels(), new Rectangle(0, r.Height - 2, r.Width, 2));*/
+
+                Rectangle draw = new ConsoleGUI.Rectangle(0, r.Height - 2, r.Width, 2);
+
+                // draw menus
+                Thread tMenu = new Thread(this.DrawThread);
+                DrawThreadArgs dMenu = new DrawThreadArgs(r, this.GetPixels(), draw);
+                tMenu.Start(dMenu);
+
+                // draw controls
+                Thread tControls = new Thread(this.DrawThread);
+                DrawThreadArgs dControls = new DrawThreadArgs(r, r.Render(this.Controls.ToArray()), draw);
+                tControls.Start(dControls);
             }
         }
 
@@ -249,26 +280,35 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Sends a key to te menu.
         /// </summary>
-        /// <param name="k"></param>
+        /// <param name="k">
+        ///     The key that shall be received.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the key was accepted.
+        /// </returns>
         public override bool Receive(ConsoleKeyInfo k)
         {
             return false;
         }
 
         /// <summary>
-        /// 
+        /// Sends a string to the menu.
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
+        /// <param name="s">
+        ///     The string that shall be received.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the string was accepted.
+        /// </returns>
         public override bool Receive(string s)
         {
             return false;
         }
 
         /// <summary>
-        /// 
+        /// Draws the menu and its controls.
         /// </summary>
         public void Draw()
         {
@@ -299,23 +339,27 @@ namespace ConsoleGUI.Controls
                 return;
             }
 
-            foreach (MenuButton btn in this.Buttons)
+            MenuButton btn = this.Buttons.FirstOrDefault(b => b.LinkedKey == e.ReceivedKey.Key);
+
+            if (btn != null && !e.Processed)
             {
-                if (btn.LinkedKey == e.ReceivedKey.Key)
+                btn.PressKey(e);
+
+                if (!e.Processed)
                 {
-                    btn.PressKey(e);
-
-                    if (!e.Processed)
-                    {
-                        e.Process();
-                    }
-
-                    return;
+                    e.Process();
                 }
+
+                return;
             }
 
             foreach (IInputReceiver r in this.InputReceivers)
             {
+                if (e.Processed)
+                {
+                    return;
+                }
+
                 if (r.Receive(e.ReceivedKey))
                 {
                     e.Process();
@@ -348,6 +392,34 @@ namespace ConsoleGUI.Controls
             {
                 this.FocusedChanged(this, e);
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
+        private void Menu_ColorChanged(object sender, EventArgs e)
+        {
+            this.Draw();
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
+        private void Menu_VisibleChanged(object sender, EventArgs e)
+        {
+            this.Draw();
         }
     }
 }

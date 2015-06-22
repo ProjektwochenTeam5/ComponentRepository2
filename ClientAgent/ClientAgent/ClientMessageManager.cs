@@ -1,15 +1,26 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="ClientMessageManager.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the <see cref="ClientMessageManager"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ClientAgent
 {
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.IO;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using ClientServerCommunication;
     using Core.Network;
-    using System.IO;
 
     /// <summary>
     /// Manages messages received by a client.
@@ -39,10 +50,19 @@ namespace ClientAgent
         /// </summary>
         public event EventHandler<MessageReceivedEventArgs> ReceivedMessage;
 
+        /// <summary>
+        /// Raised when the manager received an error.
+        /// </summary>
         public event EventHandler<MessageReceivedEventArgs> ReceivedErrorMessage;
 
+        /// <summary>
+        /// Raised when the manager received an acknowledge.
+        /// </summary>
         public event EventHandler<MessageReceivedEventArgs> ReceivedAcknowledgeMessage;
 
+        /// <summary>
+        /// Raised when the manager received a send component info.
+        /// </summary>
         public event EventHandler<MessageReceivedEventArgs> ReceivedSendComponentInfoMessage;
 
         /// <summary>
@@ -123,6 +143,12 @@ namespace ClientAgent
             }
         }
 
+        /// <summary>
+        /// Raises the <see cref="ReceivedSendComponentInfoMessage"/> event.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains the received message.
+        /// </param>
         protected void OnReceivedSendComponentInfo(MessageReceivedEventArgs e)
         {
             if (this.ReceivedSendComponentInfoMessage != null)
@@ -165,7 +191,7 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// Proceses a received Transfer Component Response message.
+        /// Processes a received Transfer Component Response message.
         /// </summary>
         /// <param name="e">
         ///     Contains the received message.
@@ -268,8 +294,6 @@ namespace ClientAgent
             this.ManagedClient.SendMessage(rq);*/
         }
 
-        static bool sent = false;
-
         /// <summary>
         /// Processes a received acknowledge message.
         /// </summary>
@@ -286,15 +310,6 @@ namespace ClientAgent
 
             Console.WriteLine("Acknowledge {0}!", received.BelongsTo);
             Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
-
-            if (!sent)
-            {
-                sent = true;
-                StoreComponent i2 = new StoreComponent();
-                i2.Component = File.ReadAllBytes("Mod.dll");
-                i2.FriendlyName = "Modulo";
-                this.ManagedClient.SendMessage(i2);
-            }
 
             if (snd == null)
             {

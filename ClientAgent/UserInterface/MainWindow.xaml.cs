@@ -29,53 +29,67 @@ namespace UserInterface
         /// </summary>
         private Point movingItemInnerPosition;
 
-        private ObservableCollection<Component> availableComps = new ObservableCollection<Component>();
+
+        private ObservableCollection<MyComponent> availableComps = new ObservableCollection<MyComponent>();
+        private ObservableCollection<MyComponent> favorites = new ObservableCollection<MyComponent>();
+        private ObservableCollection<MyComponent> matchingIn = new ObservableCollection<MyComponent>();
+        private ObservableCollection<MyComponent> matchingOut = new ObservableCollection<MyComponent>();
         private List<MyCompControl> compLayout = new List<MyCompControl>();
         private List<Link> edgeLayout = new List<Link>();
 
         public MainWindow()
         {
+            /*
+            OpenFileDialog dlg = new OpenFileDialog();
+            dlg.Filter = "Atomic component|*.dll";
+            dlg.ShowDialog();
+            */
+
             InitializeComponent();
 
-            this.availableComps.Add(new Component()
+            this.lvComponents.DataContext = availableComps;
+            this.lvFavorites.DataContext = favorites;
+            this.lvMatchingIn.DataContext = matchingIn;
+            this.lvMatchingOut.DataContext = matchingOut;
+
+            #region Test components
+            this.availableComps.Add(new MyComponent(new Component()
             {
                 FriendlyName = "Test-Komponente",
                 InputHints = new string[] { "System.Int32", "System.String", "System.Int64", "System.Double", "System.Double" },
                 InputDescriptions = new string[] { "int", "str", "long", "double", "double" },
                 OutputHints = new string[] { "System.Int32", "System.Schiff" },
                 OutputDescriptions = new string[] { "int", "schiff" }
-            });
+            }));
 
-            this.Components_LB.ItemsSource = availableComps;
-
-            this.availableComps.Add(new Component()
+            this.availableComps.Add(new MyComponent(new Component()
             {
                 FriendlyName = "Input",
                 OutputHints = new string[] { "System.String" },
                 OutputDescriptions = new string[] { "string" },
-            });
+            }));
 
-            this.availableComps.Add(new Component()
+            this.availableComps.Add(new MyComponent(new Component()
             {
                 FriendlyName = "Output",
                 InputHints = new string[] { "System.String" },
                 InputDescriptions = new string[] { "string" },
-            });
+            }));
 
-            this.availableComps.Add(new Component()
+            this.availableComps.Add(new MyComponent(new Component()
             {
                 FriendlyName = "Schiff-Output",
                 InputHints = new string[] { "System.Schiff", "System.String" },
                 InputDescriptions = new string[] { "schiff", "string"},
-            });
+            }));
 
-            this.availableComps.Add(new Component()
+            this.availableComps.Add(new MyComponent(new Component()
             {
                 FriendlyName = "Schiff-Input",
                 OutputHints = new string[] { "System.Schiff", "System.String" },
                 OutputDescriptions = new string[] { "schiff", "string" },
-            });
-
+            }));
+            #endregion Test components
         }
 
         private void ComponentCanvas_MouseMove(object sender, MouseEventArgs e)
@@ -144,7 +158,7 @@ namespace UserInterface
             DeselectItem();
             DeselectLink();
             
-            if (Link_ToB.IsChecked == false && target.IncomingLink != null)
+            if (toggleLink.IsChecked == false && target.IncomingLink != null)
             {
                 this.selectedLink = target.IncomingLink;
                 this.selectedLink.Line.Stroke = Brushes.Tomato;
@@ -158,7 +172,7 @@ namespace UserInterface
 
             // If in link-mode and no other link connects to the target input, then show that IN and OUT would fit.
             if (target != null && target.IncomingLink == null &&
-                Link_ToB.IsChecked == true && e.Data.GetDataPresent(typeof(OutputControl)))
+                toggleLink.IsChecked == true && e.Data.GetDataPresent(typeof(OutputControl)))
             {
                 OutputControl src = (OutputControl)e.Data.GetData(typeof(OutputControl));
 
@@ -175,7 +189,7 @@ namespace UserInterface
 
             // If in link-mode and no other link connects to the target input, then link IN with OUT if they fit.
             if (target != null && target.IncomingLink == null &&
-                Link_ToB.IsChecked == true && e.Data.GetDataPresent(typeof(OutputControl)))
+                toggleLink.IsChecked == true && e.Data.GetDataPresent(typeof(OutputControl)))
             {
                 OutputControl src = (OutputControl)e.Data.GetData(typeof(OutputControl));
 
@@ -203,11 +217,11 @@ namespace UserInterface
             DeselectItem();
             DeselectLink();
 
-            if (Link_ToB.IsChecked == true && srcOutput.OutgoingLink == null)
+            if (toggleLink.IsChecked == true && srcOutput.OutgoingLink == null)
             {
                 DragDrop.DoDragDrop(srcOutput, srcOutput, DragDropEffects.Link);
             }
-            else if (Link_ToB.IsChecked == false)
+            else if (toggleLink.IsChecked == false)
             {
                 this.selectedLink = srcOutput.OutgoingLink;
 
@@ -218,12 +232,17 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// If toggle link is not checked, sets the clicked component as the selected item.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void component_OnBGMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DeselectLink();
             DeselectItem();
 
-            if (Link_ToB.IsChecked == false)
+            if (toggleLink.IsChecked == false)
             {
                 movingItem = (MyCompControl)sender;
                 movingItemInnerPosition = e.GetPosition(movingItem);
@@ -232,11 +251,20 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Sets the moving item to null.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void component_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             movingItem = null;
         }
 
+        /// <summary>
+        /// Sets the selected link to null.
+        /// Resets the color of the line.
+        /// </summary>
         private void DeselectLink()
         {
             if (this.selectedLink != null)
@@ -246,11 +274,17 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Sets the given item as the selected item and highlights all connecting lines.
+        /// Updates the matching input and matching output lists.
+        /// </summary>
+        /// <param name="item">The new selected item.</param>
         private void SelectItem(MyCompControl item)
         {
             this.selectedItem = item;
             this.selectedItem.IsSelected = true;
 
+            // Highlight connecting lines
             if (this.selectedItem.Inputs != null)
             {
                 foreach (InputControl input in this.selectedItem.Inputs)
@@ -272,8 +306,31 @@ namespace UserInterface
                     }
                 }
             }
+
+            // update matching inputs and outputs
+            this.matchingIn.Clear();
+            this.matchingOut.Clear();
+
+            foreach (MyComponent c in this.availableComps)
+            {
+                c.SetSelectedComponent(selectedItem.Component);
+                
+                if (c.HasMatchingInput)
+                {
+                    this.matchingIn.Add(c);
+                }
+
+                if (c.HasMatchingOutput)
+                {
+                    this.matchingOut.Add(c);
+                }
+            }
         }
 
+        /// <summary>
+        /// Sets the selected item to null.
+        /// Resets the color of the highlighted connecting lines.
+        /// </summary>
         private void DeselectItem()
         {
             if (this.selectedItem == null)
@@ -303,10 +360,17 @@ namespace UserInterface
                 }
             }
 
+            // reset HasMatching...-Properties of components
+            ResetMatchingItems();
+
             this.selectedItem.IsSelected = false;
             this.selectedItem = null;
         }
 
+        /// <summary>
+        /// Removes the selected link from the canvas and the edgeLayout.
+        /// Resets the links of connected components.
+        /// </summary>
         private void DeleteSelectedLink()
         {
             if (this.selectedLink != null)
@@ -319,6 +383,10 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Removes the selected item and all connected links from the canvas and the edgeLayout.
+        /// Resets the links of connected components.
+        /// </summary>
         private void DeleteSelectedItem()
         {
             if (this.selectedItem == null)
@@ -326,6 +394,7 @@ namespace UserInterface
                 return;
             }
 
+            // Remove incoming links
             if (this.selectedItem.Inputs != null)
             {
                 foreach (InputControl input in this.selectedItem.Inputs)
@@ -340,7 +409,7 @@ namespace UserInterface
                 }
             }
 
-
+            // Remove outgoing links
             if (this.selectedItem.Outputs != null)
             {
                 foreach (OutputControl output in this.selectedItem.Outputs)
@@ -355,20 +424,51 @@ namespace UserInterface
                 }
             }
 
+            // reset HasMatching...-Properties of components
+            ResetMatchingItems();
+
             this.compLayout.Remove(this.selectedItem);
             this.ComponentCanvas.Children.Remove(this.selectedItem);
             this.selectedItem = null;
         }
 
+        /// <summary>
+        /// Clears the matching input and matching output lists and
+        /// resets the HasMatching... properties of all available components.
+        /// </summary>
+        private void ResetMatchingItems()
+        {
+            this.matchingIn.Clear();
+            this.matchingOut.Clear();
+
+            foreach (MyComponent c in this.availableComps)
+            {
+                c.SetSelectedComponent(null);
+            }
+        }
+
+        /// <summary>
+        /// Removes all items from the canvas and clears compLayout and edgeLayout.
+        /// </summary>
         private void DeleteAll()
         {
             this.compLayout.Clear();
             this.edgeLayout.Clear();
             this.ComponentCanvas.Children.Clear();
+
             this.selectedItem = null;
             this.selectedLink = null;
+
+            // reset HasMatching...-Properties of components
+            ResetMatchingItems();
         }
         
+        /// <summary>
+        /// Deletes the selected item or link when Delete is pressed.
+        /// Deselects the selected item or link when Escape is pressed.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MainGrid_KeyDown(object sender, KeyEventArgs e)
         {
             switch (e.Key)
@@ -384,19 +484,25 @@ namespace UserInterface
             }
         }
 
-        private void Delete_B_Click(object sender, RoutedEventArgs e)
+        /// <summary>
+        /// Deletes the selected item or link.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void btnDelete_Click(object sender, RoutedEventArgs e)
         {
             DeleteSelectedLink();
             DeleteSelectedItem();
         }
 
-        private void Components_LB_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        private void ComponentsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
+            ListView senderView = (ListView)sender;
             MyCompControl newComponent = null;
 
-            if (Components_LB.SelectedItem != null)
+            if (senderView.SelectedItem != null)
             {
-                newComponent = new MyCompControl((Component)Components_LB.SelectedItem);
+                newComponent = new MyCompControl((MyComponent)senderView.SelectedItem);
                 newComponent.AllowDrop = true;
                 newComponent.OnBGMouseLeftButtonDown += component_OnBGMouseLeftButtonDown;
                 newComponent.MouseLeftButtonUp += component_MouseLeftButtonUp;
@@ -413,18 +519,18 @@ namespace UserInterface
             }
         }
 
-        private void Link_ToB_Checked(object sender, RoutedEventArgs e)
+        private void toggleLink_Checked(object sender, RoutedEventArgs e)
         {
             DeselectLink();
             DeselectItem();
         }
 
-        private void DeleteAll_B_Click(object sender, RoutedEventArgs e)
+        private void btnDeleteAll_Click(object sender, RoutedEventArgs e)
         {
             DeleteAll();
         }
 
-        private void CreateJob_B_Click(object sender, RoutedEventArgs e)
+        private void btnCreateJob_Click(object sender, RoutedEventArgs e)
         {
             MyCompControl comp = null;
             bool everythingConnected = true;
@@ -490,8 +596,8 @@ namespace UserInterface
             {
                 ComponentEdge edge = new ComponentEdge();
 
-                edge.OutputComponentGuid = link.Source.ParentComponent.Component.ComponentGuid;
-                edge.InputComponentGuid = link.Target.ParentComponent.Component.ComponentGuid;
+                edge.OutputComponentGuid = link.Source.ParentComponent.Component.Component.ComponentGuid;
+                edge.InputComponentGuid = link.Target.ParentComponent.Component.Component.ComponentGuid;
                 edge.InputValueID = link.Target.InputValueID;
                 edge.OutputValueID = link.Source.OutputValueID;
                 edge.InternalInputComponentGuid = link.Target.ParentComponent.InternalComponentGuid;
@@ -533,7 +639,7 @@ namespace UserInterface
             return combinedComp;
         }
 
-        private void CreateComp_B_Click(object sender, RoutedEventArgs e)
+        private void btnCreateComp_Click(object sender, RoutedEventArgs e)
         {
             if (this.edgeLayout.Count > 0)
             {
@@ -545,7 +651,7 @@ namespace UserInterface
                     Component newComp = ConvertLayoutToComponent();
                     newComp.FriendlyName = createDlg.FriendlyName;
 
-                    this.availableComps.Add(newComp);
+                    this.availableComps.Add(new MyComponent(newComp));
 
                     if (MessageBox.Show(
                             "Do you wish to clear the blueprint space?", 
@@ -553,7 +659,7 @@ namespace UserInterface
                             MessageBoxButton.YesNo, 
                             MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
-                        this.Link_ToB.IsChecked = false;
+                        this.toggleLink.IsChecked = false;
                         DeleteAll();
                     }
                 }
@@ -564,6 +670,28 @@ namespace UserInterface
                     "Create component", 
                     MessageBoxButton.OK, 
                     MessageBoxImage.Information);
+            }
+        }
+
+        private void FavoriteCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox s = (CheckBox)sender;
+            MyComponent comp = ((ContentPresenter)s.TemplatedParent).Content as MyComponent;
+
+            if (comp != null && !favorites.Contains(comp))
+            {
+                favorites.Add(comp);
+            }
+        }
+
+        private void FavoriteCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            CheckBox s = (CheckBox)sender;
+            MyComponent comp = ((ContentPresenter)s.TemplatedParent).Content as MyComponent;
+
+            if (comp != null && favorites.Contains(comp))
+            {
+                favorites.Remove(comp);
             }
         }
     }
