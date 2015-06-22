@@ -446,8 +446,15 @@ namespace UserInterface
             this.compLayout.Clear();
             this.edgeLayout.Clear();
             this.ComponentCanvas.Children.Clear();
+
             this.selectedItem = null;
             this.selectedLink = null;
+
+            // reset HasMatching...-Properties of components
+            foreach (MyComponent c in this.availableComps)
+            {
+                c.SetSelectedComponent(null);
+            }
         }
         
         /// <summary>
