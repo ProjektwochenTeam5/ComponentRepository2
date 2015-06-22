@@ -53,7 +53,6 @@ namespace Server
 
         }
 
-
         public void SendIP(IPEndPoint ipendpoint, UdpClient client)
         {
             AgentAccept a = new AgentAccept();

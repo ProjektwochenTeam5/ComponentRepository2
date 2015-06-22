@@ -41,7 +41,7 @@ namespace Server
             //Task serverReceiverTask = new Task(() => serverReceiver.StartReceiving());
             //serverReceiverTask.Start();
 
-            SplitJob.Split(new Component());
+            //SplitJob.Split(new Component());
 
             Console.ReadLine();
         }
