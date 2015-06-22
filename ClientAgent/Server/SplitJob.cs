@@ -174,6 +174,12 @@ namespace Server
             }
         }
 
+        private static List<object> SendJobToClient(Component job, List<object> inputData)
+        {
+
+            return null;
+        }
+
         private static int Add(IEnumerable<object> param)
         {
             int result = 0;
@@ -212,8 +218,8 @@ namespace Server
                         }
 
                         // input Data mittels JobRequest an client schicken.
-                        var comp = this.GetComponentById(nextCompGuid);
-                        this.SendJobToClient(comp, inputData);
+                        var comp = GetComponentById(nextCompGuid);
+                        SendJobToClient(comp, inputData);
 
                         /////////// TEST METHODENAUFRUF
                         int result = Add(inputData);
@@ -257,6 +263,11 @@ namespace Server
                     }*/
                 }
             }
+        }
+
+        private static Component GetComponentById(Guid nextCompGuid)
+        {
+            throw new NotImplementedException();
         }
     }
 }
