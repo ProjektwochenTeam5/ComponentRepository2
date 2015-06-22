@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace Server
@@ -13,9 +14,21 @@ namespace Server
     {
         private static List<ExtendedComponentEdge> edges;
 
-        public static void Split(DoJobRequest jobreq)
+        public static event EventHandler<SendJobToClientEventArgs> OnSendJobToClient;
+
+        public static bool GoOn { get; set; }
+
+        public static string CurrentMessageId { get; set; }
+
+        public static TCPServerManager Manager { get; set; }
+
+        public static Guid JobGuid { get; set; }
+
+        public static void Split(DoJobRequest jobreq, TCPServerManager manager)
         {
+            Manager = manager;
             var job = jobreq.Job;
+            JobGuid = Guid.NewGuid();
 
             //var addGuid = Guid.NewGuid();
             //var inpGuid = Guid.NewGuid();
@@ -95,8 +108,8 @@ namespace Server
 
             if (job.IsAtomic)
             {
-                // an client schiken (Auftrag)
-                SendJobToClient(job, null);
+                // an client schicken (Auftrag)
+                var result = Manager.SendJobToClient(job.ComponentGuid, null, JobGuid);
             }
             else
             {
@@ -156,7 +169,6 @@ namespace Server
 
                 // jetzt haben wir alle Ergebnisse abgearbeitet --> fertig!!!
 
-
                 // Job aufteilen
 
                 // alle outputs finden (edges ohne InputComponentGUID)
@@ -170,14 +182,7 @@ namespace Server
                 // Komponente berechnen lassen
                 // Ergebnis speichern
                 // 2. output ........
-
             }
-        }
-
-        private static List<object> SendJobToClient(Component job, List<object> inputData)
-        {
-
-            return null;
         }
 
         private static int Add(IEnumerable<object> param)
@@ -218,22 +223,14 @@ namespace Server
                         }
 
                         // input Data mittels JobRequest an client schicken.
-                        var comp = GetComponentById(nextCompGuid);
-                        SendJobToClient(comp, inputData);
-
-  
-                        
-                        /////////// TEST METHODENAUFRUF
-                        int result = Add(inputData);
-
+                        var resultlist = Manager.SendJobToClient(nextCompGuid, inputData, JobGuid);
 
                         //var outputEdges = edges.Where(x => x.InternalInputComponentGuid == nextCompGuid);
                         // TODO: result-IEnumerable durchgehen und results in outputEdges schreiben!
 
-                        foreach (var outputEdge in edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid))
+                        for (int i = 0; i < resultlist.Count; i++)
                         {
-                            ////////// TEST ZUWEISUNG
-                            outputEdge.ComponentResult = result;
+                            edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid).ToArray()[i].ComponentResult = resultlist[i];
                         }
                     }
                     else
@@ -245,12 +242,12 @@ namespace Server
                         // Result von client ist angekommen:
                         //clientResultEdge == compInputEdge
                         //var clientResultEdges = edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid);
-                        
-                        
-                        /////////////////// TEST INPUT
-                        foreach (var resultEdge in edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid))
+
+                        var resultlist = Manager.SendJobToClient(nextCompGuid, null, JobGuid);
+
+                        for (int i = 0; i < resultlist.Count; i++)
                         {
-                            resultEdge.ComponentResult = 5;
+                            edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid).ToArray()[i].ComponentResult = resultlist[i];
                         }
                     }
 
@@ -265,11 +262,6 @@ namespace Server
                     }*/
                 }
             }
-        }
-
-        private static Component GetComponentById(Guid nextCompGuid)
-        {
-            throw new NotImplementedException();
         }
     }
 }

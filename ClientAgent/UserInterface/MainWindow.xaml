@@ -2,10 +2,51 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:core="clr-namespace:Core.Network;assembly=Core.Network"
+        xmlns:local="clr-namespace:UserInterface"
         Title="MainWindow" Height="700" Width="1000" MinHeight="500" MinWidth="800">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="convBoolToVis"/>
+        <Style x:Key="styleCustomCheckBox" TargetType="{x:Type CheckBox}">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type CheckBox}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image x:Name="imageCheckBox" 
+                           Width="16" 
+                           Height="16" 
+                           Source="star_unchecked.png"/>
+                            <ContentPresenter VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="False">
+                                <Setter TargetName="imageCheckBox" 
+                                Property="Source" 
+                                Value="star_unchecked.png"/>
+                            </Trigger>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="imageCheckBox" 
+                                Property="Source"
+                                Value="star_checked.png"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <DataTemplate x:Key="ComponentTemplate" DataType="local:Component">
+            <StackPanel Orientation="Horizontal">
+                <CheckBox IsChecked="{Binding Path=IsFavorite}" Style="{StaticResource styleCustomCheckBox}" Margin="0 0 5 0" Checked="FavoriteCheckBox_Checked" Unchecked="FavoriteCheckBox_Unchecked"/>
+                <TextBlock Text="{Binding Path=Component.FriendlyName}" />
+                <local:Triangle Size="10" Fill="YellowGreen" Stroke="Green" VerticalAlignment="Center" Margin="5 0 0 0" Visibility="{Binding Path=HasMatchingInput, Converter={StaticResource convBoolToVis}}"/>
+                <local:Triangle Size="10" Fill="Yellow" Stroke="Orange" VerticalAlignment="Center" Margin="5 0 0 0" Visibility="{Binding Path=HasMatchingOutput, Converter={StaticResource convBoolToVis}}" />
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+    
     <Grid x:Name="MainGrid" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Background="#FF5D5D5D" KeyDown="MainGrid_KeyDown">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="120"/>
         </Grid.ColumnDefinitions>
@@ -16,33 +57,60 @@
         </Grid.RowDefinitions>
 
         <Label Content="Blueprints: Components" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1"/>
-        <Label HorizontalAlignment="Left" Content="Components" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="0"/>
-        <Label HorizontalAlignment="Left" Content="Toolbox" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="2"/>
+        <Label Content="Components" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="0"/>
+        <Label Content="Toolbox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="2"/>
 
-        <ListBox x:Name="Components_LB" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" BorderBrush="Black" ItemsSource="{Binding}" MouseDoubleClick="Components_LB_MouseDoubleClick" Grid.Row="1" Margin="5 0">
-            <ListBox.ItemTemplate>
-                <DataTemplate DataType="core:Component">
-                    <TextBlock Text="{Binding Path=FriendlyName}" />
-                </DataTemplate>
-            </ListBox.ItemTemplate>
-        </ListBox>
+        <Border BorderBrush="Black" Grid.Row="1" Margin="5 0">
+            <StackPanel Background="White">
+                <StackPanel.Resources>
+                    <Style TargetType="ListView">
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding Path=Items.Count, RelativeSource={RelativeSource Self}}" Value="0">
+                                <Setter Property="Height" Value="50" />
+                                <Setter Property="Background">
+                                    <Setter.Value>
+                                        <ImageBrush ImageSource="empty.png" Stretch="None"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </StackPanel.Resources>
+                
+                <Expander Header="Favorites" IsExpanded="True">
+                    <ListView x:Name="lvFavorites" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
+                </Expander>
+                <Expander Header="Matching input">
+                    <ListView x:Name="lvMatchingIn" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
+                </Expander>
+                <Expander Header="Matching output">
+                    <ListView x:Name="lvMatchingOut" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
+                </Expander>
+                <Expander Header="All components" IsExpanded="True">
+                    <ListView x:Name="lvComponents" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
+                </Expander>
+                <Expander x:Name="expJobs" Header="Saved jobs">
+                    <ListView x:Name="lvJobs" Margin="25 0 0 0" BorderThickness="0" />
+                </Expander>
+            </StackPanel>
+        </Border>
         
         <DockPanel Background="White"  Grid.Row="1" Grid.Column="2" Margin="5 0">
             <StackPanel DockPanel.Dock="Top">
-                <Button x:Name="Delete_B" Content="Delete" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="Delete_B_Click"/>
-                <Button x:Name="DeleteAll_B" Content="Delete All" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="DeleteAll_B_Click" />
-                <ToggleButton x:Name="Link_ToB" Content="Link" IsChecked="False" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Height="140" Checked="Link_ToB_Checked" />
+                <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="btnDelete_Click"/>
+                <Button x:Name="btnDeleteAll" Content="Delete All" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="btnDeleteAll_Click" />
+                <ToggleButton x:Name="toggleLink" Content="Link" IsChecked="False" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Height="140" Checked="toggleLink_Checked" />
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
-                <Button x:Name="CreateComp_B" Content="Create Comp" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="CreateComp_B_Click" />
-                <Button x:Name="CreateJob_B" Content="Execute Job" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="CreateJob_B_Click" />
+                <Button x:Name="btnCreateComp" Content="Create Comp" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateComp_Click" />
+                <Button x:Name="btnCreateJob" Content="Execute Job" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateJob_Click" />
             </StackPanel>
         </DockPanel>
         
         <ScrollViewer x:Name="scrollView" Grid.Row="1" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Canvas x:Name="ComponentCanvas" Width="1400" Height="800"  Background="#FF384893" MouseMove="ComponentCanvas_MouseMove" />
+            <Canvas x:Name="ComponentCanvas" Width="1300" Height="900"  Background="#FF384893" MouseMove="ComponentCanvas_MouseMove" AllowDrop="True" />
         </ScrollViewer>
         
-        <TextBlock x:Name="JobStatus_TBl" Text="Job Status: " Margin="5" Padding="5"  Background="Silver" Grid.Row="2" Grid.ColumnSpan="3"/>
+        <TextBlock x:Name="tblJobStatus" Text="Job Status: " Margin="5" Padding="5"  Background="Silver" Grid.Row="2" Grid.ColumnSpan="3"/>
     </Grid>
 </Window>

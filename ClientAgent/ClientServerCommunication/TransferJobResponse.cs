@@ -13,6 +13,8 @@ namespace ClientServerCommunication
 
         public object[] Result { get; set; }
 
+        public Guid BelongsToRequest { get; set; }
+
         /// <summary>
         /// Gets the message type of the message.
         /// </summary>

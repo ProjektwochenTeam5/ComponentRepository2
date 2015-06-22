@@ -8,11 +8,14 @@
     using System.Linq;
     using System.Net.Sockets;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
 
     public class TCPServerManager
     {
         public TCPServer MyTCPServer { get; set; }
+
+        public event EventHandler<JobResponseRecievedEventArgs> OnJobResponseRecieved;
 
         public Dictionary<Guid, double> CPULoads { get; set; }
 
@@ -20,15 +23,21 @@
 
         public Dictionary<Guid, Component> Components { get; set; }
 
+        public List<Guid> JobsQueued { get; set; }
+
+        public Guid ServerGuid { get; set; }
+
         public double AllClientLoad { get; set; }
 
         public TCPServerManager()
         {
+            this.JobsQueued = new List<Guid>();
             this.Components = new Dictionary<Guid, Component>();
             this.CPULoads = new Dictionary<Guid, double>();
             this.MyTCPServer = new TCPServer();
             this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
+            this.ServerGuid = Guid.NewGuid();
         }
 
         private void MyTCPServer_OnClientFetched(object sender, ClientFetchedEventArgs e)
@@ -103,6 +112,59 @@
             this.MyTCPServer.Run();
         }
 
+        public List<object> SendJobToClient(Guid componentGuid, List<object> inputData, Guid jobGuid)
+        {
+            TransferJobRequest req = new TransferJobRequest();
+            req.ServerID = this.ServerGuid;
+            req.InputData = inputData;
+            req.ComponentGuid = componentGuid;
+
+            this.JobsQueued.Add(jobGuid);
+
+            bool waiting = true;
+            TransferJobResponse resp = null;
+
+            EventHandler<JobResponseRecievedEventArgs> d = delegate(object sender, JobResponseRecievedEventArgs e)
+            {
+                if (e.BelongsToJob == jobGuid)
+                {
+                    resp = e.Data;
+                    waiting = false;
+                }
+            };
+
+            this.OnJobResponseRecieved += d;
+
+            var sendData = DataConverter.ConvertMessageToByteArray(5, DataConverter.ConvertObjectToByteArray(req));
+            var client = this.CPULoads.Where(y => y.Value == CPULoads.Min(x => x.Value)).Single().Key;
+            this.MyTCPServer.SendMessage(sendData, client);
+
+            ////this.OnJobResponseRecieved += this.TCPServerManager_OnJobResponseRecieved;
+            try
+            {
+                while (waiting)
+                {
+                    Thread.Sleep(10);
+                }
+            }
+            catch (Exception)
+            {
+                
+                throw;
+            }
+            finally
+            {
+                this.OnJobResponseRecieved -= d;
+            }
+
+            return resp.Result.ToList();
+        }
+
+        private void TCPServerManager_OnJobResponseRecieved(object sender, JobResponseRecievedEventArgs e)
+        {
+
+        }
+
         private void AddDllToDictionary(string filename)
         {
             string path = this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll";
@@ -141,11 +203,14 @@
                     }
 
                 case ClientServerCommunication.StatusCode.TransferJob:
+                    TransferJobResponse response = (TransferJobResponse)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                    this.FireOnJobResponseRecieved(new JobResponseRecievedEventArgs(response.BelongsToRequest, response));
+
                     break;
                 case ClientServerCommunication.StatusCode.DoJobRequest:
                     {
                         DoJobRequest request = (DoJobRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                        SplitJob.Split(request);
+                        SplitJob.Split(request, this);
 
                         break;
                     }
@@ -221,6 +286,13 @@
             }
         }
 
-        public ICollection<Component> componenlist { get; set; }
+        protected void FireOnJobResponseRecieved(JobResponseRecievedEventArgs e)
+        {
+            if (this.OnJobResponseRecieved != null)
+            {
+                this.OnJobResponseRecieved(this, e);
+            }
+        }
+
     }
 }
