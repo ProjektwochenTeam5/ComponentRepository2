@@ -53,6 +53,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="MyComponent.cs" />
+    <Compile Include="Triangle.cs" />
     <Page Include="ComponentCreateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -128,6 +130,13 @@
       <Project>{b1b4b865-f61c-4ed7-93ec-01c6339a82b6}</Project>
       <Name>Core.Network</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="star_checked.png" />
+    <Resource Include="star_unchecked.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="empty.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

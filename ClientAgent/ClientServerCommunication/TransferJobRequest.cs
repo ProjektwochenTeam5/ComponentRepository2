@@ -9,7 +9,7 @@ namespace ClientServerCommunication
     [Serializable]
     public class TransferJobRequest : Message
     {
-        public byte[] Job { get; set; }
+        public DoJobRequest Job { get; set; }
 
         public Guid ServerID { get; set; }
 

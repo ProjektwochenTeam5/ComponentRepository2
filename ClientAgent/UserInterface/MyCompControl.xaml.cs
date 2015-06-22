@@ -20,10 +20,10 @@ namespace UserInterface
         public event EventHandler<DragEventArgs> OnInputDragOver;
         public event EventHandler<DragEventArgs> OnInputDrop;
 
-        private Component component = null;
+        private MyComponent component = null;
         private bool selected = false;
 
-        public MyCompControl(Component component)
+        public MyCompControl(MyComponent component)
         {
             InputControl input;
             OutputControl output; 
@@ -37,13 +37,15 @@ namespace UserInterface
 
             InitializeComponent();
 
-            this.lblName.Content = component.FriendlyName;
+            Component childComponent = component.Component;
+
+            this.lblName.Content = childComponent.FriendlyName;
             this.background.MouseLeftButtonDown += FireOnMouseLeftButtonDown;
-            
-            if (component.InputHints != null)
+
+            if (childComponent.InputHints != null)
             {
-                hints = component.InputHints.ToArray();
-                descs = component.InputDescriptions.ToArray();
+                hints = childComponent.InputHints.ToArray();
+                descs = childComponent.InputDescriptions.ToArray();
 
                 for (int i = 0; i < hints.Length; i++)
                 {
@@ -57,11 +59,11 @@ namespace UserInterface
                     this.stkInput.Children.Add(input);
                 }
             }
-            
-            if (component.OutputHints != null)
+
+            if (childComponent.OutputHints != null)
             {
-                hints = component.OutputHints.ToArray();
-                descs = component.OutputDescriptions.ToArray();
+                hints = childComponent.OutputHints.ToArray();
+                descs = childComponent.OutputDescriptions.ToArray();
 
                 for (int i = 0; i < hints.Length; i++)
                 {
@@ -102,7 +104,7 @@ namespace UserInterface
             private set;
         }
 
-        public Component Component
+        public MyComponent Component
         {
             get
             {
