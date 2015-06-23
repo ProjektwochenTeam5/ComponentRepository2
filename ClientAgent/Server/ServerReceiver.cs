@@ -16,15 +16,18 @@ namespace Server
 
         public Guid ServerGuid { get; set; }
 
-        public List<TcpClient> Servers { get; set; }
+        public Dictionary<Guid, IPEndPoint> Servers { get; set; }
 
-        public event EventHandler<MessageRecievedEventArgs> OnMessageRecieved;
+        public string FriendlyName { get; set; }
+
+        public event EventHandler<ServerMessageReceivedEventArgs> OnMessageRecieved;
 
         public ServerReceiver()
         {
             this.ServerGuid = new Guid();
             this.Listener = new TcpListener(IPAddress.Any, 8080);
-            this.Servers = new List<TcpClient>();
+            this.Servers = new Dictionary<Guid, IPEndPoint>();
+            this.FriendlyName = "Team 5 Server";
         }
 
         public void StartReceiving()
@@ -51,7 +54,6 @@ namespace Server
         private void ClientWorker(object obj)
         {
             TcpClient client = (TcpClient)obj;
-            this.Servers.Add(client);
 
             NetworkStream ns = client.GetStream();
 
@@ -75,16 +77,16 @@ namespace Server
                         {
                             byte[] messageLength = new byte[4];
 
-                            for (int i = 0; i < 4; i++)
+                            for (int i = 0; i < 5; i++)
                             {
-                                messageLength[i] = buffer[4 + i];
+                                messageLength[i] = buffer[1 + i];
                             }
 
-                            var length = BitConverter.ToInt32(messageLength, 0) + 9;
-                            messagetype = buffer[8];
-                            body = new byte[length - 9];
+                            var length = BitConverter.ToInt32(messageLength, 0) + 5;
+                            messagetype = buffer[0];
+                            body = new byte[length - 5];
 
-                            for (int i = 9; i < recievedbytes; i++)
+                            for (int i = 5; i < recievedbytes; i++)
                             {
                                 body[index] = buffer[i];
                                 index++;
@@ -94,11 +96,11 @@ namespace Server
                             {
                                 continue;
                             }
-                            //else
-                            //{
-                            //    this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
-                            //    break;
-                            //}
+                            else
+                            {
+                                this.FireOnMessageRecieved(new ServerMessageReceivedEventArgs(body, (Core.Network.MessageCode)messagetype, client));
+                                break;
+                            }
                         }
 
                         for (int i = 0; i < recievedbytes; i++)
@@ -107,17 +109,17 @@ namespace Server
                             index++;
                         }
 
-                        //if (index >= body.Length)
-                        //{
-                        //    this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
-                        //    break;
-                        //}
+                        if (index >= body.Length)
+                        {
+                            this.FireOnMessageRecieved(new ServerMessageReceivedEventArgs(body, (Core.Network.MessageCode)messagetype, client));
+                            break;
+                        }
                     }
                 }
             }
         }
 
-        protected void FireOnMessageRecieved(MessageRecievedEventArgs e)
+        protected void FireOnMessageRecieved(ServerMessageReceivedEventArgs e)
         {
             if (this.OnMessageRecieved != null)
             {

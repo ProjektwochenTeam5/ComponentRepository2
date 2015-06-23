@@ -45,22 +45,29 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssemblyServerToServer.cs" />
     <Compile Include="ClientFetchedEventArgs.cs" />
     <Compile Include="ClientTerminatedEventArgs.cs" />
+    <Compile Include="ComponentSubmitServerToServer.cs" />
     <Compile Include="DataBaseWrapper.cs" />
     <Compile Include="ExtendedComponentEdge.cs" />
     <Compile Include="GUI.cs" />
     <Compile Include="JobResponseRecievedEventArgs.cs" />
+    <Compile Include="JobServerToServer.cs" />
+    <Compile Include="KeepAliveServerToServer.cs" />
     <Compile Include="MessageRecievedEventArgs.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RecBroadcast.cs" />
+    <Compile Include="RecServerBroadcast.cs" />
     <Compile Include="SendJobToClientEventArgs.cs" />
     <Compile Include="ServerBroadcast.cs" />
+    <Compile Include="ServerMessageReceivedEventArgs.cs" />
     <Compile Include="ServerReceiver.cs" />
     <Compile Include="SplitJob.cs" />
     <Compile Include="TCPServer.cs" />
     <Compile Include="TCPServerManager.cs" />
+    <Compile Include="TcpServerToServerManager.cs" />
     <Compile Include="UdpClientDiscoverRecievedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
