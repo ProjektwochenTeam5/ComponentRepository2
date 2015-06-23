@@ -84,15 +84,24 @@
             {
                 while (true)
                 {
-
-                }
-                uint old = this.ClientPing[e.ClientInfo.ClientGuid];
-                Thread.Sleep(60000);
-                if (old == this.ClientPing[e.ClientInfo.ClientGuid])
-                {
-
+                    uint old = this.ClientPing[e.ClientInfo.ClientGuid];
+                    Thread.Sleep(60000);
+                    if (old == this.ClientPing[e.ClientInfo.ClientGuid])
+                    {
+                        this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
+                        this.MyTCPServer.Clients.Remove(e.ClientInfo);
+                        Console.WriteLine("60 seconds over - Client deleted!");
+                        break;
+                    }
                 }
             }));
+
+            t.Start();
+        }
+
+        private void IncrementClientKeepAlive(Guid clientguid)
+        {
+            this.ClientPing[clientguid] = this.ClientPing[clientguid] + 1;
         }
 
         private void SendComponentInfosToClient(ClientInfo info)
@@ -227,6 +236,7 @@
                         KeepAlive keepAlive = (KeepAlive)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
                         Console.WriteLine("Keep alive recieved from {0} || Terminate = {1} || Workload = {2}",e.Info.FriendlyName, keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
                         this.CalculateClientLoads(keepAlive, e.Info.ClientGuid);
+                        this.IncrementClientKeepAlive(e.Info.ClientGuid);
                         this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
                         break;
                     }
