@@ -1,5 +1,6 @@
 ﻿namespace Server
 {
+    using Core.Network;
     using System;
     using System.Collections.Generic;
     using System.Linq;
@@ -8,11 +9,11 @@
 
     public class ClientFetchedEventArgs : EventArgs
     {
-        public ClientFetchedEventArgs(Guid clientid)
+        public ClientFetchedEventArgs(ClientInfo info)
         {
-            this.ClientId = clientid;
+            this.ClientInfo = info;
         }
 
-        public Guid ClientId { get; set; }
+        public ClientInfo ClientInfo { get; set; }
     }
 }

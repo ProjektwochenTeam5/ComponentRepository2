@@ -79,7 +79,7 @@ namespace Server
 
             NetworkStream ns = client.GetStream();
 
-            this.FireOnClientFetched(new ClientFetchedEventArgs(clientInfo.ClientGuid));
+            this.FireOnClientFetched(new ClientFetchedEventArgs(clientInfo));
             Console.WriteLine("----> Client fetched! FriendlyName: {0} - ClientID: {1}", clientInfo.FriendlyName, clientInfo.ClientGuid);
 
             while (true)

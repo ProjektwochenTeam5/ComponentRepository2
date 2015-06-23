@@ -57,6 +57,7 @@
     <Compile Include="SplitJob.cs" />
     <Compile Include="TCPServer.cs" />
     <Compile Include="TCPServerManager.cs" />
+    <Compile Include="UdpClientDiscoverRecievedEventArgs.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
