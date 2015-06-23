@@ -139,6 +139,8 @@
             var client = this.CPULoads.Where(y => y.Value == CPULoads.Min(x => x.Value)).Single().Key;
             this.MyTCPServer.SendMessage(sendData, client);
 
+            Console.WriteLine("Sending TransferJobReqest!");
+
             ////this.OnJobResponseRecieved += this.TCPServerManager_OnJobResponseRecieved;
             try
             {
@@ -210,6 +212,9 @@
                 case ClientServerCommunication.StatusCode.DoJobRequest:
                     {
                         DoJobRequest request = (DoJobRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                        this.MyTCPServer.SendAck(e.Info, request.MessageID);
+
+                        Console.WriteLine("DoJobRequest recieved!");
                         SplitJob.Split(request, this);
 
                         break;
