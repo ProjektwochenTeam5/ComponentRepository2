@@ -23,6 +23,7 @@
             this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
             this.ServerGuid = Guid.NewGuid();
+            this.AllServerComponents = new Dictionary<Guid, List<Component>>();
         }
 
         public TCPServerManager(RecBroadcast broadcast)
@@ -36,6 +37,7 @@
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
             this.ServerGuid = Guid.NewGuid();
             broadcast.OnUdpClientDiscovered += broadcast_OnUdpClientDiscovered;
+            this.AllServerComponents = new Dictionary<Guid, List<Component>>();
         }
 
         public TCPServer MyTCPServer { get; set; }
@@ -43,6 +45,8 @@
         public event EventHandler<JobResponseRecievedEventArgs> OnJobResponseRecieved;
 
         public Dictionary<Guid, double> CPULoads { get; set; }
+
+        public Dictionary<Guid,List<Component>> AllServerComponents { get; set; }
 
         public Dictionary<Guid, string> Dlls { get; set; }
 
@@ -308,6 +312,7 @@
             if (ka.Terminate)
             {
                 this.MyTCPServer.Clients.Remove(info);
+                this.IpAdressFriendlyName.Remove(info.IpAddress.ToString());
                 Console.WriteLine("Client deleted!");
             }
             else
