@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleStringInput", "Compo
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ClientJobExecutor", "ClientJobExecutor\ClientJobExecutor.csproj", "{C1856488-C8A1-4F5D-93AF-19AF3EE23C44}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PrimGenerator", "Components\PrimGenerator\PrimGenerator.csproj", "{F2C77123-097B-4ABC-A959-6D3FCF955F28}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -191,6 +193,10 @@ Global
 		{C1856488-C8A1-4F5D-93AF-19AF3EE23C44}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C1856488-C8A1-4F5D-93AF-19AF3EE23C44}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C1856488-C8A1-4F5D-93AF-19AF3EE23C44}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F2C77123-097B-4ABC-A959-6D3FCF955F28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F2C77123-097B-4ABC-A959-6D3FCF955F28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F2C77123-097B-4ABC-A959-6D3FCF955F28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F2C77123-097B-4ABC-A959-6D3FCF955F28}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -218,5 +224,6 @@ Global
 		{28012576-2FD6-411A-8BF2-6B1982365279} = {CAB5718B-7285-4C0D-AB62-53401643FB08}
 		{F8E96161-3089-4FCB-AC2D-5B846576366D} = {CAB5718B-7285-4C0D-AB62-53401643FB08}
 		{4A488036-6E32-4546-B4E8-3AF572C09CD7} = {CAB5718B-7285-4C0D-AB62-53401643FB08}
+		{F2C77123-097B-4ABC-A959-6D3FCF955F28} = {CAB5718B-7285-4C0D-AB62-53401643FB08}
 	EndGlobalSection
 EndGlobal
