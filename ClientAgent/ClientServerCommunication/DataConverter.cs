@@ -161,5 +161,25 @@ namespace ClientServerCommunication
                 return null;
             }
         }
+
+        public static byte[] ConvertJsonToByteArray(MessageCode m, string json)
+        {
+            var jsonbytes = Encoding.ASCII.GetBytes(json);
+            byte[] send = new byte[jsonbytes.Length + 5];
+            send[0] = (byte)m;
+
+            var length = BitConverter.GetBytes(jsonbytes.Length);
+            for (int i = 1; i < 5; i++)
+            {
+                send[i] = length[i - 1];
+            }
+
+            for (int i = 5; i < send.Length; i++)
+            {
+                send[i] = jsonbytes[i];
+            }
+
+            return send;
+        }
     }
 }

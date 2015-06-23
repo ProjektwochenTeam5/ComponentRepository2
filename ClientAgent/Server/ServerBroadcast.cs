@@ -28,7 +28,7 @@ namespace Server
             while (true)
             {
                 IPEndPoint ip = new IPEndPoint(IPAddress.Broadcast, 8081);
-                byte[] bytes = Encoding.ASCII.GetBytes("1111");
+                byte[] bytes = Encoding.ASCII.GetBytes("PWSP");
                 this.Client.Send(bytes, bytes.Length, ip);
 
                 Thread.Sleep(180000);
