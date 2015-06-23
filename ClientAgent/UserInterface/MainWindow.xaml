@@ -6,12 +6,12 @@
         Title="MainWindow" Height="700" Width="1000" MinHeight="500" MinWidth="800">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="convBoolToVis"/>
-        <Style x:Key="styleCustomCheckBox" TargetType="{x:Type CheckBox}">
+        <Style x:Key="styleStarCheckBox" TargetType="{x:Type CheckBox}">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="{x:Type CheckBox}">
                         <StackPanel Orientation="Horizontal">
-                            <Image x:Name="imageCheckBox" 
+                            <Image x:Name="starCheckBox" 
                            Width="16" 
                            Height="16" 
                            Source="star_unchecked.png"/>
@@ -19,12 +19,12 @@
                         </StackPanel>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsChecked" Value="False">
-                                <Setter TargetName="imageCheckBox" 
+                                <Setter TargetName="starCheckBox" 
                                 Property="Source" 
                                 Value="star_unchecked.png"/>
                             </Trigger>
                             <Trigger Property="IsChecked" Value="True">
-                                <Setter TargetName="imageCheckBox" 
+                                <Setter TargetName="starCheckBox" 
                                 Property="Source"
                                 Value="star_checked.png"/>
                             </Trigger>
@@ -36,7 +36,7 @@
 
         <DataTemplate x:Key="ComponentTemplate" DataType="local:Component">
             <StackPanel Orientation="Horizontal">
-                <CheckBox IsChecked="{Binding Path=IsFavorite}" Style="{StaticResource styleCustomCheckBox}" Margin="0 0 5 0" Checked="FavoriteCheckBox_Checked" Unchecked="FavoriteCheckBox_Unchecked"/>
+                <CheckBox IsChecked="{Binding Path=IsFavorite}" Style="{StaticResource styleStarCheckBox}" Margin="0 0 5 0" Checked="FavoriteCheckBox_Checked" Unchecked="FavoriteCheckBox_Unchecked"/>
                 <TextBlock Text="{Binding Path=Component.FriendlyName}" />
                 <local:Triangle Size="10" Fill="YellowGreen" Stroke="Green" VerticalAlignment="Center" Margin="5 0 0 0" Visibility="{Binding Path=HasMatchingInput, Converter={StaticResource convBoolToVis}}"/>
                 <local:Triangle Size="10" Fill="Yellow" Stroke="Orange" VerticalAlignment="Center" Margin="5 0 0 0" Visibility="{Binding Path=HasMatchingOutput, Converter={StaticResource convBoolToVis}}" />
@@ -77,6 +77,7 @@
                     </Style>
                 </StackPanel.Resources>
                 
+                <Button x:Name="btnStaticInput" Content="add input description..." Margin="5" Click="btnStaticInput_Click"/>
                 <Expander Header="Favorites" IsExpanded="True">
                     <ListView x:Name="lvFavorites" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
                 </Expander>

@@ -15,6 +15,15 @@ namespace UserInterface
     /// </summary>
     public partial class MainWindow : Window
     {
+        private readonly MyComponent STATIC_STRING_COMPONENT =
+            new MyComponent(
+                new Component()
+                {
+                    FriendlyName = "static string",
+                    OutputHints = new string[] { "System.String" },
+                    OutputDescriptions = new string[] { "out" }
+                });
+
         /// <summary>
         /// The component to drag when clicked on.
         /// </summary>
@@ -35,7 +44,7 @@ namespace UserInterface
         /// Only valid if movingItem != null.
         /// </summary>
         private Point movingItemInnerPosition;
-        
+
         /// <summary>
         /// The collection containing all available components.
         /// </summary>
@@ -59,6 +68,11 @@ namespace UserInterface
         private ObservableCollection<MyComponent> matchingOut = new ObservableCollection<MyComponent>();
 
         /// <summary>
+        /// The internal GUIDs of the input components along with their input descriptions.
+        /// </summary>
+        private Dictionary<Guid, string> inputDescriptions = new Dictionary<Guid, string>();
+
+        /// <summary>
         /// The list containing all components which are visible on the canvas.
         /// </summary>
         private List<MyCompControl> compLayout = new List<MyCompControl>();
@@ -67,6 +81,8 @@ namespace UserInterface
         /// The list containing all edges which make up the job.
         /// </summary>
         private List<Link> edgeLayout = new List<Link>();
+
+        private List<Link> staticStringLinks = new List<Link>();
 
         public MainWindow()
         {
@@ -92,10 +108,12 @@ namespace UserInterface
                 OutputHints = new string[] { "System.Int32", "System.Schiff" },
                 OutputDescriptions = new string[] { "int", "schiff" }
             }));
-
+            
             this.availableComps.Add(new MyComponent(new Component()
             {
                 FriendlyName = "Input",
+                InputHints = new string[] { "System.String" },
+                InputDescriptions = new string[] { "descr" },
                 OutputHints = new string[] { "System.String" },
                 OutputDescriptions = new string[] { "string" },
             }));
@@ -223,13 +241,13 @@ namespace UserInterface
             {
                 OutputControl src = (OutputControl)e.Data.GetData(typeof(OutputControl));
 
-                if (target.ParentComponent != src.ParentComponent && target.Hint == src.Hint)
+                if (target.ParentControl != src.ParentControl && target.Hint == src.Hint)
                 {
                     e.Effects = DragDropEffects.Link;
                 }
             }
         }
-
+      
         /// <summary>
         /// If toggle link is checked and the input hints match, connects the drag source output to the input.
         /// </summary>
@@ -245,19 +263,43 @@ namespace UserInterface
             {
                 OutputControl src = (OutputControl)e.Data.GetData(typeof(OutputControl));
 
-                if (target.ParentComponent != src.ParentComponent && target.Hint == src.Hint)
+                if (target.ParentControl != src.ParentControl && target.Hint == src.Hint)
                 {
                     Line line = new Line();
 
-                    line.X1 = Canvas.GetLeft(src.ParentComponent) + src.ParentComponent.ActualWidth - 25;
-                    line.Y1 = Canvas.GetTop(src.ParentComponent) + ((src.OutputValueID - 1) * 30) + 7;
-                    line.X2 = Canvas.GetLeft(target.ParentComponent) + 20;
-                    line.Y2 = Canvas.GetTop(target.ParentComponent) + ((target.InputValueID - 1) * 30) + 7;
+                    line.X1 = Canvas.GetLeft(src.ParentControl) + src.ParentControl.ActualWidth - 25;
+                    line.Y1 = Canvas.GetTop(src.ParentControl) + ((src.OutputValueID - 1) * 30) + 7;
+                    line.X2 = Canvas.GetLeft(target.ParentControl) + 20;
+                    line.Y2 = Canvas.GetTop(target.ParentControl) + ((target.InputValueID - 1) * 30) + 7;
                     line.Stroke = Brushes.White;
                     
-                    Link link = new Link(src, target, line);
-                    this.edgeLayout.Add(link);
-                    ComponentCanvas.Children.Add(line);
+                    if (src.ParentControl.Component == this.STATIC_STRING_COMPONENT)
+                    {
+                        ComponentCanvas.Children.Add(line);
+
+                        StaticStringInputWindow dlg = new StaticStringInputWindow();
+                        dlg.Owner = this;
+
+                        if (dlg.ShowDialog() == true)
+                        {
+                            this.inputDescriptions.Add(target.ParentControl.InternalComponentGuid, dlg.Description);
+
+                            Link staticInputLink = new Link(src, target, line);
+                            this.edgeLayout.Add(staticInputLink);
+                            this.staticStringLinks.Add(staticInputLink);
+                        }
+                        else
+                        {
+                            ComponentCanvas.Children.Remove(line);
+                        }
+                    }
+                    else
+                    {
+                        ComponentCanvas.Children.Add(line);
+
+                        Link link = new Link(src, target, line);
+                        this.edgeLayout.Add(link);
+                    }
                 }
             }
         }
@@ -317,19 +359,6 @@ namespace UserInterface
         private void component_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             movingItem = null;
-        }
-
-        /// <summary>
-        /// Sets the selected link to null.
-        /// Resets the color of the line.
-        /// </summary>
-        private void DeselectLink()
-        {
-            if (this.selectedLink != null)
-            {
-                this.selectedLink.Line.Stroke = Brushes.White;
-                this.selectedLink = null;
-            }
         }
 
         /// <summary>
@@ -426,6 +455,19 @@ namespace UserInterface
         }
 
         /// <summary>
+        /// Sets the selected link to null.
+        /// Resets the color of the line.
+        /// </summary>
+        private void DeselectLink()
+        {
+            if (this.selectedLink != null)
+            {
+                this.selectedLink.Line.Stroke = Brushes.White;
+                this.selectedLink = null;
+            }
+        }
+
+        /// <summary>
         /// Removes the selected link from the canvas and the edgeLayout.
         /// Resets the links of connected components.
         /// </summary>
@@ -433,6 +475,12 @@ namespace UserInterface
         {
             if (this.selectedLink != null)
             {
+                if (selectedLink.Source.ParentControl.Component == this.STATIC_STRING_COMPONENT)
+                {
+                    this.inputDescriptions.Remove(this.selectedLink.Target.ParentControl.InternalComponentGuid);
+                    this.staticStringLinks.Remove(this.selectedLink);
+                }
+
                 this.edgeLayout.Remove(this.selectedLink);
                 ComponentCanvas.Children.Remove(this.selectedLink.Line);
                 this.selectedLink.Source.OutgoingLink = null;
@@ -452,6 +500,8 @@ namespace UserInterface
                 return;
             }
 
+            bool isStaticStringComponent = this.selectedItem.Component == STATIC_STRING_COMPONENT;
+
             // Remove incoming links
             if (this.selectedItem.Inputs != null)
             {
@@ -459,6 +509,11 @@ namespace UserInterface
                 {
                     if (input.IncomingLink != null)
                     {
+                        if (isStaticStringComponent)
+                        {
+                            staticStringLinks.Remove(input.IncomingLink);
+                        }
+
                         this.edgeLayout.Remove(input.IncomingLink);
                         this.ComponentCanvas.Children.Remove(input.IncomingLink.Line);
                         input.IncomingLink.Source.OutgoingLink = null;
@@ -474,6 +529,11 @@ namespace UserInterface
                 {
                     if (output.OutgoingLink != null)
                     {
+                        if (isStaticStringComponent)
+                        {
+                            staticStringLinks.Remove(output.OutgoingLink);
+                        }
+
                         this.edgeLayout.Remove(output.OutgoingLink);
                         this.ComponentCanvas.Children.Remove(output.OutgoingLink.Line);
                         output.OutgoingLink.Target.IncomingLink = null;
@@ -486,8 +546,27 @@ namespace UserInterface
             ResetMatchingItems();
 
             this.compLayout.Remove(this.selectedItem);
+            this.inputDescriptions.Remove(this.selectedItem.InternalComponentGuid);
             this.ComponentCanvas.Children.Remove(this.selectedItem);
             this.selectedItem = null;
+        }
+
+        /// <summary>
+        /// Removes all items from the canvas and clears compLayout and edgeLayout.
+        /// </summary>
+        private void DeleteAll()
+        {
+            this.compLayout.Clear();
+            this.edgeLayout.Clear();
+            this.inputDescriptions.Clear();
+            this.staticStringLinks.Clear();
+            this.ComponentCanvas.Children.Clear();
+
+            this.selectedItem = null;
+            this.selectedLink = null;
+
+            // reset HasMatching...-Properties of components
+            ResetMatchingItems();
         }
 
         /// <summary>
@@ -504,23 +583,7 @@ namespace UserInterface
                 c.SetSelectedComponent(null);
             }
         }
-
-        /// <summary>
-        /// Removes all items from the canvas and clears compLayout and edgeLayout.
-        /// </summary>
-        private void DeleteAll()
-        {
-            this.compLayout.Clear();
-            this.edgeLayout.Clear();
-            this.ComponentCanvas.Children.Clear();
-
-            this.selectedItem = null;
-            this.selectedLink = null;
-
-            // reset HasMatching...-Properties of components
-            ResetMatchingItems();
-        }
-        
+                
         /// <summary>
         /// Deletes the selected item or link when Delete is pressed.
         /// Deselects the selected item or link when Escape is pressed.
@@ -654,7 +717,9 @@ namespace UserInterface
                 return;
             }
 
-            Component job = ConvertLayoutToComponent();
+            Job job = new Job();
+            job.InputDescriptions = this.inputDescriptions;
+            job.JobComponent = ConvertLayoutToComponent();
 
             //TODO job
             MessageBox.Show("Job is executing...",
@@ -675,22 +740,27 @@ namespace UserInterface
             List<string> inputDescs = new List<string>();
             List<string> outputHints = new List<string>();
             List<string> outputDescs = new List<string>();
+            List<Link> usefulLinks = new List<Link>(edgeLayout);
 
-            foreach (Link link in edgeLayout)
+            foreach (Link unusefulLink in staticStringLinks)
+            {
+                usefulLinks.Remove(unusefulLink);
+            }
+
+            foreach (Link link in usefulLinks)
             {
                 ComponentEdge edge = new ComponentEdge();
 
-                edge.OutputComponentGuid = link.Source.ParentComponent.Component.Component.ComponentGuid;
-                edge.InputComponentGuid = link.Target.ParentComponent.Component.Component.ComponentGuid;
+                edge.OutputComponentGuid = link.Source.ParentControl.Component.Component.ComponentGuid;
+                edge.InputComponentGuid = link.Target.ParentControl.Component.Component.ComponentGuid;
                 edge.InputValueID = link.Target.InputValueID;
                 edge.OutputValueID = link.Source.OutputValueID;
-                edge.InternalInputComponentGuid = link.Target.ParentComponent.InternalComponentGuid;
-                edge.InternalOutputComponentGuid = link.Source.ParentComponent.InternalComponentGuid;
+                edge.InternalInputComponentGuid = link.Target.ParentControl.InternalComponentGuid;
+                edge.InternalOutputComponentGuid = link.Source.ParentControl.InternalComponentGuid;
 
                 edges.Add(edge);
             }
-
-
+            
             foreach (MyCompControl comp in compLayout)
             {
                 foreach (InputControl input in comp.Inputs)
@@ -794,5 +864,40 @@ namespace UserInterface
                 favorites.Remove(comp);
             }
         }
+
+        private void btnStaticInput_Click(object sender, RoutedEventArgs e)
+        {
+            MyCompControl staticInputComponent = new MyCompControl(this.STATIC_STRING_COMPONENT);
+            staticInputComponent.OnBGMouseLeftButtonDown += component_OnBGMouseLeftButtonDown;
+            staticInputComponent.MouseDoubleClick += inputComponent_MouseDoubleClick;
+            staticInputComponent.MouseLeftButtonUp += component_MouseLeftButtonUp;
+            staticInputComponent.OnOutputMouseLeftButtonDown += component_OnOutputMouseLeftButtonDown;
+
+            Canvas.SetZIndex(staticInputComponent, 1); // move above connecting lines
+            Canvas.SetLeft(staticInputComponent, 10);
+            Canvas.SetTop(staticInputComponent, 10);
+            this.ComponentCanvas.Children.Add(staticInputComponent);
+        }
+
+        /// <summary>
+        /// Enables the user to edit the string which was entered before.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void inputComponent_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {            
+            OutputControl descriptionOut = ((MyCompControl)sender).Outputs[0];
+
+            if (descriptionOut.OutgoingLink != null)
+            {
+                StaticStringInputWindow dlg = new StaticStringInputWindow();
+                dlg.Owner = this;
+                
+                if (dlg.ShowDialog() == true)
+                {
+                    this.inputDescriptions[descriptionOut.OutgoingLink.Target.ParentControl.InternalComponentGuid] = dlg.Description;
+                }
+            }
+        }        
     }
 }

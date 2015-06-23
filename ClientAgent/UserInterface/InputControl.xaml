@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:UserInterface">
     <StackPanel Orientation="Vertical" Height="30">
-        <local:Triangle Size="15" Stroke="Green" Fill="YellowGreen" HorizontalAlignment="Right"/>
+        <local:Triangle DataContext="{Binding}" Size="15" Stroke="Green" Fill="YellowGreen" HorizontalAlignment="Right" />
         <Label x:Name="lblDesc" Content="{Binding Path=Description}" FontSize="10" Padding="0" HorizontalContentAlignment="Right" Foreground="White"/>
     </StackPanel>
 </UserControl>
