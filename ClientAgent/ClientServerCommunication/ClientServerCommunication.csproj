@@ -44,6 +44,8 @@
     <Compile Include="AgentDiscover.cs" />
     <Compile Include="DataConverter.cs" />
     <Compile Include="DoJobRequest.cs" />
+    <Compile Include="ExecuteRequest.cs" />
+    <Compile Include="ExecuteResponse.cs" />
     <Compile Include="Extensions.cs" />
     <Compile Include="StatusCode.cs" />
     <Compile Include="StoreComponent.cs" />

@@ -41,11 +41,22 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="JobArgument.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ClientServerCommunication\ClientServerCommunication.csproj">
+      <Project>{7e87af0b-6fd2-438d-a795-a6b7d6194cd8}</Project>
+      <Name>ClientServerCommunication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Core.Component\Core.Component.csproj">
+      <Project>{3cbff49b-e085-49af-8aa5-e3bab177b179}</Project>
+      <Name>Core.Component</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

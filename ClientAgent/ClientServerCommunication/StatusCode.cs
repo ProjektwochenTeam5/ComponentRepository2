@@ -24,6 +24,8 @@ namespace ClientServerCommunication
 
         StorComponent = 8,
 
-        Error = 9
+        Error = 9,
+
+        ExecuteJob = 10
     }
 }

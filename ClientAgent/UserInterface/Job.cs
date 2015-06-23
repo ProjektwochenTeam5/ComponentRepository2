@@ -7,9 +7,9 @@ namespace UserInterface
     public class Job
     {
         /// <summary>
-        /// The internal GUIDs of the input components along with their input descriptions.
+        /// The input identifiers of the input components along with their input descriptions.
         /// </summary>
-        public Dictionary<Guid, string> InputDescriptions
+        public Dictionary<InputIdentifier, string> InputDescriptions
         {
             get;
             set;
