@@ -1,0 +1,15 @@
+﻿<Window x:Class="UserInterface.StaticStringInputWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="StaticStringInputWindow" Height="200" Width="300" 
+        ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
+    <DockPanel FocusManager.FocusedElement="{Binding ElementName=txtDescription}">
+        <Button x:Name="btnSave" Content="Save" DockPanel.Dock="Bottom" Height="25" Margin="5" Click="btnSave_Click"/>
+
+        <StackPanel>
+            <Label Content="Input description"/>
+            <TextBox x:Name="txtDescription" Height="23" TextWrapping="Wrap" Margin="5" TextChanged="txtDescription_TextChanged" KeyDown="txtDescription_KeyDown"/>
+            <TextBlock x:Name="txtInfo" Height="23" Foreground="Tomato" Margin="5"/>
+        </StackPanel>
+    </DockPanel>
+</Window>

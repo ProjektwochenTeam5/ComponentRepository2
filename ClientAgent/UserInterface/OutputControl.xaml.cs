@@ -10,7 +10,7 @@ namespace UserInterface
     {
         public OutputControl(MyCompControl parent, uint outputValueId, string hint, string description)
         {
-            this.ParentComponent = parent;
+            this.ParentControl = parent;
             this.OutputValueID = outputValueId;
             this.Hint = hint;
             this.Description = description;
@@ -32,7 +32,7 @@ namespace UserInterface
             private set;
         }
 
-        public MyCompControl ParentComponent
+        public MyCompControl ParentControl
         {
             get;
             private set;

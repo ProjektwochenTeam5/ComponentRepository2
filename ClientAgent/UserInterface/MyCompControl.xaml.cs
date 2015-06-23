@@ -75,7 +75,7 @@ namespace UserInterface
                 }
             }
         }
-
+        
         public bool IsSelected
         {
             get
@@ -155,7 +155,7 @@ namespace UserInterface
                 this.OnInputDragOver(this, e);
             }
         }
-
+        
         private void FireOnInputDrop(object sender, DragEventArgs e)
         {
             if (this.OnInputDrop != null)

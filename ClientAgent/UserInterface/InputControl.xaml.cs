@@ -1,4 +1,5 @@
-﻿using System.Windows.Controls;
+﻿using System.ComponentModel;
+using System.Windows.Controls;
 using System.Windows.Shapes;
 
 namespace UserInterface
@@ -10,16 +11,16 @@ namespace UserInterface
     {
         public InputControl(MyCompControl parent, uint inputValueId, string hint, string description)
         {
-            this.ParentComponent = parent;
+            this.ParentControl = parent;
             this.InputValueID = inputValueId;
             this.Hint = hint;
             this.Description = description;
 
             InitializeComponent();
 
-            lblDesc.DataContext = this;
+            this.lblDesc.DataContext = this;
         }
-
+                
         public Link IncomingLink
         {
             get;
@@ -32,7 +33,7 @@ namespace UserInterface
             private set;
         }
 
-        public MyCompControl ParentComponent
+        public MyCompControl ParentControl
         {
             get;
             private set;
