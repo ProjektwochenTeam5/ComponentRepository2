@@ -14,16 +14,26 @@ namespace ClientAgent
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.IO;
+    using System.IO.Pipes;
     using System.Linq;
     using System.Reflection;
     using Core.Component;
+    using System.Net.Sockets;
+    using System.Net;
+    using System.Threading;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using ClientServerCommunication;
+    using ClientJobExecutor;
 
     /// <summary>
     /// Provides methods for executing a component.
     /// </summary>
     public static class JobExecutor
     {
+        private static int lastPort = 15000;
+
         /// <summary>
         /// Gets the 
         /// </summary>
@@ -37,10 +47,105 @@ namespace ClientAgent
         public static IEnumerable<object> Execute(Assembly dll, IEnumerable<object> args)
         {
             IComponent comp = ReadComponentInfoFromDll(dll);
+
+            Process client = new Process();
+            client.StartInfo.FileName = "ClientJobExecutor.exe";
+
+            int port = 0;
+            TcpListener l;
+            do
+            {
+                try
+                {
+                    port = lastPort;
+                    l = new TcpListener(new IPEndPoint(IPAddress.Any, lastPort++));
+                    l.Start();
+                    if (lastPort >= ushort.MaxValue)
+                    {
+                        lastPort = 15000;
+                    }
+
+                    break;
+                }
+                catch
+                {
+                    Thread.Sleep(20);
+                }
+            }
+            while (true);
+
             if (args == null)
             {
                 args = new object[0];
             }
+
+            client.StartInfo.Arguments = port.ToString();
+            client.StartInfo.CreateNoWindow = false;
+            client.Start();
+
+            if (!client.HasExited)
+            {
+                TcpClient cl = l.AcceptTcpClient();
+                BinaryFormatter f = new BinaryFormatter();
+                JobArgument arg = new JobArgument(args, comp);
+
+                MemoryStream ms = new MemoryStream();
+
+                f.Serialize(ms, arg);
+                long length = ms.Length;
+
+                byte b1, b100, b10000, b1000000;
+
+                b1 = (byte)(length % 0x100);
+                b100 = (byte)((length / 0x100) % 0x100);
+                b10000 = (byte)((length / 0x10000) % 0x100);
+                b1000000 = (byte)((length / 0x1000000) % 0x100);
+
+                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, 5 });
+                send.AddRange(ms.ToArray());
+
+                NetworkStream nstr = cl.GetStream();
+                nstr.Write(send.ToArray(), 0, send.Count);
+
+                while (true)
+                {
+                    if (nstr.DataAvailable)
+                    {
+                        byte[] hdr = new byte[9];
+
+                        nstr.Read(hdr, 0, 9);
+
+                        uint len;
+                        StatusCode sc;
+
+                        if (!Client.ParseHeader(hdr, out len, out sc))
+                        {
+                            continue;
+                        }
+
+                        byte[] body = new byte[len];
+                        int rcvbody = nstr.Read(body, 0, (int)len);
+
+                        using (MemoryStream nms = new MemoryStream(body))
+                        {
+                            Message rcv = (Message)f.Deserialize(nms);
+                            if (rcv.MessageType == StatusCode.TransferJob)
+                            {
+                                TransferJobResponse rsp = rcv as TransferJobResponse;
+                                break;
+                            }
+                        }
+
+                        break;
+                    }
+
+                    Thread.Sleep(10);
+                }
+
+                client.WaitForExit();
+            }
+
+            l.Stop();
 
             return comp.Evaluate(args);
         }
