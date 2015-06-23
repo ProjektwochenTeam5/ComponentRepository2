@@ -139,6 +139,7 @@
             TransferJobRequest req = new TransferJobRequest();
             req.ServerID = this.ServerGuid;
             req.InputData = inputData;
+            req.InputData = new List<object>() { 4, 3 };
             req.ComponentGuid = componentGuid;
 
             this.JobsQueued.Add(jobGuid);
@@ -150,6 +151,7 @@
             {
                 if (e.BelongsToJob == jobGuid)
                 {
+                    Console.WriteLine("Answer from Client matches Request! Result is: " + e.Data.Result.ElementAt(0));
                     resp = e.Data;
                     waiting = false;
                 }
@@ -183,11 +185,6 @@
             return resp.Result.ToList();
         }
 
-        private void TCPServerManager_OnJobResponseRecieved(object sender, JobResponseRecievedEventArgs e)
-        {
-
-        }
-
         private void AddDllToDictionary(string filename)
         {
             this.Dlls.Add(Guid.NewGuid(), this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll");
@@ -218,6 +215,7 @@
                         else
                         {
                             Console.WriteLine("We don't have this component in store!");
+                            this.MyTCPServer.SendError(e.Info, request.MessageID);
                         }
 
                         break;                        

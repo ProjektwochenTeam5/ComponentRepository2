@@ -183,6 +183,9 @@ namespace Server
                 // Ergebnis speichern
                 // 2. output ........
             }
+
+            Console.WriteLine("Split is through!");
+
         }
 
         private static int Add(IEnumerable<object> param)
