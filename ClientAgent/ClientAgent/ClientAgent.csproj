@@ -45,6 +45,7 @@
     <Compile Include="Client.cs" />
     <Compile Include="ClientListenerThreadArgs.cs" />
     <Compile Include="ClientMessageManager.cs" />
+    <Compile Include="JobArgument.cs" />
     <Compile Include="JobExecutor.cs" />
     <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="Program.cs" />
@@ -58,6 +59,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ClientJobExecutor\ClientJobExecutor.csproj">
+      <Project>{c1856488-c8a1-4f5d-93af-19af3ee23c44}</Project>
+      <Name>ClientJobExecutor</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ClientServerCommunication\ClientServerCommunication.csproj">
       <Project>{7e87af0b-6fd2-438d-a795-a6b7d6194cd8}</Project>
       <Name>ClientServerCommunication</Name>
