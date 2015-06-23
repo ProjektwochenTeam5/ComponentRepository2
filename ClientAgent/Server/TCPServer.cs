@@ -220,7 +220,7 @@ namespace Server
             try
             {
                 stream.Write(message, 0, message.Length);
-                Console.WriteLine("Sending Message!");
+                Console.WriteLine("Sending Message! + {0} bytes!", message.Length);
             }
             catch (Exception ex)
             {
