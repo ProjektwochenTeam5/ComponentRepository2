@@ -238,7 +238,7 @@ namespace ClientAgent
             mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)msg.MessageType });
             mes.AddRange(ms.ToArray());
 
-            if (this.ConnectionClient.Connected)
+            if (this.ConnectionClient.GetStream().CanWrite && this.ConnectionClient.Connected)
             {
                 this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
             }
