@@ -369,13 +369,11 @@ namespace ClientAgent
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
 
-            /*
             StoreComponent i = new StoreComponent();
             i.Component = File.ReadAllBytes("Add.dll");
             i.FriendlyName = "Add";
             args.Client.SendMessage(i);
-             */
-
+            
             while (!args.Stopped)
             {
                 // send keep alive
@@ -386,7 +384,7 @@ namespace ClientAgent
                     args.Client.SendMessage(new KeepAlive() { CPUWorkload = cpu.NextValue() });
                 }
 
-                while (str.DataAvailable)
+                if (str.DataAvailable)
                 {
                     byte[] hdr = new byte[9];
 
@@ -496,10 +494,31 @@ namespace ClientAgent
         /// </param>
         private void SendDiscover(UdpClient cl)
         {
-            List<byte> msg = new List<byte>();
-            msg.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 1 });
+            /*
+             * List<byte> msg = new List<byte>();
+               msg.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 1 });
+               UdpBroadcast.SendBoadcast(1233, msg.ToArray());
+             */
+            
+            List<byte> mes = new List<byte>();
+            MemoryStream ms = new MemoryStream();
 
-            UdpBroadcast.SendBoadcast(1233, msg.ToArray());
+            AgentDiscover d = new AgentDiscover();
+
+            this.formatter.Serialize(ms, d);
+
+            uint length = (uint)ms.Length;
+            byte b1, b100, b10000, b1000000;
+
+            b1 = (byte)(length % 0x100);
+            b100 = (byte)((length / 0x100) % 0x100);
+            b10000 = (byte)((length / 0x10000) % 0x100);
+            b1000000 = (byte)((length / 0x1000000) % 0x100);
+
+            mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)StatusCode.AgentConnection });
+            mes.AddRange(ms.ToArray());
+
+            UdpBroadcast.SendBoadcast(1233, mes.ToArray());
             ////cl.Send(msg.ToArray(), msg.Count, new IPEndPoint(IPAddress.Broadcast, 1234));
         }
 

@@ -202,14 +202,19 @@ namespace ClientAgent.UI
         /// </param>
         private void ButtonQuit_ButtonKeyPressed(object sender, EventArgs e)
         {
+            this.StopWork();
             this.Close();
         }
 
         /// <summary>
-        /// 
+        /// Called when the client has connected to a server.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
         private void Client_Connected(object sender, EventArgs e)
         {
             this.labelStatus.Text = "Connected to a server!";
