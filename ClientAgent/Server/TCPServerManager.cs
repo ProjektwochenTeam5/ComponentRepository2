@@ -18,7 +18,7 @@
             this.IpAdressFriendlyName = new Dictionary<string, string>();
             this.JobsQueued = new List<Guid>();
             this.Components = new Dictionary<Guid, Component>();
-            this.CPULoads = new Dictionary<Guid, double>();
+            this.CPULoads = new Dictionary<Guid, int>();
             this.MyTCPServer = new TCPServer();
             this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
@@ -32,7 +32,7 @@
             this.IpAdressFriendlyName = new Dictionary<string, string>();
             this.JobsQueued = new List<Guid>();
             this.Components = new Dictionary<Guid, Component>();
-            this.CPULoads = new Dictionary<Guid, double>();
+            this.CPULoads = new Dictionary<Guid, int>();
             this.MyTCPServer = new TCPServer();
             this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
@@ -46,7 +46,7 @@
 
         public event EventHandler<JobResponseRecievedEventArgs> OnJobResponseRecieved;
 
-        public Dictionary<Guid, double> CPULoads { get; set; }
+        public Dictionary<Guid, int> CPULoads { get; set; }
 
         public Dictionary<Guid,List<Component>> AllServerComponents { get; set; }
 
