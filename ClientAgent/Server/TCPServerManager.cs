@@ -48,6 +48,8 @@
 
         public Dictionary<Guid,List<Component>> AllServerComponents { get; set; }
 
+        public Dictionary<Guid, List<ClientInfo>> AllServerClients { get; set; }
+
         public Dictionary<Guid, string> Dlls { get; set; }
 
         public Dictionary<Guid, Component> Components { get; set; }
