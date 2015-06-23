@@ -53,6 +53,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="InputIdentifier.cs" />
     <Compile Include="Job.cs" />
     <Compile Include="MyComponent.cs" />
     <Compile Include="StaticStringInputWindow.xaml.cs">

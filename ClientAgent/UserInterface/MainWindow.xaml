@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:core="clr-namespace:Core.Network;assembly=Core.Network"
         xmlns:local="clr-namespace:UserInterface"
-        Title="MainWindow" Height="700" Width="1000" MinHeight="500" MinWidth="800">
+        Title="Projektwochen Team 5" Height="700" Width="1000" MinHeight="500" MinWidth="800">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="convBoolToVis"/>
         <Style x:Key="styleStarCheckBox" TargetType="{x:Type CheckBox}">
@@ -78,7 +78,7 @@
                 </StackPanel.Resources>
                 
                 <Button x:Name="btnStaticInput" Content="add input description..." Margin="5" Click="btnStaticInput_Click"/>
-                <Expander Header="Favorites" IsExpanded="True">
+                <Expander Header="Favorites">
                     <ListView x:Name="lvFavorites" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
                 </Expander>
                 <Expander Header="Matching input">
@@ -89,9 +89,6 @@
                 </Expander>
                 <Expander Header="All components" IsExpanded="True">
                     <ListView x:Name="lvComponents" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
-                </Expander>
-                <Expander x:Name="expJobs" Header="Saved jobs">
-                    <ListView x:Name="lvJobs" Margin="25 0 0 0" BorderThickness="0" />
                 </Expander>
             </StackPanel>
         </Border>
