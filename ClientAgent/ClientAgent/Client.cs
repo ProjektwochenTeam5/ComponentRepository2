@@ -381,7 +381,7 @@ namespace ClientAgent
                 {
                     Console.WriteLine("Keep Alive {0}", DateTime.Now);
                     lastKeepAlive = DateTime.Now;
-                    args.Client.SendMessage(new KeepAlive() { CPUWorkload = cpu.NextValue() });
+                    args.Client.SendMessage(new KeepAlive() { CPUWorkload = (int)cpu.NextValue() });
                 }
 
                 if (str.DataAvailable)
@@ -429,7 +429,7 @@ namespace ClientAgent
         /// <returns>
         ///     Returns a value indicating whether the specified byte array is a valid header.
         /// </returns>
-        private static bool ParseHeader(byte[] header, out uint length, out StatusCode status)
+        public static bool ParseHeader(byte[] header, out uint length, out StatusCode status)
         {
             length = 0;
             status = StatusCode.KeepAlive;
@@ -465,7 +465,7 @@ namespace ClientAgent
         /// <returns>
         ///     Returns a value indicating whether the specified byte array is a valid UDP server message header.
         /// </returns>
-        private static bool ParseUDPHeader(byte[] header, out uint length, out StatusCode status)
+        public static bool ParseUDPHeader(byte[] header, out uint length, out StatusCode status)
         {
             length = 0;
             status = StatusCode.KeepAlive;
