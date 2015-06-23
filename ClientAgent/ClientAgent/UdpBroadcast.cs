@@ -25,16 +25,20 @@ namespace ClientAgent
         /// </param>
         public static void SendBoadcast(int port, byte[] data)
         {
-            byte current = 1;
+            ////byte current = 1;
             UdpClient cl = new UdpClient();
-
+            cl.EnableBroadcast = true;
+            cl.Send(data, data.Length, new IPEndPoint(IPAddress.Broadcast, port));
+            
+            /*
             for(; current < 0xff; current++)
             {
                 IPEndPoint target = new IPEndPoint(new IPAddress(new byte[] { 10, 101, 150, current }), port);
                 cl.Send(data, data.Length, target);
-            }
-
-            /*foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
+            }*/
+            
+            /*
+            foreach (NetworkInterface ni in NetworkInterface.GetAllNetworkInterfaces())
             {
                 foreach (var i in ni.GetIPProperties().UnicastAddresses)
                 {
@@ -56,14 +60,21 @@ namespace ClientAgent
                         uint addr = (uint)(b[3] + 0x100 * b[2] + 0x10000 * b[1] + 0x1000000 * b[0]);
 
                         byte[] bits = new byte[32];
-                        uint address = 0;
+                        byte[] addrBits = new byte[32];
+                        byte[] addrBytes = inf.Address.GetAddressBytes();
+                        long addr0 = inf.Address.Address;
 
                         for (int n = 0; n < 32; n++)
                         {
                             bits[n] = (byte)(addr / Math.Pow(2, n) % 2);
+                            if (bits[n] == 1)
+                            {
+                                addrBits[n] = (byte)(addr0 / Math.Pow(2, n) % 2);
+                            }
                         }
 
-                        Console.WriteLine("{0} - {1}", string.Join(string.Empty, bits.Reverse()), i.Address);
+                        global::System.Windows.Forms.MessageBox.Show(string.Format("{0} - {1}", string.Join(string.Empty, bits.Reverse()), string.Join(string.Empty, addrBits.Reverse())));
+                        //Console.WriteLine();
                     });
 
                     t.Start(new object[] { i });

@@ -109,11 +109,21 @@ namespace ConsoleGUI.Controls
             return ret;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="k"></param>
+        /// <returns></returns>
         public override bool Receive(ConsoleKeyInfo k)
         {
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public override bool Receive(string s)
         {
             return false;

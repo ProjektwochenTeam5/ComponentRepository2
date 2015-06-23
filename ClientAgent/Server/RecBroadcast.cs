@@ -15,6 +15,8 @@ namespace Server
     {
         public int UdpClientPort { get { return 1233; } }
 
+        public event EventHandler<UdpClientDiscoverRecievedEventArgs> OnUdpClientDiscovered;
+
         public void Recieve()
         {
 
@@ -30,9 +32,21 @@ namespace Server
                 {
                     byte[] bytes = client.Receive(ref groupEP);
 
-                    ////////////// For testing purposes
-                    Console.WriteLine("Recieved broadcast from {0} :\n {1}\n", groupEP.ToString(), Encoding.ASCII.GetString(bytes, 0, bytes.Length));
+                    if (bytes[8] == (byte)1)
+                    {
+                        byte[] body = bytes.SubArray(9, bytes.Length - 9);
+                        Console.WriteLine("Recieved broadcast from {0} - {1}", groupEP.ToString(), Encoding.ASCII.GetString(body, 0, body.Length));
 
+                        AgentDiscover discover = (AgentDiscover)DataConverter.ConvertByteArrayToMessage(body);
+
+                        if (discover != null)
+                        {
+                            this.FireOnClientDiscovered(new UdpClientDiscoverRecievedEventArgs(groupEP.Address.ToString(), discover.FriendlyName));
+                        }
+                    }
+                    
+                    ////////////// For testing purposes
+                    
 
                     //// TODO: Check if Messagetype == 1
                     //////// Send IP Back - store client
@@ -81,6 +95,14 @@ namespace Server
             string IpAdresse = hostInfo.AddressList[0].ToString();
 
             return IpAdresse;
+        }
+
+        protected void FireOnClientDiscovered(UdpClientDiscoverRecievedEventArgs e)
+        {
+            if (this.OnUdpClientDiscovered != null)
+            {
+                this.OnUdpClientDiscovered(this, e);
+            }
         }
     }
 }

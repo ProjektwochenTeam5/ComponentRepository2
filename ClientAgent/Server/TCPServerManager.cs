@@ -13,6 +13,31 @@
 
     public class TCPServerManager
     {
+        public TCPServerManager()
+        {
+            this.IpAdressFriendlyName = new Dictionary<string, string>();
+            this.JobsQueued = new List<Guid>();
+            this.Components = new Dictionary<Guid, Component>();
+            this.CPULoads = new Dictionary<Guid, double>();
+            this.MyTCPServer = new TCPServer();
+            this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
+            this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
+            this.ServerGuid = Guid.NewGuid();
+        }
+
+        public TCPServerManager(RecBroadcast broadcast)
+        {
+            this.IpAdressFriendlyName = new Dictionary<string, string>();
+            this.JobsQueued = new List<Guid>();
+            this.Components = new Dictionary<Guid, Component>();
+            this.CPULoads = new Dictionary<Guid, double>();
+            this.MyTCPServer = new TCPServer();
+            this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
+            this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
+            this.ServerGuid = Guid.NewGuid();
+            broadcast.OnUdpClientDiscovered += broadcast_OnUdpClientDiscovered;
+        }
+
         public TCPServer MyTCPServer { get; set; }
 
         public event EventHandler<JobResponseRecievedEventArgs> OnJobResponseRecieved;
@@ -23,31 +48,28 @@
 
         public Dictionary<Guid, Component> Components { get; set; }
 
+        public Dictionary<string, string> IpAdressFriendlyName { get; set; }
+
         public List<Guid> JobsQueued { get; set; }
 
         public Guid ServerGuid { get; set; }
 
         public double AllClientLoad { get; set; }
 
-        public TCPServerManager()
+        void broadcast_OnUdpClientDiscovered(object sender, UdpClientDiscoverRecievedEventArgs e)
         {
-            this.JobsQueued = new List<Guid>();
-            this.Components = new Dictionary<Guid, Component>();
-            this.CPULoads = new Dictionary<Guid, double>();
-            this.MyTCPServer = new TCPServer();
-            this.MyTCPServer.OnMessageRecieved += this.MyTCPServer_OnMessageRecieved;
-            this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
-            this.ServerGuid = Guid.NewGuid();
+            this.IpAdressFriendlyName.Add(e.IPAdress, e.FriendlyName);
         }
 
         private void MyTCPServer_OnClientFetched(object sender, ClientFetchedEventArgs e)
         {
-            this.SendComponentInfosToClient(e.ClientId);
+            this.SendComponentInfosToClient(e.ClientInfo);
+            e.ClientInfo.FriendlyName = this.IpAdressFriendlyName[e.ClientInfo.IpAddress.ToString()];
         }
 
-        private void SendComponentInfosToClient(Guid clientID)
+        private void SendComponentInfosToClient(ClientInfo info)
         {
-            this.MyTCPServer.SendMessage(this.BuildComponentInfos(), clientID);
+            this.MyTCPServer.SendMessage(this.BuildComponentInfos(), info.ClientGuid);
         }
 
         private byte[] BuildComponentInfos()
@@ -61,14 +83,14 @@
 
                 foreach (var keyvaluepair in this.Dlls)
                 {
-                    if (keyvaluepair.Value == item.Location)
+                    if (keyvaluepair.Value == item.Value)
                     {
                         g = keyvaluepair.Key;
                         break;
                     }
                 }
 
-                componentdic.Add(this.MyTCPServer.Wrapper.ReadComponentInfoFormDll(item), g);
+                componentdic.Add(this.MyTCPServer.Wrapper.ReadComponentInfoFormDll(item.Key), g);
             }
 
             /////////////////// IComponentdictionary fertig
@@ -106,7 +128,7 @@
             foreach (var item in this.MyTCPServer.Wrapper.Data)
             {
                 Guid g;
-                this.Dlls.Add(g = Guid.NewGuid(), item.Location);
+                this.Dlls.Add(g = Guid.NewGuid(), item.Value);
             }
 
             this.MyTCPServer.Run();
@@ -139,7 +161,8 @@
             var client = this.CPULoads.Where(y => y.Value == CPULoads.Min(x => x.Value)).Single().Key;
             this.MyTCPServer.SendMessage(sendData, client);
 
-            ////this.OnJobResponseRecieved += this.TCPServerManager_OnJobResponseRecieved;
+            Console.WriteLine("Sending TransferJobReqest!");
+
             try
             {
                 while (waiting)
@@ -167,9 +190,7 @@
 
         private void AddDllToDictionary(string filename)
         {
-            string path = this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll";
-            Guid g;
-            this.Dlls.Add(g = Guid.NewGuid(), path);
+            this.Dlls.Add(Guid.NewGuid(), this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll");
         }
 
         private void MyTCPServer_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
@@ -179,7 +200,7 @@
                 case ClientServerCommunication.StatusCode.KeepAlive:
                     {
                         KeepAlive keepAlive = (KeepAlive)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                        Console.WriteLine("Keep alive recieved || Terminate = {0} || Workload = {1}", keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
+                        Console.WriteLine("Keep alive recieved from {0} || Terminate = {1} || Workload = {2}",e.Info.FriendlyName, keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
                         this.CalculateClientLoads(keepAlive, e.Info.ClientGuid);
                         this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
                         break;
@@ -203,13 +224,19 @@
                     }
 
                 case ClientServerCommunication.StatusCode.TransferJob:
-                    TransferJobResponse response = (TransferJobResponse)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                    this.FireOnJobResponseRecieved(new JobResponseRecievedEventArgs(response.BelongsToRequest, response));
+                    {
+                        TransferJobResponse response = (TransferJobResponse)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                        this.FireOnJobResponseRecieved(new JobResponseRecievedEventArgs(response.BelongsToRequest, response));
 
-                    break;
+                        break;
+                    }
+
                 case ClientServerCommunication.StatusCode.DoJobRequest:
                     {
                         DoJobRequest request = (DoJobRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                        this.MyTCPServer.SendAck(e.Info, request.MessageID);
+
+                        Console.WriteLine("DoJobRequest recieved!");
                         SplitJob.Split(request, this);
 
                         break;

@@ -48,19 +48,16 @@ namespace ClientAgent
             input.StartReading();
 
             // Initialize output
-            //ConsoleRenderer r = new ConsoleRenderer();
+            ConsoleRenderer r = new ConsoleRenderer();
 
             // Main Menu
-            //mainMenu = new ClientMenu(new[] { r }, input, new TcpClient(new IPEndPoint(IPAddress.Any, 12345)));
-            //mainMenu.StartWork();
-            //mainMenu.Show();
+            mainMenu = new ClientMenu(new[] { r }, input, new TcpClient(new IPEndPoint(IPAddress.Any, 12345)));
+            mainMenu.StartWork();
+            mainMenu.Show();
 
             // Wait until closed
-            //mainMenu.WaitForClose();
+            mainMenu.WaitForClose();
 
-            //mainMenu.StopWork();
-            UdpBroadcast.SendBoadcast(1234, new byte[0]);
-            Console.ReadLine();
             Environment.Exit(0);
         }
     }

@@ -12,64 +12,87 @@ using System.Threading.Tasks;
 
     public class DataBaseWrapper
     {
-        public List<Assembly> Data { get; set; }
+        public Dictionary<byte[], string> Data { get; set; }
+
+        public object locker = new object();
 
         public string StorePath { get { return Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName) + "\\Store"; } }
 
         public void GetAssemblies()
         {
-            this.Data = new List<Assembly>();
-
-            foreach (var dll in Directory.GetFiles(this.StorePath, "*dll"))
+            lock (this.locker)
             {
-                if (Path.GetFileName(dll) == "Core.Component.dll")
+                this.Data = new Dictionary<byte[], string>();
+
+                //foreach (var dll in Directory.GetFiles(this.StorePath, "*dll"))
+                //{
+                //    if (Path.GetFileName(dll) == "Core.Component.dll")
+                //    {
+                //        continue;
+                //    }
+                //    this.Data.Add(Assembly.LoadFile(dll));
+                //}
+
+
+                foreach (string item in Directory.GetFiles(this.StorePath))
                 {
-                    continue;
+                    if (Path.GetFileName(item) == "Core.Component.dll")
+                    {
+                        continue;
+                    }
+
+                    byte[] data = File.ReadAllBytes(item);
+                    this.Data.Add(data, item);
                 }
-                this.Data.Add(Assembly.LoadFile(dll));
             }
         }
 
-        public IComponent ReadComponentInfoFormDll(Assembly dll)
+        public IComponent ReadComponentInfoFormDll(byte[] dll)
         {
-            Type componentInfo = null;
+            lock (this.locker)
+            {
+                Assembly a = Assembly.Load(dll);
+                Type componentInfo = null;
 
-            var result = from type in dll.GetTypes()
-                          where typeof(IComponent).IsAssignableFrom(type)
-                          select type;
+                var result = from type in a.GetTypes()
+                             where typeof(IComponent).IsAssignableFrom(type)
+                             select type;
 
 
-            componentInfo = result.Single();
+                componentInfo = result.Single();
 
-            IComponent comp = (IComponent)Activator.CreateInstance(componentInfo);
-            return comp;
+                IComponent comp = (IComponent)Activator.CreateInstance(componentInfo);
+                return comp;
+            }
         }
 
         public bool StoreComponent(byte[] dll, string filename)
         {
-            try
+            lock (this.locker)
             {
-                System.IO.FileStream fs=
-                   new System.IO.FileStream(this.StorePath + "\\" + filename + ".dll", System.IO.FileMode.Create,
-                                            System.IO.FileAccess.Write);
+                try
+                {
 
-                fs.Write(dll, 0, dll.Length);
+                    using (FileStream fs = new FileStream(this.StorePath + "\\" + filename + ".dll", System.IO.FileMode.Create,
+                                                System.IO.FileAccess.Write, FileShare.Read))
+                    {
+                        fs.Write(dll, 0, dll.Length);
+                        
+                    }
 
-                // close file stream
-                fs.Close();
+                    Console.WriteLine("--> " + filename + " Component succsessfully stored!");
+                    return true;
+                }
+                catch (Exception e)
+                {
+                    // Error
+                    Console.WriteLine("Exception caught in process: {0}",
+                                      e.ToString());
+                }
 
-                Console.WriteLine("--> " + filename + " Component succsessfully stored!");
-                return true;
+                // error occured, return false
+                return false;
             }
-            catch (Exception e)
-            {
-                // Error
-                Console.WriteLine("Exception caught in process: {0}",
-                                  e.ToString());
-            }
-
-            // error occured, return false
-            return false;
         }
     }
 }
