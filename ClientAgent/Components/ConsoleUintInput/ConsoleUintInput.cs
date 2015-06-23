@@ -26,7 +26,7 @@ namespace ConsoleUintInput
         public ConsoleUintInput()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() }); 
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() }); 
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
