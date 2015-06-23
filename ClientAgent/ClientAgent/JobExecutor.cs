@@ -1,19 +1,33 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="JobExecutor.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the <see cref="JobExecutor"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ClientAgent
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.IO;
+    using System.Linq;
     using System.Reflection;
     using Core.Component;
 
-    public class JobExecutor
+    /// <summary>
+    /// Provides methods for executing a component.
+    /// </summary>
+    public static class JobExecutor
     {
         /// <summary>
-        /// 
+        /// Gets the 
         /// </summary>
-        public static Dictionary<string, Assembly> Data { get; set; }
+        public static Dictionary<string, Assembly> Data { get; private set; }
 
         /// <summary>
         /// 
@@ -22,7 +36,12 @@ namespace ClientAgent
         /// <returns></returns>
         public static IEnumerable<object> Execute(Assembly dll, IEnumerable<object> args)
         {
-            IComponent comp = ReadComponentInfoFormDll(dll);
+            IComponent comp = ReadComponentInfoFromDll(dll);
+            if (args == null)
+            {
+                args = new object[0];
+            }
+
             return comp.Evaluate(args);
         }
 
@@ -94,7 +113,7 @@ namespace ClientAgent
         /// </summary>
         /// <param name="dll"></param>
         /// <returns></returns>
-        private static IComponent ReadComponentInfoFormDll(Assembly dll)
+        private static IComponent ReadComponentInfoFromDll(Assembly dll)
         {
             Type componentInfo = null;
 

@@ -41,6 +41,7 @@
   <ItemGroup>
     <Compile Include="Controls\CheckBox.cs" />
     <Compile Include="Controls\DrawThreadArgs.cs" />
+    <Compile Include="Controls\StackTextBox.cs" />
     <Compile Include="IO\ConsoleInput.cs" />
     <Compile Include="IO\ConsoleRenderer.cs" />
     <Compile Include="Controls\Control.cs" />

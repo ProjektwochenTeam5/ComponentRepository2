@@ -5,6 +5,9 @@
 // <summary>
 // This file contains the <see cref="TextBox"/> class.
 // </summary>
+// <author>
+// David Eiwen
+// </author>
 // --------------------------------------------------------------
 
 namespace ConsoleGUI.Controls

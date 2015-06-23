@@ -17,12 +17,12 @@ namespace ClientAgent
     using System.Collections.ObjectModel;
     using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
+    using System.Threading;
     using System.Threading.Tasks;
     using ClientServerCommunication;
     using Core.Network;
-    using System.Threading;
-    using System.Reflection;
 
     /// <summary>
     /// Manages messages received by a client.
@@ -98,13 +98,18 @@ namespace ClientAgent
         /// </value>
         public ReadOnlyCollection<Component> StoredComponentInfos
         {
-            get;
-            private set;
+            get
+            {
+                return new ReadOnlyCollection<Component>(this.storedComponentInfos);
+            }
         }
 
         /// <summary>
-        /// 
+        /// Gets the file names of the stored components.
         /// </summary>
+        /// <value>
+        ///     Contains the file names of the stored components.
+        /// </value>
         public Dictionary<Guid, string> StoredComponents
         {
             get;
@@ -180,10 +185,10 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
+        /// Raises the <see cref="ReceivedTransferComponentResponseMessage"/> event.
         /// </summary>
         /// <param name="e">
-        ///     
+        ///     Contains the received message.
         /// </param>
         protected void OnReceivedTransferComponentResponseMessage(MessageReceivedEventArgs e)
         {
@@ -194,10 +199,10 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
+        /// Raises the <see cref="ReceivedTansferJobRequestMessage"/> event.
         /// </summary>
         /// <param name="e">
-        ///     
+        ///     Contains the received message.
         /// </param>
         protected void OnReceivedTransferJobRequestMessage(MessageReceivedEventArgs e)
         {
@@ -218,22 +223,23 @@ namespace ClientAgent
         /// </param>
         private void ManagedClient_ReceivedTCPMessage(object sender, MessageReceivedEventArgs e)
         {
+            this.OnReceivedMessage(e);
             switch (e.ReceivedMessage.MessageType)
             {
                 case StatusCode.Error:
                     this.OnReceivedErrorMessage(e);
                     this.ReceivedEror(e);
-                    break;
+                    return;
 
                 case StatusCode.Acknowledge:
                     this.OnReceivedAcknowledgeMessage(e);
                     this.ReceivedAcknowledge(e);
-                    break;
+                    return;
 
                 case StatusCode.SendComponentInfos:
                     this.OnReceivedSendComponentInfo(e);
                     this.ReceivedSendComponentInfos(e);
-                    break;
+                    return;
 
                 case StatusCode.TransferComponent:
                     this.OnReceivedTransferComponentResponseMessage(e);
@@ -257,58 +263,64 @@ namespace ClientAgent
         {
             TransferJobRequest rq = e.ReceivedMessage as TransferJobRequest;
 
-            while (true)
-            {
-                Component cmp = this.storedComponentInfos.FirstOrDefault(c => c.ComponentGuid == rq.ComponentGuid);
-
-                if (cmp == null)
-                {
-                    TransferComponentRequest tcr = new TransferComponentRequest();
-                    tcr.ComponentID = rq.ComponentGuid;
-
-                    TransferComponentResponse resp = null;
-                    bool cont = false;
-
-                    // event handler receiving a transfer component response
-                    EventHandler<MessageReceivedEventArgs> d = delegate(object sender, MessageReceivedEventArgs args)
+            Thread t = new Thread(delegate()
+                { 
+                    while (true)
                     {
-                        if (args.ReceivedMessage.MessageType != StatusCode.TransferComponent)
+                        string cmp = this.StoredComponents.FirstOrDefault(c => c.Key == rq.ComponentGuid).Value;
+
+                        if (cmp == default(string) || string.IsNullOrEmpty(cmp))
+                        {
+                            TransferComponentRequest tcr = new TransferComponentRequest();
+                            tcr.ComponentID = rq.ComponentGuid;
+
+                            TransferComponentResponse resp = null;
+                            bool cont = false;
+
+                            // event handler receiving a transfer component response
+                            EventHandler<MessageReceivedEventArgs> d = delegate(object sender, MessageReceivedEventArgs args)
+                            {
+                                if (args.ReceivedMessage.MessageType != StatusCode.TransferComponent)
+                                {
+                                    return;
+                                }
+
+                                cont = true;
+                                resp = args.ReceivedMessage as TransferComponentResponse;
+                            };
+
+                            this.ReceivedMessage += d;
+                            this.WaitingMessages.Add(tcr);
+                            this.ManagedClient.SendMessage(tcr);
+
+                            while (!cont)
+                            {
+                                Thread.Sleep(10);
+                            }
+
+                            this.ReceivedMessage -= d;
+                            continue;
+                        }
+
+                        string pth = this.StoredComponents.FirstOrDefault(k => k.Value == cmp).Value;
+
+                        JobExecutor.GetAssemblies();
+                        Assembly a = JobExecutor.Data.FirstOrDefault(k => k.Key == pth).Value;
+
+                        if (a == null)
                         {
                             return;
                         }
 
-                        cont = true;
-                        resp = args.ReceivedMessage as TransferComponentResponse;
-                    };
-
-                    this.ReceivedTransferComponentResponseMessage += d;
-                    this.ManagedClient.SendMessage(tcr);
-
-                    while (!cont)
-                    {
-                        Thread.Sleep(10);
+                        TransferJobResponse tjs = new TransferJobResponse();
+                        tjs.Result = JobExecutor.Execute(a, rq.InputData).ToArray();
+                        tjs.BelongsToRequest = rq.ComponentGuid;
+                        this.ManagedClient.SendMessage(tjs);
+                        return;
                     }
+                });
 
-                    this.ReceivedTransferComponentResponseMessage -= d;
-                    continue;
-                }
-
-                string pth = this.StoredComponents.FirstOrDefault(k => k.Key == cmp.ComponentGuid).Value;
-
-                JobExecutor.GetAssemblies();
-                Assembly a = JobExecutor.Data.FirstOrDefault(k => k.Key == pth).Value;
-
-                if (a == null)
-                {
-                    return;
-                }
-
-                TransferJobResponse tjs = new TransferJobResponse();
-                tjs.Result = JobExecutor.Execute(a, rq.InputData).ToArray();
-                tjs.BelongsToRequest = rq.ComponentGuid;
-                this.ManagedClient.SendMessage(tjs);
-                return;
-            }
+            t.Start();
         }
 
         /// <summary>
@@ -326,7 +338,7 @@ namespace ClientAgent
             }
 
             TransferComponentRequest rq =
-                this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == r.BelongsTo) as TransferComponentRequest;
+                this.WaitingMessages.ToArray().FirstOrDefault(msg => msg.MessageID == r.BelongsTo) as TransferComponentRequest;
 
             if (rq == null)
             {
@@ -401,16 +413,89 @@ namespace ClientAgent
                 }
             }
 
-            if (m.MetadataComponents.Count > 0)
+            if (!sent && m.MetadataComponents.Count > 0)
             {
+                sent = true;
+
+                var addGuid = Guid.NewGuid();
+                var inpGuid = Guid.NewGuid();
+                var outGuid = Guid.NewGuid();
+
+                var intaddGuid1 = this.StoredComponentInfos.First(c => c.FriendlyName == "Add").ComponentGuid;
+                var intaddGuid2 = this.StoredComponentInfos.First(c => c.FriendlyName == "Add").ComponentGuid;
+                var intinpGuid1 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
+                var intinpGuid2 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
+                var intinpGuid3 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
+                var intoutGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Output").ComponentGuid;
+
+                //////////////// Testjob
+                Component job = new Component();
+                job.ComponentGuid = new Guid();
+                job.FriendlyName = "Addieren von 3 Zahlen";
+                job.InputDescriptions = new List<string>() { "zahl1", "zahl2", "zahl3" };
+                job.OutputDescriptions = new List<string>() { "zahl" };
+                job.InputHints = new List<string>() { typeof(int).ToString(), typeof(int).ToString(), typeof(int).ToString() };
+                job.IsAtomic = false;
+                job.Edges = new List<ComponentEdge>();
+
+                var edge1 = new ComponentEdge();
+                edge1.InputComponentGuid = addGuid;
+                edge1.OutputComponentGuid = inpGuid;
+                edge1.InternalInputComponentGuid = intaddGuid1;
+                edge1.InternalOutputComponentGuid = intinpGuid1;
+                edge1.InputValueID = 1;
+                edge1.OutputValueID = 1;
+
+                var edge2 = new ComponentEdge();
+                edge2.InputComponentGuid = addGuid;
+                edge2.OutputComponentGuid = inpGuid;
+                edge2.InternalInputComponentGuid = intaddGuid1;
+                edge2.InternalOutputComponentGuid = intinpGuid2;
+                edge2.InputValueID = 2;
+                edge2.OutputValueID = 1;
+
+                var edge3 = new ComponentEdge();
+                edge3.InputComponentGuid = addGuid;
+                edge3.OutputComponentGuid = addGuid;
+                edge3.InternalInputComponentGuid = intaddGuid2;
+                edge3.InternalOutputComponentGuid = intaddGuid1;
+                edge3.InputValueID = 1;
+                edge3.OutputValueID = 1;
+
+                var edge4 = new ComponentEdge();
+                edge4.InputComponentGuid = addGuid;
+                edge4.OutputComponentGuid = inpGuid;
+                edge4.InternalInputComponentGuid = intaddGuid2;
+                edge4.InternalOutputComponentGuid = intinpGuid3;
+                edge4.InputValueID = 2;
+                edge4.OutputValueID = 1;
+
+                var edge5 = new ComponentEdge();
+                edge5.InputComponentGuid = outGuid;
+                edge5.OutputComponentGuid = addGuid;
+                edge5.InternalInputComponentGuid = intoutGuid;
+                edge5.InternalOutputComponentGuid = intaddGuid2;
+                edge5.InputValueID = 1;
+                edge5.OutputValueID = 1;
+
+                List<ComponentEdge> myedges = new List<ComponentEdge>();
+
+                myedges.Add(edge1);
+                myedges.Add(edge2);
+                myedges.Add(edge3);
+                myedges.Add(edge4);
+                myedges.Add(edge5);
+                job.Edges = myedges.AsEnumerable();
                 DoJobRequest rq = new DoJobRequest();
-                rq.Job = m.MetadataComponents.First();
+                rq.Job = job;
                 this.WaitingMessages.Add(rq);
                 this.ManagedClient.SendMessage(rq);
             }
 
             Console.WriteLine("\nTotal elements found: {0}\n", m.MetadataComponents.Count);
         }
+
+        static bool sent = false;
 
         /// <summary>
         /// Processes a received acknowledge message.
