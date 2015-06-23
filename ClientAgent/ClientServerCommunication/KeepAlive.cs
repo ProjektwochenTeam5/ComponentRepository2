@@ -10,9 +10,9 @@ namespace ClientServerCommunication
     public class KeepAlive : Message
     {
         /// <summary>
-        /// Gets or sets the CPU load.
+        /// Gets or sets the CPU load in percent.
         /// </summary>
-        public double CPUWorkload { get; set; }
+        public int CPUWorkload { get; set; }
 
         /// <summary>
         /// Gets or sets a value indicating whether the client shall terminate.

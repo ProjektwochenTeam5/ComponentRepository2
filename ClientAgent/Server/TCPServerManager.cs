@@ -24,6 +24,7 @@
             this.MyTCPServer.OnClientFetched += this.MyTCPServer_OnClientFetched;
             this.ServerGuid = Guid.NewGuid();
             this.AllServerComponents = new Dictionary<Guid, List<Component>>();
+            this.ClientPing = new Dictionary<Guid, uint>();
         }
 
         public TCPServerManager(RecBroadcast broadcast)
@@ -38,6 +39,7 @@
             this.ServerGuid = Guid.NewGuid();
             broadcast.OnUdpClientDiscovered += broadcast_OnUdpClientDiscovered;
             this.AllServerComponents = new Dictionary<Guid, List<Component>>();
+            this.ClientPing = new Dictionary<Guid, uint>();
         }
 
         public TCPServer MyTCPServer { get; set; }
@@ -49,6 +51,10 @@
         public Dictionary<Guid,List<Component>> AllServerComponents { get; set; }
 
         public Dictionary<Guid, List<ClientInfo>> AllServerClients { get; set; }
+
+        public Dictionary<Guid, int> AllServerCpuLoads { get; set; }
+
+        public Dictionary<Guid, uint> ClientPing { get; set; }
 
         public Dictionary<Guid, string> Dlls { get; set; }
 
@@ -71,6 +77,22 @@
         {
             this.SendComponentInfosToClient(e.ClientInfo);
             e.ClientInfo.FriendlyName = this.IpAdressFriendlyName[e.ClientInfo.IpAddress.ToString()];
+
+            this.ClientPing.Add(e.ClientInfo.ClientGuid, 0);
+
+            Task t = new Task(new Action(() =>
+            {
+                while (true)
+                {
+
+                }
+                uint old = this.ClientPing[e.ClientInfo.ClientGuid];
+                Thread.Sleep(60000);
+                if (old == this.ClientPing[e.ClientInfo.ClientGuid])
+                {
+
+                }
+            }));
         }
 
         private void SendComponentInfosToClient(ClientInfo info)
