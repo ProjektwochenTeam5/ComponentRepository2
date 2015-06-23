@@ -24,16 +24,6 @@ using System.Threading.Tasks;
             {
                 this.Data = new Dictionary<byte[], string>();
 
-                //foreach (var dll in Directory.GetFiles(this.StorePath, "*dll"))
-                //{
-                //    if (Path.GetFileName(dll) == "Core.Component.dll")
-                //    {
-                //        continue;
-                //    }
-                //    this.Data.Add(Assembly.LoadFile(dll));
-                //}
-
-
                 foreach (string item in Directory.GetFiles(this.StorePath))
                 {
                     if (Path.GetFileName(item) == "Core.Component.dll")
