@@ -10,6 +10,14 @@ namespace ClientServerCommunication
     public class AgentDiscover : Message
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="AgentDiscover"/> class.
+        /// </summary>
+        public AgentDiscover()
+        {
+            this.FriendlyName = Environment.MachineName;
+        }
+
+        /// <summary>
         /// Gets the message type of the message.
         /// </summary>
         /// <value>
@@ -19,5 +27,16 @@ namespace ClientServerCommunication
         {
             get { return StatusCode.AgentConnection; }
         }
+
+
+        /// <summary>
+        /// Gets or sets the FriendlyName of the agent.
+        /// </summary>
+        /// <value>
+        ///     Contains the friendly name of the agent.
+        /// </value>
+        public string FriendlyName { get; set; }
+
+
     }
 }

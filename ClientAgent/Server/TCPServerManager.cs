@@ -141,7 +141,6 @@
 
             Console.WriteLine("Sending TransferJobReqest!");
 
-            ////this.OnJobResponseRecieved += this.TCPServerManager_OnJobResponseRecieved;
             try
             {
                 while (waiting)
@@ -169,9 +168,7 @@
 
         private void AddDllToDictionary(string filename)
         {
-            string path = this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll";
-            Guid g;
-            this.Dlls.Add(g = Guid.NewGuid(), path);
+            this.Dlls.Add(Guid.NewGuid(), this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll");
         }
 
         private void MyTCPServer_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
@@ -205,10 +202,13 @@
                     }
 
                 case ClientServerCommunication.StatusCode.TransferJob:
-                    TransferJobResponse response = (TransferJobResponse)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                    this.FireOnJobResponseRecieved(new JobResponseRecievedEventArgs(response.BelongsToRequest, response));
+                    {
+                        TransferJobResponse response = (TransferJobResponse)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                        this.FireOnJobResponseRecieved(new JobResponseRecievedEventArgs(response.BelongsToRequest, response));
 
-                    break;
+                        break;
+                    }
+
                 case ClientServerCommunication.StatusCode.DoJobRequest:
                     {
                         DoJobRequest request = (DoJobRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
