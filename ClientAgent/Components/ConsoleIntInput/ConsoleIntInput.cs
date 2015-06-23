@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="Fibo.cs" company="FHWN"> 
+// <copyright file="ConsoleIntInput.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace Fibo
+namespace ConsoleIntInput
 {
     using System;
     using System.Collections.Generic;
@@ -16,20 +16,20 @@ namespace Fibo
     using Core.Component;
 
     /// <summary>
-    /// This is the component class to get Fibonacci numbers.
+    /// This is the component class for the console input.
     /// </summary>
-    public class Fibo : IComponent
+    public class ConsoleIntInput : IComponent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Fibo"/> class.
+        /// Initializes a new instance of the <see cref="ConsoleIntInput"/> class.
         /// </summary>
-        public Fibo()
+        public ConsoleIntInput()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
+            this.InputHints = new List<string>();
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();            
+            this.OutputDescriptions = new List<string>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace Fibo
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Fibonacci Numbers"; }
+            get { return "Console Int Input"; }
         }
 
         /// <summary>
@@ -100,23 +100,26 @@ namespace Fibo
         /// <returns>Collection of output arguments.</returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            if (values.Count() != 2)
+            if (values.Count() != 0)
             {
                 return new object[] { new ArgumentException() };
             }
-           
-            uint a = 0;
-            uint b = 1;
-            uint n = 0;
 
-            for (uint i = 0; i < n; i++)
+            while (true)
             {
-                uint temp = a;
-                a = b;
-                b = temp + b;
-            }
+                Console.WriteLine("Please enter the operating value.");
+                string userInput = Console.ReadLine();
+                bool parseOK;
+                int num = 0;
+                if (string.IsNullOrEmpty(userInput) == true)
+                {
+                    Console.WriteLine("Please enter any value you want to operate with. ");
+                }               
 
-            return new object[] { a };
+                parseOK = int.TryParse(userInput, out num);
+               
+                return new object[] { num };
+            }
         }
     }
 }

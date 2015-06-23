@@ -9,6 +9,7 @@ namespace Sub
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -25,15 +26,10 @@ namespace Sub
         public Sub()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new List<string>();
-            this.OutputHints = new List<string>();
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString(), typeof(int).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
-
-            this.InputHints.ToList().Add(typeof(int).ToString());
-            this.InputHints.ToList().Add(typeof(int).ToString());
-
-            this.OutputHints.ToList().Add(typeof(int).ToString());
         }
 
         /// <summary>

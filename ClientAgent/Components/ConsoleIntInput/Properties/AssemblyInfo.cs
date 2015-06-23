@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ConsoleStringInput")]
+[assembly: AssemblyTitle("ConsoleIntInput")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FHWN")]
-[assembly: AssemblyProduct("ConsoleStringInput")]
+[assembly: AssemblyProduct("ConsoleIntInput")]
 [assembly: AssemblyCopyright("Copyright © FHWN 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("ba56ce55-9014-4c21-9f32-480ea91f3464")]
+[assembly: Guid("f3d91653-42e4-4d39-a9d5-87d89ee61ffa")]
 
 // Version information for an assembly consists of the following four values:
 //

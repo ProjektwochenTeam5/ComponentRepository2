@@ -112,7 +112,6 @@ namespace Log
             {
                 return new object[] { new ArgumentException() };
             }
-
             else
             {
                 double result = Math.Log(num, log_base);
