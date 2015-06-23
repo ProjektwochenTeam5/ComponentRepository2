@@ -21,6 +21,8 @@ namespace ClientAgent
     using System.Threading.Tasks;
     using ClientServerCommunication;
     using Core.Network;
+    using System.Threading;
+    using System.Reflection;
 
     /// <summary>
     /// Manages messages received by a client.
@@ -41,6 +43,7 @@ namespace ClientAgent
         public ClientMessageManager(Client managed)
         {
             this.WaitingMessages = new List<Message>(512);
+            this.StoredComponents = new Dictionary<Guid, string>();
             this.ManagedClient = managed;
             this.ManagedClient.ReceivedTCPMessage += this.ManagedClient_ReceivedTCPMessage;
         }
@@ -66,6 +69,16 @@ namespace ClientAgent
         public event EventHandler<MessageReceivedEventArgs> ReceivedSendComponentInfoMessage;
 
         /// <summary>
+        /// Raised when the manager received a transfer component response.
+        /// </summary>
+        public event EventHandler<MessageReceivedEventArgs> ReceivedTransferComponentResponseMessage;
+
+        /// <summary>
+        /// Raised when the manager received a transfer job request.
+        /// </summary>
+        public event EventHandler<MessageReceivedEventArgs> ReceivedTransferJobRequestMessage;
+
+        /// <summary>
         /// Gets the received messages with their IDs.
         /// </summary>
         /// <value>
@@ -84,6 +97,15 @@ namespace ClientAgent
         ///     Contains the stored components.
         /// </value>
         public ReadOnlyCollection<Component> StoredComponentInfos
+        {
+            get;
+            private set;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        public Dictionary<Guid, string> StoredComponents
         {
             get;
             private set;
@@ -158,6 +180,34 @@ namespace ClientAgent
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e">
+        ///     
+        /// </param>
+        protected void OnReceivedTransferComponentResponseMessage(MessageReceivedEventArgs e)
+        {
+            if (this.ReceivedTransferComponentResponseMessage != null)
+            {
+                this.ReceivedTransferComponentResponseMessage(this, e);
+            }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e">
+        ///     
+        /// </param>
+        protected void OnReceivedTransferJobRequestMessage(MessageReceivedEventArgs e)
+        {
+            if (this.ReceivedTransferJobRequestMessage != null)
+            {
+                this.ReceivedTransferJobRequestMessage(this, e);
+            }
+        }
+
+        /// <summary>
         /// Called when the managed client received a message.
         /// </summary>
         /// <param name="sender">
@@ -171,23 +221,94 @@ namespace ClientAgent
             switch (e.ReceivedMessage.MessageType)
             {
                 case StatusCode.Error:
+                    this.OnReceivedErrorMessage(e);
                     this.ReceivedEror(e);
                     break;
 
                 case StatusCode.Acknowledge:
+                    this.OnReceivedAcknowledgeMessage(e);
                     this.ReceivedAcknowledge(e);
                     break;
 
                 case StatusCode.SendComponentInfos:
+                    this.OnReceivedSendComponentInfo(e);
                     this.ReceivedSendComponentInfos(e);
                     break;
 
                 case StatusCode.TransferComponent:
+                    this.OnReceivedTransferComponentResponseMessage(e);
                     this.ReceivedTransferComponentResponse(e);
+                    break;
+
+                case StatusCode.TransferJob:
+                    this.OnReceivedTransferJobRequestMessage(e);
+                    this.ReceivedTransferJobRequest(e);
                     break;
             }
 
             this.WaitingMessages.Add(e.ReceivedMessage);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="e"></param>
+        private void ReceivedTransferJobRequest(MessageReceivedEventArgs e)
+        {
+            TransferJobRequest rq = e.ReceivedMessage as TransferJobRequest;
+
+            while (true)
+            {
+                Component cmp = this.storedComponentInfos.FirstOrDefault(c => c.ComponentGuid == rq.ComponentGuid);
+
+                if (cmp == null)
+                {
+                    TransferComponentRequest tcr = new TransferComponentRequest();
+                    tcr.ComponentID = rq.ComponentGuid;
+
+                    TransferComponentResponse resp = null;
+                    bool cont = false;
+
+                    // event handler receiving a transfer component response
+                    EventHandler<MessageReceivedEventArgs> d = delegate(object sender, MessageReceivedEventArgs args)
+                    {
+                        if (args.ReceivedMessage.MessageType != StatusCode.TransferComponent)
+                        {
+                            return;
+                        }
+
+                        cont = true;
+                        resp = args.ReceivedMessage as TransferComponentResponse;
+                    };
+
+                    this.ReceivedTransferComponentResponseMessage += d;
+                    this.ManagedClient.SendMessage(tcr);
+
+                    while (!cont)
+                    {
+                        Thread.Sleep(10);
+                    }
+
+                    this.ReceivedTransferComponentResponseMessage -= d;
+                    continue;
+                }
+
+                string pth = this.StoredComponents.FirstOrDefault(k => k.Key == cmp.ComponentGuid).Value;
+
+                JobExecutor.GetAssemblies();
+                Assembly a = JobExecutor.Data.FirstOrDefault(k => k.Key == pth).Value;
+
+                if (a == null)
+                {
+                    return;
+                }
+
+                TransferJobResponse tjs = new TransferJobResponse();
+                tjs.Result = JobExecutor.Execute(a, rq.InputData).ToArray();
+                tjs.BelongsToRequest = rq.ComponentGuid;
+                this.ManagedClient.SendMessage(tjs);
+                return;
+            }
         }
 
         /// <summary>
@@ -222,7 +343,8 @@ namespace ClientAgent
                 return;
             }
 
-            File.WriteAllBytes(c.FriendlyName + ".dll", r.Component);
+            File.WriteAllBytes("temp\\" + c.FriendlyName + ".dll", r.Component);
+            this.StoredComponents.Add(c.ComponentGuid, c.FriendlyName + ".dll");
         }
 
         /// <summary>
@@ -279,19 +401,15 @@ namespace ClientAgent
                 }
             }
 
-            Console.WriteLine("\nTotal elements found: {0}\n", m.MetadataComponents.Count);
-
-            /*if (m.MetadataComponents.Count <= 0)
+            if (m.MetadataComponents.Count > 0)
             {
-                return;
+                DoJobRequest rq = new DoJobRequest();
+                rq.Job = m.MetadataComponents.First();
+                this.WaitingMessages.Add(rq);
+                this.ManagedClient.SendMessage(rq);
             }
 
-            Component cm = m.MetadataComponents.First();
-
-            TransferComponentRequest rq = new TransferComponentRequest();
-            rq.ComponentID = cm.ComponentGuid;
-            this.WaitingMessages.Add(rq);
-            this.ManagedClient.SendMessage(rq);*/
+            Console.WriteLine("\nTotal elements found: {0}\n", m.MetadataComponents.Count);
         }
 
         /// <summary>
