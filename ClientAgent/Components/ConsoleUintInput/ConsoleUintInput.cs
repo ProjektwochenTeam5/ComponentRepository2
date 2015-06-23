@@ -26,8 +26,8 @@ namespace ConsoleUintInput
         public ConsoleUintInput()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new List<string>();
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() }); 
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
         }
@@ -100,7 +100,7 @@ namespace ConsoleUintInput
         /// <returns>Collection of output arguments.</returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            if (values.Count() != 0)
+            if (values.Count() != 1)
             {
                 return new object[] { new ArgumentException() };
             }

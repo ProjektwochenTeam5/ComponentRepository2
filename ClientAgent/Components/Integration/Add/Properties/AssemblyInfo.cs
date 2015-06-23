@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AddComponent")]
+[assembly: AssemblyTitle("Add")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("FHWN")]
-[assembly: AssemblyProduct("AddComponent")]
+[assembly: AssemblyProduct("Add")]
 [assembly: AssemblyCopyright("Copyright © FHWN 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -20,7 +20,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("e3930a73-833e-4600-85f6-2ca65ce9dbc5")]
+[assembly: Guid("68f3756f-abc4-40cc-9d9f-7468e8e7b35f")]
 
 // Version information for an assembly consists of the following four values:
 //

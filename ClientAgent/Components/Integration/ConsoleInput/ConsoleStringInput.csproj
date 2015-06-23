@@ -7,7 +7,7 @@
     <ProjectGuid>{4A488036-6E32-4546-B4E8-3AF572C09CD7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConsoleInput</RootNamespace>
+    <RootNamespace>ConsoleIntInput</RootNamespace>
     <AssemblyName>ConsoleInput</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -39,11 +39,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConsoleInput.cs" />
+    <Compile Include="ConsoleStringInput.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\Core.Component\Core.Component.csproj">
+    <ProjectReference Include="..\..\pwsp_v12\Core.Component\Core.Component.csproj">
       <Project>{3cbff49b-e085-49af-8aa5-e3bab177b179}</Project>
       <Name>Core.Component</Name>
     </ProjectReference>

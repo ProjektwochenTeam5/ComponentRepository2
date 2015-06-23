@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleInput.cs" company="FHWN"> 
+// <copyright file="ConsoleStringInput.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleInput
+namespace ConsoleStringInput
 {
     using System;
     using System.Collections.Generic;
@@ -18,12 +18,12 @@ namespace ConsoleInput
     /// <summary>
     /// This is the component class for the console input.
     /// </summary>
-    public class ConsoleInput : IComponent
+    public class ConsoleStringInput : IComponent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleInput"/> class.
+        /// Initializes a new instance of the <see cref="ConsoleStringInput"/> class.
         /// </summary>
-        public ConsoleInput()
+        public ConsoleStringInput()
         {
             this.ComponentGuid = new Guid();
             this.InputHints = new List<string>();
@@ -50,7 +50,7 @@ namespace ConsoleInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Input"; }
+            get { return "Console String Input"; }
         }
 
         /// <summary>
@@ -107,11 +107,11 @@ namespace ConsoleInput
 
             while (true)
             {
-                Console.WriteLine("Please enter the operating values.");
+                Console.WriteLine("Please enter the operating value.");
             string userInput = Console.ReadLine();
             if (string.IsNullOrEmpty(userInput) == true)
             {
-                Console.WriteLine("Please enter any values you want to operate with. ");              
+                Console.WriteLine("Please enter any value you want to operate with. ");              
             }
 
             return new object[] { userInput };
