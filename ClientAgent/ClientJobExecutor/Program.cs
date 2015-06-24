@@ -26,6 +26,7 @@ namespace ClientJobExecutor
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            Console.ReadLine();
             int port;
             if(!int.TryParse(args[0], out port))
             {

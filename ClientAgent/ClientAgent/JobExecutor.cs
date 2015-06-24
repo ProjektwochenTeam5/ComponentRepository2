@@ -106,7 +106,7 @@ namespace ClientAgent
                 b10000 = (byte)((length / 0x10000) % 0x100);
                 b1000000 = (byte)((length / 0x1000000) % 0x100);
 
-                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, 5 });
+                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)arg.MessageType });
                 send.AddRange(ms.ToArray());
 
                 NetworkStream nstr = cl.GetStream();
@@ -204,7 +204,7 @@ namespace ClientAgent
             try
             {
                 using (FileStream fs = new System.IO.FileStream(
-                    StorePath + "\\" + filename + ".dll",
+                    filename,
                     System.IO.FileMode.Create,
                     System.IO.FileAccess.Write))
                 {

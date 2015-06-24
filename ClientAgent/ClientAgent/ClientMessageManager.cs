@@ -244,7 +244,7 @@ namespace ClientAgent
                 case StatusCode.TransferComponent:
                     this.ReceivedTransferComponentResponse(e);
                     this.OnReceivedTransferComponentResponseMessage(e);
-                    break;
+                    return;
 
                 case StatusCode.TransferJob:
                     this.ReceivedTransferJobRequest(e);
@@ -342,8 +342,7 @@ namespace ClientAgent
                 return;
             }
 
-            IEnumerable<Message> ms = this.WaitingMessages.ToArray().Where(msg => msg as TransferComponentRequest != null && msg.MessageID == r.BelongsTo);
-            TransferComponentRequest rq = ms.SingleOrDefault() as TransferComponentRequest;
+            TransferComponentRequest rq = this.WaitingMessages.ToArray().FirstOrDefault(msg => msg.MessageID == r.BelongsTo) as TransferComponentRequest;
 
             if (rq == null)
             {
