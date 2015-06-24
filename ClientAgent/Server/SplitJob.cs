@@ -24,10 +24,11 @@ namespace Server
 
         public static Guid JobGuid { get; set; }
 
-        public static void Split(DoJobRequest jobreq, TCPServerManager manager)
+        public static List<object> Split(JobRequest jobreq, TCPServerManager manager)
         {
+            List<object> ResultList = new List<object>();
             Manager = manager;
-            var job = jobreq.Job;
+            var job = jobreq.JobComponent;
             JobGuid = Guid.NewGuid();
 
             //var addGuid = Guid.NewGuid();
@@ -163,7 +164,8 @@ namespace Server
                     // BERECHNUNG VOM USER ODER AUSGABE?? (wenn letzte component ausgabe ist)
                     foreach (var resultEdge in edges.Where(x => x.InternalInputComponentGuid == outputGuid))
                     {
-                        Console.WriteLine("Ergebnis: " + ((int)resultEdge.ComponentResult).ToString());
+                        //Console.WriteLine("Ergebnis: " + ((int)resultEdge.ComponentResult).ToString());
+                        ResultList.Add(resultEdge.ComponentResult);
                     }
                 }
 
@@ -185,8 +187,9 @@ namespace Server
             }
 
             Console.WriteLine("Split is through!");
-
+            return ResultList;
         }
+
 
         private static int Add(IEnumerable<object> param)
         {

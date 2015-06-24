@@ -15,9 +15,16 @@ namespace Server
     {
         public TcpServerToServerManager(TCPServerManager manager)
         {
-            this.Server = new ServerReceiver();
             this.Server.OnMessageRecieved += Server_OnMessageRecieved;
             this.TcpManager = manager;
+
+            this.Server = new ServerReceiver();
+            Task serverReceiverTask = new Task(() => this.Server.StartReceiving());
+            serverReceiverTask.Start();
+
+            KeepAliveServerToServer keepAlive = new KeepAliveServerToServer(this);
+            Task keepAliveTask = new Task(() => keepAlive.SendKeepAlives(this.Server.Servers));
+            keepAliveTask.Start();
         }
 
         public TCPServerManager TcpManager { get; set; }
@@ -44,12 +51,9 @@ namespace Server
                     this.SendComponentSubmitRespose(e.Server, submitReq.ComponentSubmitRequestGuid);
                     break;
                 case Core.Network.MessageCode.JobRequest:
-                    JobResponse jobResp = JsonConvert.DeserializeObject<JobResponse>(Encoding.ASCII.GetString(e.MessageBody));
-
-                    break;
-                case Core.Network.MessageCode.JobResult:
-                    JobResultRequest jobResultReq = JsonConvert.DeserializeObject<JobResultRequest>(Encoding.ASCII.GetString(e.MessageBody));
-
+                    JobRequest jobReq = JsonConvert.DeserializeObject<JobRequest>(Encoding.ASCII.GetString(e.MessageBody));
+                    this.SendJobResponse(e.Server, jobReq.JobRequestGuid, true);
+                    this.TryToExecuteJob(jobReq, e.Server);
                     break;
                 case Core.Network.MessageCode.RequestAssembly:
                     AssemblyRequest assemblyRequest = JsonConvert.DeserializeObject<AssemblyRequest>(Encoding.ASCII.GetString(e.MessageBody));
@@ -62,6 +66,63 @@ namespace Server
                     break;
                 default:
                     break;
+            }
+        }
+
+        private void SendJobResponse(TcpClient client, Guid guid, bool p)
+        {
+            JobResponse resp = new JobResponse();
+            resp.IsAccepted = p;
+            resp.JobRequestGuid = guid;
+
+            string json = JsonConvert.SerializeObject(resp);
+            var bytes = DataConverter.ConvertJsonToByteArray(MessageCode.JobRequest, json);
+
+            try
+            {
+                NetworkStream ns = client.GetStream();
+
+                ns.Write(bytes, 0, bytes.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                client.Close();
+            }
+        }
+
+        private void TryToExecuteJob(JobRequest jobReq, TcpClient client)
+        {
+            var results = SplitJob.Split(jobReq, this.TcpManager);
+
+            JobResultRequest req = new JobResultRequest();
+            req.JobGuid = jobReq.JobGuid;
+            req.JobResultGuid = Guid.NewGuid();
+            req.OutputData = results;
+            req.State = JobState.Ok;
+
+            string json = JsonConvert.SerializeObject(req);
+            var bytes = DataConverter.ConvertJsonToByteArray(MessageCode.JobResult, json);
+
+            try
+            {
+                NetworkStream ns = client.GetStream();
+
+                ns.Write(bytes, 0, bytes.Length);
+
+                // wait for response result
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                client.Close();
             }
         }
 

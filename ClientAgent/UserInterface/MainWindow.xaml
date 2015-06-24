@@ -48,7 +48,7 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="200"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="120"/>
+            <ColumnDefinition Width="150"/>
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="40"/>
@@ -60,7 +60,7 @@
         <Label Content="Components" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="0"/>
         <Label Content="Toolbox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="2"/>
 
-        <Border BorderBrush="Black" Grid.Row="1" Margin="5 0">
+        <ScrollViewer BorderBrush="Black" VerticalScrollBarVisibility="Auto" Grid.Row="1" Margin="5 0">
             <StackPanel Background="White">
                 <StackPanel.Resources>
                     <Style TargetType="ListView">
@@ -91,8 +91,8 @@
                     <ListView x:Name="lvComponents" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
                 </Expander>
             </StackPanel>
-        </Border>
-        
+        </ScrollViewer>
+
         <DockPanel Background="White"  Grid.Row="1" Grid.Column="2" Margin="5 0">
             <StackPanel DockPanel.Dock="Top">
                 <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="btnDelete_Click" ToolTip="remove the selected item"/>
@@ -100,7 +100,7 @@
                 <ToggleButton x:Name="toggleLink" Content="Link" IsChecked="False" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Height="140" Checked="toggleLink_Checked" />
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
-                <Button x:Name="btnCreateComp" Content="Create Comp..." HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateComp_Click" />
+                <Button x:Name="btnCreateComp" Content="Create Component..." HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateComp_Click" />
                 <Button x:Name="btnCreateJob" Content="Execute Job..." HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateJob_Click" />
             </StackPanel>
         </DockPanel>
