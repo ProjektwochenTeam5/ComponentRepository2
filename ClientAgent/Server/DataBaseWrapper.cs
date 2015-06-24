@@ -1,13 +1,14 @@
 ﻿namespace Server
 {
     using Core.Network;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
+    using System;
+    using System.Collections.Generic;
+    using System.Runtime.Serialization.Formatters.Binary;
+    using System.IO;
+    using System.Linq;
+    using System.Reflection;
+    using System.Text;
+    using System.Threading.Tasks;
     using Core.Component;
 
     public class DataBaseWrapper
@@ -67,7 +68,7 @@ using System.Threading.Tasks;
                                                 System.IO.FileAccess.Write, FileShare.Read))
                     {
                         fs.Write(dll, 0, dll.Length);
-                        
+
                     }
 
                     Console.WriteLine("--> " + filename + " Component succsessfully stored!");
@@ -82,6 +83,41 @@ using System.Threading.Tasks;
 
                 // error occured, return false
                 return false;
+            }
+        }
+
+        public bool StoreComplexComponent(byte[] complexComponent, string filename)
+        {
+            using (FileStream fs = new FileStream(this.StorePath + "\\" + filename + ".dat", FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                try
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    formatter.Serialize(fs, complexComponent);
+                    return true;
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine("Unable to store complex component");
+                    return false;
+                }
+            }
+        }
+
+        public byte[] GetComplexComponent(string filename)
+        {
+            using (FileStream fs = new FileStream(this.StorePath + "\\" + filename + ".dat", FileMode.Create, FileAccess.Write, FileShare.Read))
+            {
+                try
+                {
+                    BinaryFormatter formatter = new BinaryFormatter();
+                    return (byte[])formatter.Deserialize(fs);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Could not read complex component from file due to following reason: \n  " + e.Message);
+                    return null;
+                }
             }
         }
     }

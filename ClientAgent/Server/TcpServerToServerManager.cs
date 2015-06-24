@@ -15,10 +15,11 @@ namespace Server
     {
         public TcpServerToServerManager(TCPServerManager manager)
         {
+            this.Server = new ServerReceiver();
+
             this.Server.OnMessageRecieved += Server_OnMessageRecieved;
             this.TcpManager = manager;
 
-            this.Server = new ServerReceiver();
             Task serverReceiverTask = new Task(() => this.Server.StartReceiving());
             serverReceiverTask.Start();
 

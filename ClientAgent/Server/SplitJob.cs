@@ -229,7 +229,7 @@ namespace Server
                         }
 
                         // input Data mittels JobRequest an client schicken.
-                        var resultlist = Manager.SendJobToClient(edges.FirstOrDefault(x => x.InternalInputComponentGuid == nextCompGuid).InputComponentGuid, inputData, JobGuid);
+                        var resultlist = Manager.SendJobToClient(edges.FirstOrDefault(x => x.InternalOutputComponentGuid == nextCompGuid).OutputComponentGuid, inputData, JobGuid);
 
                         //var outputEdges = edges.Where(x => x.InternalInputComponentGuid == nextCompGuid);
                         // TODO: result-IEnumerable durchgehen und results in outputEdges schreiben!
@@ -249,7 +249,7 @@ namespace Server
                         //clientResultEdge == compInputEdge
                         //var clientResultEdges = edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid);
 
-                        var resultlist = Manager.SendJobToClient(edges.FirstOrDefault(x => x.InternalInputComponentGuid == nextCompGuid).InputComponentGuid, null, JobGuid);
+                        var resultlist = Manager.SendJobToClient(edges.FirstOrDefault(x => x.InternalOutputComponentGuid == nextCompGuid).OutputComponentGuid, null, JobGuid);
 
                         for (int i = 0; i < resultlist.Count; i++)
                         {

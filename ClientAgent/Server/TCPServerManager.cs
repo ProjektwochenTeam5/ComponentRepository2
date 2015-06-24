@@ -52,6 +52,7 @@
 
         public Dictionary<Guid, List<ClientInfo>> AllServerClients { get; set; }
 
+
         public Dictionary<Guid, int> AllServerCpuLoads { get; set; }
 
         public Dictionary<Guid, uint> ClientPing { get; set; }
@@ -176,9 +177,13 @@
             TransferJobRequest req = new TransferJobRequest();
             req.ServerID = this.ServerGuid;
             req.InputData = inputData;
-            req.InputData = new List<string>() { "Please enter a number: " };
             req.ComponentGuid = componentGuid;
             req.JobID = jobGuid;
+
+            if (req.InputData == null)
+            {
+                req.InputData = new List<object>() { "Please enter a number: " };
+            }
 
             this.JobsQueued.Add(jobGuid);
 
@@ -286,19 +291,30 @@
                     {
                         Console.WriteLine("StoreComponent recieved!");
                         StoreComponent storecomponent = (StoreComponent)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                        DataBaseWrapper db = new DataBaseWrapper();
-                        bool store = db.StoreComponent(storecomponent.Component, storecomponent.FriendlyName);
 
-                        if (store)
+                        if (!storecomponent.IsComplex)
                         {
-                            this.MyTCPServer.SendAck(e.Info, storecomponent.MessageID);
-                            this.AddDllToDictionary(e.Info.FriendlyName);
-                            this.SendInfosToAllClients();
+                            DataBaseWrapper db = new DataBaseWrapper();
+                            bool store = db.StoreComponent(storecomponent.Component, storecomponent.FriendlyName);
+
+                            if (store)
+                            {
+                                this.MyTCPServer.SendAck(e.Info, storecomponent.MessageID);
+                                this.AddDllToDictionary(e.Info.FriendlyName);
+                                this.SendInfosToAllClients();
+                            }
+                            else
+                            {
+                                this.MyTCPServer.SendError(e.Info, storecomponent.MessageID);
+                            }
                         }
                         else
                         {
-                            this.MyTCPServer.SendError(e.Info, storecomponent.MessageID);
+
+
                         }
+
+
                         break;
                     }
                 default:

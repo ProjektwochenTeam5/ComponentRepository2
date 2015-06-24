@@ -77,7 +77,6 @@ namespace Server
             clientInfo.IpAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
             clientInfo.FriendlyName = "Markus";
             this.Clients.Add(clientInfo, client);
-
             NetworkStream ns = client.GetStream();
 
             this.FireOnClientFetched(new ClientFetchedEventArgs(clientInfo));
@@ -100,7 +99,12 @@ namespace Server
                     }
 
                     byte[] body = new byte[bodylen];
+
+                    Thread.Sleep(10);
                     int rcvbody = ns.Read(body, 0, (int)bodylen);
+
+
+
 
                     this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, messagType, clientInfo));
                 }
