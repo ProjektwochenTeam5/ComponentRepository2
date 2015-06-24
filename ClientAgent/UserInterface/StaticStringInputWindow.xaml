@@ -7,7 +7,7 @@
         <Button x:Name="btnSave" Content="Save" DockPanel.Dock="Bottom" Height="25" Margin="5" Click="btnSave_Click"/>
 
         <StackPanel>
-            <Label Content="Input description"/>
+            <Label Content="Your static string"/>
             <TextBox x:Name="txtDescription" Height="23" TextWrapping="Wrap" Margin="5" TextChanged="txtDescription_TextChanged" KeyDown="txtDescription_KeyDown"/>
             <TextBlock x:Name="txtInfo" Height="23" Foreground="Tomato" Margin="5"/>
         </StackPanel>
