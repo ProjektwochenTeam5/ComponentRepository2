@@ -103,7 +103,7 @@ namespace Server
             
 
             ///////////////////// Temporär - gesamte Liste von DLLs usw. 
-            Dictionary<Guid, Assembly> components = new Dictionary<Guid, Assembly>();
+            //Dictionary<Guid, Assembly> components = new Dictionary<Guid, Assembly>();
             //////////////////////
 
             if (job.IsAtomic)
@@ -158,7 +158,7 @@ namespace Server
                     //var comp = components.First(x => x.Key == outputGuid).Value;
                     // var comp = components.First(x => x.Key == compGuid);
 
-                    GoToNextEdge(outputGuid, inputGuids, components);
+                    GoToNextEdge(outputGuid, inputGuids);
 
                     // BERECHNUNG VOM USER ODER AUSGABE?? (wenn letzte component ausgabe ist)
                     foreach (var resultEdge in edges.Where(x => x.InternalInputComponentGuid == outputGuid))
@@ -200,7 +200,7 @@ namespace Server
             return result;
         }
 
-        private static void GoToNextEdge(Guid outputGuid, List<Guid> inputGuids, Dictionary<Guid, Assembly> components)
+        private static void GoToNextEdge(Guid outputGuid, List<Guid> inputGuids)
         {
             //var compInputEdges = edges.Where(x => x.InternalInputComponentGuid == outputGuid);
 
@@ -214,7 +214,7 @@ namespace Server
                     if (!inputGuids.Contains(nextCompGuid))
                     {
                         // weiter gehen
-                        GoToNextEdge(nextCompGuid, inputGuids, components);
+                        GoToNextEdge(nextCompGuid, inputGuids);
 
                         // Component an Client mit den ganzen Inputs schicken.
                         // var inputEdges = edges.Where(x => x.InternalInputComponentGuid == nextCompGuid);
