@@ -13,7 +13,7 @@ namespace Server
 {
     public class RecBroadcast
     {
-        public int UdpClientPort { get { return 10001; } }
+        public int UdpClientPort { get { return 1233; } }
 
         public event EventHandler<UdpClientDiscoverRecievedEventArgs> OnUdpClientDiscovered;
 
@@ -78,6 +78,7 @@ namespace Server
             try
             {
                 client.Send(send, send.Length, ipendpoint);
+                Console.WriteLine("sending ip + {0}", send.Length + "bytes");
             }
             catch (Exception ex)
             {
