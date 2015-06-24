@@ -78,6 +78,10 @@
       <Project>{b1b4b865-f61c-4ed7-93ec-01c6339a82b6}</Project>
       <Name>Core.Network</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UserInterface\UserInterface.csproj">
+      <Project>{6d511e3c-81ac-46e9-acd2-5cc4a7125503}</Project>
+      <Name>UserInterface</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
