@@ -37,10 +37,8 @@ namespace Server
             //Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());
             //serverBroadcastTask.Start();
 
-            ServerReceiver serverReceiver = new ServerReceiver();
-            Task serverReceiverTask = new Task(() => serverReceiver.StartReceiving());
-            serverReceiverTask.Start();
-
+            TcpServerToServerManager tcpServerToServerManager = new TcpServerToServerManager(tcpservermanager);
+            
             //SplitJob.Split(new Component());
 
             Console.ReadLine();

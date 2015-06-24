@@ -147,5 +147,14 @@ namespace Server
 
             return (resp.KeepAliveRequestGuid == guid);
         }
+
+        internal object SendKeepAlives(Dictionary<Guid, IPEndPoint> servers)
+        {
+            while (true)
+            {
+                this.SendKeepAlive(servers, false);
+                Thread.Sleep(30000);
+            }
+        }
     }
 }
