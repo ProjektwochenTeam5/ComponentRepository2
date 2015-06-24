@@ -144,7 +144,7 @@ namespace Server
             }
         }
 
-        private void SendAckToClient(NetworkStream ns, int belongingmessageid)
+        private void SendAckToClient(NetworkStream ns, Guid belongingmessageid)
         {
             Acknowledge ack = new Acknowledge();
             ack.BelongsTo = belongingmessageid;
@@ -164,7 +164,7 @@ namespace Server
             ns.Flush();
         }
 
-        private void SendErrorToClient(NetworkStream ns, int belongingmessageid)
+        private void SendErrorToClient(NetworkStream ns, Guid belongingmessageid)
         {
             Error err = new Error();
             err.BelongsTo = belongingmessageid;
@@ -196,7 +196,7 @@ namespace Server
             }
         }
 
-        public void SendAck(ClientInfo clientinfo, int belongingmessageid)
+        public void SendAck(ClientInfo clientinfo, Guid belongingmessageid)
         {
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();
@@ -204,7 +204,7 @@ namespace Server
             this.SendAckToClient(ns, belongingmessageid);
         }
 
-        public void SendError(ClientInfo clientinfo, int belongingmessageid)
+        public void SendError(ClientInfo clientinfo, Guid belongingmessageid)
         {
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();
