@@ -11,6 +11,8 @@ namespace ClientServerCommunication
     {
         public byte[] Component { get; set; }
 
+        public bool IsComplex { get; set; }
+
         /// <summary>
         /// The friendly name of the component to store.
         /// </summary>

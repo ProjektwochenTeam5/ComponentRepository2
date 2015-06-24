@@ -3,13 +3,13 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Static String" Height="200" Width="300" 
         ResizeMode="NoResize" WindowStartupLocation="CenterOwner">
-    <DockPanel FocusManager.FocusedElement="{Binding ElementName=txtDescription}">
+    <DockPanel FocusManager.FocusedElement="{Binding ElementName=txtInput}">
         <Button x:Name="btnSave" Content="Save" DockPanel.Dock="Bottom" Height="25" Margin="5" Click="btnSave_Click"/>
 
         <StackPanel>
-            <Label Content="Input description"/>
-            <TextBox x:Name="txtDescription" Height="23" TextWrapping="Wrap" Margin="5" TextChanged="txtDescription_TextChanged" KeyDown="txtDescription_KeyDown"/>
-            <TextBlock x:Name="txtInfo" Height="23" Foreground="Tomato" Margin="5"/>
+            <Label Content="Your static string"/>
+            <TextBox x:Name="txtInput" Height="23" TextWrapping="Wrap" Margin="5" TextChanged="txtInput_TextChanged" KeyDown="txtInput_KeyDown"/>
+            <TextBlock x:Name="tbInfo" Height="23" Foreground="Tomato" Margin="5"/>
         </StackPanel>
     </DockPanel>
 </Window>

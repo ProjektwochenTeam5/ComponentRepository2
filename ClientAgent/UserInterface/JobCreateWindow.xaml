@@ -1,0 +1,15 @@
+﻿<Window x:Class="UserInterface.JobCreateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Execute job..." Height="200" Width="300" ResizeMode="NoResize"
+        WindowStartupLocation="CenterOwner">
+    <DockPanel FocusManager.FocusedElement="{Binding ElementName=txtJobName}">
+        <Button x:Name="btnExecuteJob" Content="Start job" DockPanel.Dock="Bottom" Height="25" Margin="5" Click="btnExecuteJob_Click"/>
+        
+        <StackPanel>
+            <Label Content="Job's friendly name"/>
+            <TextBox x:Name="txtJobName" Height="23" TextWrapping="Wrap" Margin="5" KeyDown="txtJobName_KeyDown" />
+            <TextBlock x:Name="tbInfo" Height="23" Foreground="Tomato" Margin="5"/>
+        </StackPanel>
+    </DockPanel>
+</Window>

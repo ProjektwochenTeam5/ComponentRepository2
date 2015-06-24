@@ -18,6 +18,7 @@ namespace Server
     using ClientServerCommunication;
     using Core.Network;
     using Core.Component;
+    using System.IO;
 
     /// <summary>
     /// Represnets the TCPServer class.
@@ -84,67 +85,125 @@ namespace Server
 
             while (true)
             {
-                bool cont = true;
-                byte[] body = null;
-                byte messagetype = 0;
-
                 if (ns.DataAvailable)
                 {
-                    int index = 0;
-                    while (cont)
+                    byte[] hdr = new byte[9];
+
+                    int hlen = ns.Read(hdr, 0, 9);
+                    uint bodylen;
+                    StatusCode messagType;
+
+                    // go to next iteration if header lengh != 9
+                    if (!ParseHeader(hdr, out bodylen, out messagType))
                     {
-                        byte[] buffer = new byte[1024];
-
-                        int recievedbytes = ns.Read(buffer, 0, buffer.Length);
-                        Console.WriteLine(recievedbytes + " bytes recieved");
-
-                        if (body == null)
-                        {
-                            byte[] messageLength = new byte[4];
-
-                            for (int i = 0; i < 4; i++)
-                            {
-                                messageLength[i] = buffer[4 + i];
-                            }
-
-                            var length = BitConverter.ToInt32(messageLength, 0) + 9;
-                            messagetype = buffer[8];
-                            body = new byte[length - 9];
-
-                            for (int i = 9; i < recievedbytes; i++)
-                            {
-                                body[index] = buffer[i];
-                                index++;
-                            }
-
-                            if (recievedbytes == buffer.Length)
-                            {
-                                continue;
-                            }
-                            else
-                            {
-                                this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
-                                break;
-                            }
-                        }
-
-                        for (int i = 0; i < recievedbytes; i++)
-                        {
-                            body[index] = buffer[i];
-                            index++;
-                        }
-
-                        if (index >= body.Length)
-                        {
-                            this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
-                            break;
-                        }
+                        continue;
                     }
+
+                    byte[] body = new byte[bodylen];
+                    int rcvbody = ns.Read(body, 0, (int)bodylen);
+
+                    this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, messagType, clientInfo));
                 }
             }
+
+            //{
+            //    bool cont = true;
+            //    byte[] body = null;
+            //    byte messagetype = 0;
+
+            //    if (ns.DataAvailable)
+            //    {
+            //        int index = 0;
+            //        while (cont)
+            //        {
+            //            byte[] buffer = new byte[1024];
+
+            //            int recievedbytes = ns.Read(buffer, 0, buffer.Length);
+            //            Console.WriteLine(recievedbytes + " bytes recieved");
+
+            //            if (body == null)
+            //            {
+            //                byte[] messageLength = new byte[4];
+
+            //                for (int i = 0; i < 4; i++)
+            //                {
+            //                    messageLength[i] = buffer[4 + i];
+            //                }
+
+            //                var length = BitConverter.ToInt32(messageLength, 0) + 9;
+            //                messagetype = buffer[8];
+            //                body = new byte[length - 9];
+
+            //                for (int i = 9; i < body.Length + 9; i++)
+            //                {
+            //                    body[index] = buffer[i];
+            //                    index++;
+            //                }
+
+            //                if (length >= buffer.Length)
+            //                {
+            //                    continue;
+            //                }
+            //                else
+            //                {
+            //                    this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
+            //                    break;
+            //                }
+            //            }
+
+            //            for (int i = 0; i < recievedbytes; i++)
+            //            {
+            //                body[index] = buffer[i];
+            //                index++;
+            //            }
+
+            //            if (index >= body.Length)
+            //            {
+            //                this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
+            //                break;
+            //            }
+            //        }
+                
+            
         }
 
-        private void SendAckToClient(NetworkStream ns, int belongingmessageid)
+        /// <summary>
+        /// Parses a byte array and returns whether the byte array is a valid header.
+        /// </summary>
+        /// <param name="header">
+        ///     The byte array that shall be parsed.
+        /// </param>
+        /// <param name="length">
+        ///     The length of the following body.
+        /// </param>
+        /// <param name="status">
+        ///     The message status.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the specified byte array is a valid header.
+        /// </returns>
+        public static bool ParseHeader(byte[] header, out uint length, out StatusCode status)
+        {
+            length = 0;
+            status = StatusCode.KeepAlive;
+
+            if (header.Length != 9)
+            {
+                return false;
+            }
+
+            if (header[0] != 0 || header[1] != 0 || header[2] != 0 || header[3] != 0)
+            {
+                return false;
+            }
+
+            length = (uint)(header[4] + (header[5] * 0x100) + (header[6] * 0x10000) + (header[7] * 0x1000000));
+
+            status = (StatusCode)header[8];
+            return true;
+        }
+
+        private void SendAckToClient(NetworkStream ns, Guid belongingmessageid)
         {
             Acknowledge ack = new Acknowledge();
             ack.BelongsTo = belongingmessageid;
@@ -164,7 +223,7 @@ namespace Server
             ns.Flush();
         }
 
-        private void SendErrorToClient(NetworkStream ns, int belongingmessageid)
+        private void SendErrorToClient(NetworkStream ns, Guid belongingmessageid)
         {
             Error err = new Error();
             err.BelongsTo = belongingmessageid;
@@ -196,7 +255,7 @@ namespace Server
             }
         }
 
-        public void SendAck(ClientInfo clientinfo, int belongingmessageid)
+        public void SendAck(ClientInfo clientinfo, Guid belongingmessageid)
         {
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();
@@ -204,7 +263,7 @@ namespace Server
             this.SendAckToClient(ns, belongingmessageid);
         }
 
-        public void SendError(ClientInfo clientinfo, int belongingmessageid)
+        public void SendError(ClientInfo clientinfo, Guid belongingmessageid)
         {
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();

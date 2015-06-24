@@ -26,7 +26,7 @@ namespace ConsoleBoolOutput
         public ConsoleBoolOutput()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString() });
             this.OutputHints = new List<string>();
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();     
@@ -122,4 +122,3 @@ namespace ConsoleBoolOutput
         }
     }
 }
-

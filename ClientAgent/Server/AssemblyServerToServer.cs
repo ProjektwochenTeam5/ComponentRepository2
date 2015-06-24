@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -21,129 +22,138 @@ namespace Server
 
         public TcpServerToServerManager Manager { get; set; }
 
-        public void SendAssemblyRequest(Dictionary<Guid, IPEndPoint> servers, Guid componentGuid)
+        public byte[] SendAssemblyRequest(Dictionary<Guid, IPEndPoint> servers, Guid componentGuid)
         {
+            var components = this.Manager.TcpManager.AllServerComponents;
 
-            //this.Manager.TcpManager.AllServerComponents.FirstOrDefault(x => x.Value.ToList().Where(y => y.ComponentGuid == componentGuid));
+            Guid targetServer = new Guid();
 
-            //foreach (var ipEndPoint in servers.Values)
-            //{
-            //    TcpClient client = new TcpClient();
-            //    client.Connect(ipEndPoint);
+            foreach (var component in components)
+            {
+                foreach (var item in component.Value)
+                {
+                    if (item.ComponentGuid == componentGuid)
+                    {
+                        targetServer = component.Key;
+                        break;
+                    }
+                }
+            }
 
-            //    ComponentSubmitRequest req = new ComponentSubmitRequest();
-            //    req.Component = component;
-            //    req.ComponentSubmitRequestGuid = Guid.NewGuid();
+            var ipEndPoint = servers.FirstOrDefault(x => x.Key == targetServer);
 
-            //    string json = JsonConvert.SerializeObject(req);
-            //    var bytes = DataConverter.ConvertJsonToByteArray(MessageCode.KeepAlive, json);
+            if (targetServer != default(Guid))
+            {
+                TcpClient client = new TcpClient();
+                try
+                {
+                    client.Connect(servers.FirstOrDefault(x => x.Key == targetServer).Value);
 
-            //    int waitForResponse = 0;
+                    AssemblyRequest req = new AssemblyRequest();
+                    req.AssemblyRequestGuid = Guid.NewGuid();
+                    req.ComponentGuid = componentGuid;
 
-            //    try
-            //    {
-            //        NetworkStream ns = client.GetStream();
+                    string json = JsonConvert.SerializeObject(req);
+                    var bytes = DataConverter.ConvertJsonToByteArray(MessageCode.RequestAssembly, json);
 
-            //        ns.Write(bytes, 0, bytes.Length);
+                    int waitForResponse = 0;
+                    NetworkStream ns = client.GetStream();
 
-            //        bool run = true;
+                    ns.Write(bytes, 0, bytes.Length);
 
-            //        while (run)
-            //        {
-            //            if (waitForResponse > 120)
-            //            {
-            //                this.Manager.Server.Servers.Remove(servers.FirstOrDefault(x => x.Value == ipEndPoint).Key);
-            //                break;
-            //            }
+                    bool run = true;
 
-            //            bool cont = true;
-            //            byte[] body = null;
-            //            byte messagetype = 0;
+                    while (run)
+                    {
+                        if (waitForResponse > 120)
+                        {
+                            this.Manager.Server.Servers.Remove(targetServer);
+                            break;
+                        }
 
-            //            if (ns.DataAvailable)
-            //            {
-            //                int index = 0;
-            //                while (cont)
-            //                {
-            //                    byte[] buffer = new byte[1024];
+                        bool cont = true;
+                        byte[] body = null;
+                        byte messagetype = 0;
 
-            //                    int recievedbytes = ns.Read(buffer, 0, buffer.Length);
-            //                    Console.WriteLine(recievedbytes + " bytes empfangen");
+                        if (ns.DataAvailable)
+                        {
+                            int index = 0;
+                            while (cont)
+                            {
+                                byte[] buffer = new byte[1024];
 
-            //                    if (body == null)
-            //                    {
-            //                        byte[] messageLength = new byte[4];
+                                int recievedbytes = ns.Read(buffer, 0, buffer.Length);
+                                Console.WriteLine(recievedbytes + " bytes empfangen");
 
-            //                        for (int i = 0; i < 5; i++)
-            //                        {
-            //                            messageLength[i] = buffer[1 + i];
-            //                        }
+                                if (body == null)
+                                {
+                                    byte[] messageLength = new byte[4];
 
-            //                        var length = BitConverter.ToInt32(messageLength, 0) + 5;
-            //                        messagetype = buffer[0];
-            //                        body = new byte[length - 5];
+                                    for (int i = 0; i < 5; i++)
+                                    {
+                                        messageLength[i] = buffer[1 + i];
+                                    }
 
-            //                        for (int i = 5; i < recievedbytes; i++)
-            //                        {
-            //                            body[index] = buffer[i];
-            //                            index++;
-            //                        }
+                                    var length = BitConverter.ToInt32(messageLength, 0) + 5;
+                                    messagetype = buffer[0];
+                                    body = new byte[length - 5];
 
-            //                        if (recievedbytes == buffer.Length)
-            //                        {
-            //                            continue;
-            //                        }
-            //                        else
-            //                        {
-            //                            if ((int)messagetype == (int)MessageCode.ComponentSubmit)
-            //                            {
-            //                                if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body, ipEndPoint))
-            //                                {
-            //                                    run = false;
-            //                                }
-            //                            }
-            //                        }
-            //                    }
+                                    for (int i = 5; i < recievedbytes; i++)
+                                    {
+                                        body[index] = buffer[i];
+                                        index++;
+                                    }
 
-            //                    for (int i = 0; i < recievedbytes; i++)
-            //                    {
-            //                        body[index] = buffer[i];
-            //                        index++;
-            //                    }
+                                    if (recievedbytes == buffer.Length)
+                                    {
+                                        continue;
+                                    }
+                                    else
+                                    {
+                                        if ((int)messagetype == (int)MessageCode.RequestAssembly)
+                                        {
+                                            return body;
+                                        }
+                                    }
+                                }
 
-            //                    if (index >= body.Length)
-            //                    {
-            //                        if ((int)messagetype == (int)MessageCode.ComponentSubmit)
-            //                        {
-            //                            if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body, ipEndPoint))
-            //                            {
-            //                                run = false;
-            //                            }
-            //                        }
-            //                    }
-            //                }
-            //            }
-            //            else
-            //            {
-            //                Thread.Sleep(1000);
-            //                waitForResponse++;
-            //            }
-            //        }
-            //    }
-            //    catch (Exception ex)
-            //    {
-            //        Console.WriteLine(ex.Message);
-            //    }
+                                for (int i = 0; i < recievedbytes; i++)
+                                {
+                                    body[index] = buffer[i];
+                                    index++;
+                                }
 
-            //    client.Close();
-            //}
-        }
+                                if (index >= body.Length)
+                                {
+                                    if ((int)messagetype == (int)MessageCode.RequestAssembly)
+                                    {
+                                        return body;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            Thread.Sleep(1000);
+                            waitForResponse++;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+                finally
+                {
+                    client.Close();
+                }
+            }
+            else
+            {
+                this.Manager.TcpManager.AllServerComponents.Remove(componentGuid);
+            }
 
-        private bool CheckComponentSubmit(Guid guid, byte[] body, IPEndPoint ipEndPoint)
-        {
-            string json = Encoding.ASCII.GetString(body);
-            ComponentSubmitResponse resp = JsonConvert.DeserializeObject<ComponentSubmitResponse>(json);
-            return (resp.IsAccepted && resp.ComponentSubmitRequestGuid == guid);
+            return null;
         }
     }
 }

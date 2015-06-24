@@ -28,6 +28,12 @@ namespace Core.Network
         public Guid JobRequestGuid { get; set; }
 
         /// <summary>
+        /// Gets or sets the unique identifier of the job.
+        /// </summary>
+        /// <value>A unique identifier.</value>
+        public Guid JobGuid { get; set; }
+
+        /// <summary>
         /// Gets or sets the display name of the job.
         /// </summary>
         /// <value>A name string.</value>

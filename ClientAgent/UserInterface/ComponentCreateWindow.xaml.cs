@@ -28,7 +28,7 @@ namespace UserInterface
         }
 
         /// <summary>
-        /// The entered friendly name for the new component.
+        /// Gets the entered friendly name for the new component.
         /// </summary>
         public string FriendlyName
         {
@@ -95,6 +95,7 @@ namespace UserInterface
                 return false;
             }
 
+            // Check if name is already in use.
             foreach (MyComponent c in this.availableComponents)
             {
                 if (c.Component.FriendlyName == this.FriendlyName)

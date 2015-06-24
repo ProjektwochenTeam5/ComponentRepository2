@@ -94,7 +94,7 @@ namespace Server
                                     {
                                         if ((int)messagetype == (int)MessageCode.ComponentSubmit)
                                         {
-                                            if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body, ipEndPoint))
+                                            if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body))
                                             {
                                                 run = false;
                                             }
@@ -112,7 +112,7 @@ namespace Server
                                 {
                                     if ((int)messagetype == (int)MessageCode.ComponentSubmit)
                                     {
-                                        if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body, ipEndPoint))
+                                        if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body))
                                         {
                                             run = false;
                                         }
@@ -136,7 +136,7 @@ namespace Server
             }
         }
 
-        private bool CheckComponentSubmit(Guid guid, byte[] body, IPEndPoint ipEndPoint)
+        private bool CheckComponentSubmit(Guid guid, byte[] body)
         {
             string json = Encoding.ASCII.GetString(body);
             ComponentSubmitResponse resp = JsonConvert.DeserializeObject<ComponentSubmitResponse>(json);

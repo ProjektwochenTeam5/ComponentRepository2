@@ -1,5 +1,4 @@
 ﻿using Core.Network;
-using System;
 using System.Collections.Generic;
 
 namespace UserInterface
@@ -15,6 +14,9 @@ namespace UserInterface
             set;
         }
 
+        /// <summary>
+        /// The component which represents the job.
+        /// </summary>
         public Component JobComponent
         {
             get;

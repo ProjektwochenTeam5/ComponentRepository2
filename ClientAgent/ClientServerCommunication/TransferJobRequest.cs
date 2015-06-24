@@ -13,7 +13,10 @@ namespace ClientServerCommunication
         public Guid ComponentGuid { get; set; }
 
         public Guid ServerID { get; set; }
-        
+
+        public Guid JobID { get; set; }
+
+
         /// <summary>
         /// Gets or sets a collection of input arguments.
         /// </summary>

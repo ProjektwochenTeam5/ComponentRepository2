@@ -304,7 +304,7 @@ namespace ClientAgent
                 {
                     try
                     {
-                        args.Client.SendDiscover(args.UdpClient);
+                        args.Client.SendDiscover();
                     }
                     catch
                     {
@@ -368,11 +368,6 @@ namespace ClientAgent
             cpu.CategoryName = "Processor";
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
-
-            StoreComponent i = new StoreComponent();
-            i.Component = File.ReadAllBytes("Add.dll");
-            i.FriendlyName = "Add";
-            args.Client.SendMessage(i);
             
             while (!args.Stopped)
             {
@@ -395,7 +390,7 @@ namespace ClientAgent
                     // go to next iteration if header lengh != 9
                     if (!ParseHeader(hdr, out bodylen, out messagType))
                     {
-                        break;
+                        continue;
                     }
 
                     byte[] body = new byte[bodylen];
@@ -489,17 +484,8 @@ namespace ClientAgent
         /// <summary>
         /// Sends a UDP broadcast message indicating that the client searches for a server.
         /// </summary>
-        /// <param name="cl">
-        ///     The UDP client used for the transmission.
-        /// </param>
-        private void SendDiscover(UdpClient cl)
+        private void SendDiscover()
         {
-            /*
-             * List<byte> msg = new List<byte>();
-               msg.AddRange(new byte[] { 0, 0, 0, 0, 0, 0, 0, 0, 1 });
-               UdpBroadcast.SendBoadcast(1233, msg.ToArray());
-             */
-            
             List<byte> mes = new List<byte>();
             MemoryStream ms = new MemoryStream();
 

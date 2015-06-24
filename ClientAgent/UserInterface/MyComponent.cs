@@ -25,6 +25,11 @@ namespace UserInterface
             this.Component = childComponent;
         }
 
+        /// <summary>
+        /// Notifies this <see cref="MyComponent"/> instance of a new selected component
+        /// which is used to set this instance's HasMatching... properties.
+        /// </summary>
+        /// <param name="component">The selected component.</param>
         public void SetSelectedComponent(MyComponent component)
         {
             this.HasMatchingInput = false;
@@ -60,12 +65,18 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Gets the underlying <see cref="Core.Network.Component"/> instance.
+        /// </summary>
         public Core.Network.Component Component
         {
             get;
             private set;
         }
 
+        /// <summary>
+        /// Gets or sets a value indicating whether this <see cref="MyComponent"/> instance is marked as favorite.
+        /// </summary>
         public bool IsFavorite
         {
             get
@@ -83,6 +94,10 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="MyComponent"/> instance has an input which matches
+        /// at least one of the outputs of the selected component (set by SetSelectedComponent method).
+        /// </summary>
         public bool HasMatchingInput
         {
             get
@@ -100,6 +115,10 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="MyComponent"/> instance has an output which matches
+        /// at least one of the input of the selected component (set by SetSelectedComponent method).
+        /// </summary>
         public bool HasMatchingOutput
         {
             get

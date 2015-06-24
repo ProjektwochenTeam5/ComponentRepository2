@@ -39,7 +39,7 @@ namespace ClientServerCommunication
         /// <summary>
         /// Initializes a new instance of the <see cref="ExecuteRequest"/> class.
         /// </summary>
-        public ExecuteRequest()
+        public ExecuteRequest() : base()
         {
         }
 
