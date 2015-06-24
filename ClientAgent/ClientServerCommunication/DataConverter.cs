@@ -61,9 +61,10 @@ namespace ClientServerCommunication
                 using (MemoryStream ms = new MemoryStream())
                 {
                     bf.Serialize(fs, m);
+                    fs.Flush();
+
                     fs.Close();
                     fs.Dispose();
-                    fs.Flush();
                 }
             }
             catch(Exception ex)

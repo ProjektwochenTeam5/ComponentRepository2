@@ -13,7 +13,7 @@ namespace Server
 {
     public class RecBroadcast
     {
-        public int UdpClientPort { get { return 1233; } }
+        public int UdpClientPort { get { return 10001; } }
 
         public event EventHandler<UdpClientDiscoverRecievedEventArgs> OnUdpClientDiscovered;
 
@@ -30,23 +30,26 @@ namespace Server
             {
                 while (!done)
                 {
-                    byte[] bytes = client.Receive(ref groupEP);
-
-                    if (bytes[8] == (byte)1)
+                    if (client.Available > 0)
                     {
-                        byte[] body = bytes.SubArray(9, bytes.Length - 9);
-                        Console.WriteLine("Recieved broadcast from {0} - {1}", groupEP.ToString(), Encoding.ASCII.GetString(body, 0, body.Length));
+                        byte[] bytes = client.Receive(ref groupEP);
 
-                        AgentDiscover discover = (AgentDiscover)DataConverter.ConvertByteArrayToMessage(body);
-
-                        if (discover != null)
+                        if (bytes[8] == (byte)1)
                         {
-                            this.FireOnClientDiscovered(new UdpClientDiscoverRecievedEventArgs(groupEP.Address.ToString(), discover.FriendlyName));
+                            byte[] body = bytes.SubArray(9, bytes.Length - 9);
+                            Console.WriteLine("Recieved broadcast from {0} - {1}", groupEP.ToString(), Encoding.ASCII.GetString(body, 0, body.Length));
+
+                            AgentDiscover discover = (AgentDiscover)DataConverter.ConvertByteArrayToMessage(body);
+
+                            if (discover != null)
+                            {
+                                this.FireOnClientDiscovered(new UdpClientDiscoverRecievedEventArgs(groupEP.Address.ToString(), discover.FriendlyName));
+                            }
                         }
+
+                        groupEP.Port = 1234;
+                        this.SendIP(groupEP, client);
                     }
-                    
-                    groupEP.Port = 1234;
-                    this.SendIP(groupEP, client);
                 }
             }
             catch (Exception e)
