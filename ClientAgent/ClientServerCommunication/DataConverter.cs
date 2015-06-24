@@ -67,6 +67,7 @@ namespace ClientServerCommunication
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                throw;
             }
 
             return serializedaccept;
