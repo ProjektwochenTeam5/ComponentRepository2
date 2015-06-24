@@ -113,7 +113,7 @@ namespace ClientAgent
                 nstr.Write(send.ToArray(), 0, send.Count);
 
                 // wait for answer
-                while (true)
+                while (nstr.CanRead && nstr.CanWrite)
                 {
                     if (nstr.DataAvailable)
                     {
@@ -154,7 +154,7 @@ namespace ClientAgent
 
             l.Stop();
 
-            return null;
+            return new object[] { new InvalidOperationException() };
         }
 
         /// <summary>

@@ -81,7 +81,7 @@
     <AppDesigner Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="\\thomas11\studenten\95036\Desktop\pwsp_v12\Core.Component\Core.Component.csproj">
+    <ProjectReference Include="..\..\..\Core.Component\Core.Component.csproj">
       <Project>{3cbff49b-e085-49af-8aa5-e3bab177b179}</Project>
       <Name>Core.Component</Name>
     </ProjectReference>

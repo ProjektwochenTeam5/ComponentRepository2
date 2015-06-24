@@ -36,9 +36,14 @@ namespace ConsoleGUI.Controls
         public StackTextBox(ICollection<IRenderer> outputs)
             : base(outputs)
         {
-
+            this.TextAppended += this.StackTextBox_TextAppended;
         }
 
+        public event EventHandler TextAppended;
+
+        /// <summary>
+        /// 
+        /// </summary>
         public string Text
         {
             get
@@ -49,18 +54,19 @@ namespace ConsoleGUI.Controls
             private set
             {
                 this.textProperty = value;
-                this.OnTextChanged(EventArgs.Empty);
+                this.OnTextAppended(EventArgs.Empty);
             }
         }
 
+        /// <summary>
+        /// Appeds a line to the text.
+        /// </summary>
+        /// <param name="line">
+        ///     The string that shall be appended.
+        /// </param>
         public void PushLine(string line)
         {
-            this.Text += line;
-        }
-
-        public string ReadLine()
-        {
-            throw new NotImplementedException();
+            this.Text += string.Format("{0}\n", line);
         }
 
         public override Pixel[,] GetPixels()
@@ -75,12 +81,32 @@ namespace ConsoleGUI.Controls
 
         public override bool Receive(string s)
         {
-            throw new NotImplementedException();
+            this.Text += string.Format("{0}\n", s);
+            return true;
         }
 
-        protected void OnTextChanged(EventArgs e)
+        /// <summary>
+        /// Raises the <see cref="TextAppended"/> event.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
+        protected void OnTextAppended(EventArgs e)
         {
+            if (this.TextAppended != null)
+            {
+                this.TextAppended(this, e);
+            }
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void StackTextBox_TextAppended(object sender, EventArgs e)
+        {
+            this.Draw(this.Rectangle);
         }
     }
 }
