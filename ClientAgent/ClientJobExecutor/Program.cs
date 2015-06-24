@@ -13,6 +13,7 @@ namespace ClientJobExecutor
     using System.Threading.Tasks;
     using Core.Component;
     using ClientServerCommunication;
+    using System.Reflection;
 
     /// <summary>
     /// 
@@ -25,6 +26,7 @@ namespace ClientJobExecutor
         /// <param name="args"></param>
         static void Main(string[] args)
         {
+            Console.ReadLine();
             int port;
             if(!int.TryParse(args[0], out port))
             {
@@ -65,9 +67,44 @@ namespace ClientJobExecutor
                     using(MemoryStream ms = new MemoryStream(rd))
                     {
                         Message m = (Message)f.Deserialize(ms);
-                        if (m.MessageType == StatusCode.TransferJob)
+                        if (m.MessageType == StatusCode.ExecuteJob)
                         {
-                            
+                            ExecuteRequest rq = m as ExecuteRequest;
+
+                            Assembly a = Assembly.Load(rq.Assembly);
+
+                            Type componentInfo = null;
+
+                            var result = from type in a.GetTypes()
+                                         where typeof(IComponent).IsAssignableFrom(type)
+                                         select type;
+
+                            componentInfo = result.Single();
+                            Console.Title = a.GetName().Name;
+
+                            IComponent comp = (IComponent)Activator.CreateInstance(componentInfo);
+                            object[] res = comp.Evaluate(rq.InputData).ToArray();
+
+                            ExecuteResponse rsp = new ExecuteResponse(res, false);
+
+                            using (MemoryStream resstr = new MemoryStream())
+                            {
+                                f.Serialize(resstr, rsp);
+                                List<byte> resp = new List<byte>();
+
+                                long len = resstr.Length;
+                                byte b1, b100, b10000, b1000000;
+
+                                b1 = (byte)(len % 0x100);
+                                b100 = (byte)((len / 0x100) % 0x100);
+                                b10000 = (byte)((len / 0x10000) % 0x100);
+                                b1000000 = (byte)((len / 0x1000000) % 0x100);
+
+                                resp.AddRange(new byte[] { 1, 1, 1, 1, b1, b100, b10000, b1000000, (byte)rsp.MessageType });
+                                resp.AddRange(resstr.ToArray());
+                                str.Write(resp.ToArray(), 0, resp.Count);
+                                break;
+                            }
                         }
                     }
 
@@ -78,6 +115,7 @@ namespace ClientJobExecutor
             }
 
             cl.Close();
+            Environment.Exit(0);
         }
     }
 }

@@ -45,7 +45,6 @@
     <Compile Include="Client.cs" />
     <Compile Include="ClientListenerThreadArgs.cs" />
     <Compile Include="ClientMessageManager.cs" />
-    <Compile Include="JobArgument.cs" />
     <Compile Include="JobExecutor.cs" />
     <Compile Include="MessageReceivedEventArgs.cs" />
     <Compile Include="Program.cs" />

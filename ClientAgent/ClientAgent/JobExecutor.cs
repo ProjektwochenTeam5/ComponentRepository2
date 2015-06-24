@@ -44,10 +44,8 @@ namespace ClientAgent
         /// </summary>
         /// <param name="args"></param>
         /// <returns></returns>
-        public static IEnumerable<object> Execute(Assembly dll, IEnumerable<object> args)
+        public static IEnumerable<object> Execute(string dll, IEnumerable<object> args)
         {
-            IComponent comp = ReadComponentInfoFromDll(dll);
-
             Process client = new Process();
             client.StartInfo.FileName = "ClientJobExecutor.exe";
 
@@ -87,8 +85,15 @@ namespace ClientAgent
             {
                 TcpClient cl = l.AcceptTcpClient();
                 BinaryFormatter f = new BinaryFormatter();
-                JobArgument arg = new JobArgument(args, comp);
 
+                FileInfo dlli = new FileInfo("temp\\" + dll);
+                byte[] dllrd = new byte[dlli.Length];
+                using(FileStream fs = new FileStream("temp\\" + dll, FileMode.Open, FileAccess.Read, FileShare.Read))
+                {
+                    fs.Read(dllrd, 0, (int)dlli.Length);
+                }
+
+                ExecuteRequest arg = new ExecuteRequest(dllrd, args.ToArray());
                 MemoryStream ms = new MemoryStream();
 
                 f.Serialize(ms, arg);
@@ -101,12 +106,13 @@ namespace ClientAgent
                 b10000 = (byte)((length / 0x10000) % 0x100);
                 b1000000 = (byte)((length / 0x1000000) % 0x100);
 
-                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, 5 });
+                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)arg.MessageType });
                 send.AddRange(ms.ToArray());
 
                 NetworkStream nstr = cl.GetStream();
                 nstr.Write(send.ToArray(), 0, send.Count);
 
+                // wait for answer
                 while (true)
                 {
                     if (nstr.DataAvailable)
@@ -129,10 +135,11 @@ namespace ClientAgent
                         using (MemoryStream nms = new MemoryStream(body))
                         {
                             Message rcv = (Message)f.Deserialize(nms);
-                            if (rcv.MessageType == StatusCode.TransferJob)
+                            if (rcv.MessageType == StatusCode.ExecuteJob)
                             {
-                                TransferJobResponse rsp = rcv as TransferJobResponse;
-                                break;
+                                ExecuteResponse rsp = rcv as ExecuteResponse;
+                                l.Stop();
+                                return rsp.Result;
                             }
                         }
 
@@ -147,7 +154,7 @@ namespace ClientAgent
 
             l.Stop();
 
-            return comp.Evaluate(args);
+            return null;
         }
 
         /// <summary>
@@ -197,7 +204,7 @@ namespace ClientAgent
             try
             {
                 using (FileStream fs = new System.IO.FileStream(
-                    StorePath + "\\" + filename + ".dll",
+                    filename,
                     System.IO.FileMode.Create,
                     System.IO.FileAccess.Write))
                 {

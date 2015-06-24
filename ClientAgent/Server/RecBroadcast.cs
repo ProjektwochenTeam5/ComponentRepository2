@@ -45,11 +45,6 @@ namespace Server
                         }
                     }
                     
-                    ////////////// For testing purposes
-                    
-
-                    //// TODO: Check if Messagetype == 1
-                    //////// Send IP Back - store client
                     groupEP.Port = 1234;
                     this.SendIP(groupEP, client);
                 }
@@ -89,12 +84,11 @@ namespace Server
 
         public string GetMyIP()
         {
+            string hostName = Dns.GetHostName();
+            IPHostEntry hostInfo = Dns.GetHostByName(hostName);
+            string ipAdress = hostInfo.AddressList[0].ToString();
 
-            string HostName = System.Net.Dns.GetHostName();
-            System.Net.IPHostEntry hostInfo = System.Net.Dns.GetHostByName(HostName);
-            string IpAdresse = hostInfo.AddressList[0].ToString();
-
-            return IpAdresse;
+            return ipAdress;
         }
 
         protected void FireOnClientDiscovered(UdpClientDiscoverRecievedEventArgs e)

@@ -369,10 +369,10 @@ namespace ClientAgent
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
 
-            StoreComponent i = new StoreComponent();
+            /*StoreComponent i = new StoreComponent();
             i.Component = File.ReadAllBytes("Add.dll");
             i.FriendlyName = "Add";
-            args.Client.SendMessage(i);
+            args.Client.SendMessage(i);*/
             
             while (!args.Stopped)
             {
@@ -395,7 +395,7 @@ namespace ClientAgent
                     // go to next iteration if header lengh != 9
                     if (!ParseHeader(hdr, out bodylen, out messagType))
                     {
-                        break;
+                        continue;
                     }
 
                     byte[] body = new byte[bodylen];

@@ -10,16 +10,11 @@ namespace ClientServerCommunication
     public abstract class Message
     {
         /// <summary>
-        /// The next message ID.
-        /// </summary>
-        private static int nextID = 0;
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Message"/> class.
         /// </summary>
         public Message()
         {
-            this.MessageID = nextID++;
+            this.MessageID = Guid.NewGuid();
         }
 
         /// <summary>
@@ -36,6 +31,6 @@ namespace ClientServerCommunication
         /// <value>
         /// Contains the message's ID.
         /// </value>
-        public int MessageID { get; private set; }
+        public Guid MessageID { get; private set; }
     }
 }

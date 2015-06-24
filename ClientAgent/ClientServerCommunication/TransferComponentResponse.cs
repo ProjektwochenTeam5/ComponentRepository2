@@ -25,6 +25,6 @@ namespace ClientServerCommunication
         /// <summary>
         /// The Id of the Request the answer belongs to.
         /// </summary>
-        public int BelongsTo { get; set; }
+        public Guid BelongsTo { get; set; }
     }
 }

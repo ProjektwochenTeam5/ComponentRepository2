@@ -53,21 +53,26 @@ namespace ClientServerCommunication
         public static byte[] ConvertObjectToByteArray(Message m)
         {
             BinaryFormatter bf = new BinaryFormatter();
-
+            FileStream fs = new FileStream("DataFile.dat", FileMode.Create);
             byte[] serializedaccept = null;
 
             try
             {
                 using (MemoryStream ms = new MemoryStream())
                 {
-                    bf.Serialize(ms, m);
-                    serializedaccept = ms.ToArray();
+                    bf.Serialize(fs, m);
+                    fs.Close();
+                    fs.Dispose();
+                    fs.Flush();
                 }
             }
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                throw;
             }
+
+            serializedaccept = File.ReadAllBytes("DataFile.dat");
 
             return serializedaccept;
         }

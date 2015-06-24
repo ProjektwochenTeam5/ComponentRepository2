@@ -176,8 +176,9 @@
             TransferJobRequest req = new TransferJobRequest();
             req.ServerID = this.ServerGuid;
             req.InputData = inputData;
-            req.InputData = new List<object>() { 4, 3 };
+            req.InputData = new List<string>() { "Please enter a number: " };
             req.ComponentGuid = componentGuid;
+            req.JobID = jobGuid;
 
             this.JobsQueued.Add(jobGuid);
 
@@ -245,10 +246,10 @@
                     {
                         TransferComponentRequest request = (TransferComponentRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
                         bool contains = this.Components.Keys.Contains(request.ComponentID);
-
+                        Console.WriteLine("--------Transfer component request Recieved");
                         if (contains)
                         {
-                            this.GiveTranserComponentResponse(e.Info, request.ComponentID, request.MessageID);
+                            this.GiveTransferComponentResponse(e.Info, request.ComponentID, request.MessageID);
                         }
                         else
                         {
@@ -284,6 +285,7 @@
 
                 case ClientServerCommunication.StatusCode.StorComponent:
                     {
+                        Console.WriteLine("StoreComponent recieved!");
                         StoreComponent storecomponent = (StoreComponent)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
                         DataBaseWrapper db = new DataBaseWrapper();
                         bool store = db.StoreComponent(storecomponent.Component, storecomponent.FriendlyName);
@@ -305,7 +307,7 @@
             }
         }
 
-        private void GiveTranserComponentResponse(ClientInfo clientInfo, Guid guid, int requestid)
+        private void GiveTransferComponentResponse(ClientInfo clientInfo, Guid guid, Guid requestid)
         {
             string path = string.Empty;
             try
@@ -327,7 +329,7 @@
             byte[] body = DataConverter.ConvertObjectToByteArray(response);
 
             byte[] send = DataConverter.ConvertMessageToByteArray(4, body);
-
+            Console.WriteLine("sending: " + path);
             this.MyTCPServer.SendMessage(send, clientInfo.ClientGuid);
         }
 

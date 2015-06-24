@@ -13,11 +13,11 @@ namespace ClientServerCommunication
 
         public bool Error { get; set; }
 
-        public ExecuteResponse()
+        public ExecuteResponse() : base()
         {
         }
 
-        public ExecuteResponse(object[] result, bool error)
+        public ExecuteResponse(object[] result, bool error) : base()
         {
             this.Result = result;
             this.Error = error;
