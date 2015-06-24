@@ -287,6 +287,7 @@
                     {
                         Console.WriteLine("StoreComponent recieved!");
                         StoreComponent storecomponent = (StoreComponent)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                        
                         DataBaseWrapper db = new DataBaseWrapper();
                         bool store = db.StoreComponent(storecomponent.Component, storecomponent.FriendlyName);
 
