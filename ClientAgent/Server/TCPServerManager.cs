@@ -178,6 +178,7 @@
             req.InputData = inputData;
             req.InputData = new List<string>() { "Please enter a number: " };
             req.ComponentGuid = componentGuid;
+            req.JobID = jobGuid;
 
             this.JobsQueued.Add(jobGuid);
 
