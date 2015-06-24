@@ -5,20 +5,25 @@ using System.Windows.Shapes;
 
 namespace UserInterface
 {
+    /// <summary>
+    /// This class represents a triangle shape which points to the right.
+    /// </summary>
     public class Triangle : Shape
     {
         public static readonly DependencyProperty SizeProperty = DependencyProperty.Register("Size", typeof(double), typeof(Triangle));
 
-        public Triangle()
-        {
-        }
-
+        /// <summary>
+        /// Gets or sets the size (height and width) of this <see cref="Triangle"/> instance.
+        /// </summary>
         public double Size
         {
             get { return (double)this.GetValue(SizeProperty); }
             set { this.SetValue(SizeProperty, value); }
         }
 
+        /// <summary>
+        /// Defines the triangle geometry.
+        /// </summary>
         protected override Geometry DefiningGeometry
         {
             get
