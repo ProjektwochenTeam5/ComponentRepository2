@@ -17,7 +17,7 @@ namespace UserInterface
         }
 
         /// <summary>
-        /// Gets the 
+        /// Gets the friendly name of the job entered by the user.
         /// </summary>
         public string JobName
         {

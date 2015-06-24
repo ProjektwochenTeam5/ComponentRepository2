@@ -108,7 +108,7 @@ namespace UserInterface
             #region Test components TODO
             this.availableComps.Add(new MyComponent(new Component()
             {
-                FriendlyName = "Test-Komponente",
+                FriendlyName = "Test-Komponente 12345678901234567890",
                 InputHints = new string[] { "System.Int32", "System.String", "System.Int64", "System.Double", "System.String" },
                 InputDescriptions = new string[] { "int", "str", "long", "double", "str2" },
                 OutputHints = new string[] { "System.Int32", "System.Schiff" },
@@ -800,7 +800,7 @@ namespace UserInterface
                 edges.Add(edge);
             }
             
-            // define combined components input/output hints and descriptions
+            // define the combined component's input/output hints and descriptions
             foreach (MyCompControl comp in this.compLayout)
             {
                 foreach (InputControl input in comp.Inputs)
