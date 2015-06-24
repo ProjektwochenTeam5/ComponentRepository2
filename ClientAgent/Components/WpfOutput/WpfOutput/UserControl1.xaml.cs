@@ -1,11 +1,4 @@
-﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleUintOutput.cs" company="FHWN"> 
-// Copyright (c) FHWN. All rights reserved. 
-// </copyright> 
-// <summary>Component classlibary.</summary> 
-// <author>Matthias Böhm</author> 
-// -----------------------------------------------------------------------
-namespace ConsoleUintOutput
+﻿namespace WpfOutput
 {
     using System;
     using System.Collections.Generic;
@@ -13,23 +6,43 @@ namespace ConsoleUintOutput
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using System.Windows;
+    using System.Windows.Controls;
+    using System.Windows.Data;
+    using System.Windows.Documents;
+    using System.Windows.Input;
+    using System.Windows.Media;
+    using System.Windows.Media.Imaging;
+    using System.Windows.Navigation;
+    using System.Windows.Shapes;
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for the console output.
+    /// Interaction logic for UserControl.
     /// </summary>
-    public class ConsoleUintOutput
+    public partial class UserControl1 : UserControl, IComponent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleUintOutput"/> class.
+        /// Initializes a new instance of the <see cref="WpfOutput"/> class.
         /// </summary>
-        public ConsoleUintOutput()
+        public UserControl1()
         {
+            InitializeComponent();
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new List<string>();
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();     
+            this.OutputDescriptions = new List<string>();
+        }
+
+        /// <summary>
+        /// Gets the input from user.
+        /// </summary>
+        /// <value>A input string.</value>
+        public string Input
+        {
+            get;
+            private set;
         }
 
         /// <summary>
@@ -50,7 +63,7 @@ namespace ConsoleUintOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Uint Output"; }
+            get { return "WPF Output"; }
         }
 
         /// <summary>
@@ -100,23 +113,19 @@ namespace ConsoleUintOutput
         /// <returns>Collection of output arguments.</returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            if (values.Count() != 1)
+            if (values.Count() != 0)
             {
                 return new object[] { new ArgumentException() };
             }
 
-            bool parseOK;
-            uint ioutput = 0;
-            string output = string.Empty;
+            string full_string = string.Empty;
 
-            foreach (var item in values)
+            foreach (string s in values)
             {
-                output += (string)item;
+                full_string = full_string + " " + s;
             }
 
-            parseOK = uint.TryParse(output, out ioutput);
-
-            Console.WriteLine(ioutput);
+            MessageBox.Show(full_string);
 
             return null;
         }
