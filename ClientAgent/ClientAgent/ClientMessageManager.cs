@@ -227,28 +227,28 @@ namespace ClientAgent
             switch (e.ReceivedMessage.MessageType)
             {
                 case StatusCode.Error:
-                    this.OnReceivedErrorMessage(e);
                     this.ReceivedEror(e);
+                    this.OnReceivedErrorMessage(e);
                     return;
 
                 case StatusCode.Acknowledge:
-                    this.OnReceivedAcknowledgeMessage(e);
                     this.ReceivedAcknowledge(e);
+                    this.OnReceivedAcknowledgeMessage(e);
                     return;
 
                 case StatusCode.SendComponentInfos:
-                    this.OnReceivedSendComponentInfo(e);
                     this.ReceivedSendComponentInfos(e);
+                    this.OnReceivedSendComponentInfo(e);
                     return;
 
                 case StatusCode.TransferComponent:
-                    this.OnReceivedTransferComponentResponseMessage(e);
                     this.ReceivedTransferComponentResponse(e);
+                    this.OnReceivedTransferComponentResponseMessage(e);
                     break;
 
                 case StatusCode.TransferJob:
-                    this.OnReceivedTransferJobRequestMessage(e);
                     this.ReceivedTransferJobRequest(e);
+                    this.OnReceivedTransferJobRequestMessage(e);
                     break;
             }
 
@@ -285,11 +285,16 @@ namespace ClientAgent
                                     return;
                                 }
 
+                                while (this.StoredComponents.ToArray().FirstOrDefault(c => c.Key == rq.ComponentGuid).Value == null)
+                                {
+                                    Thread.Sleep(5);
+                                }
+
                                 cont = true;
                                 resp = args.ReceivedMessage as TransferComponentResponse;
                             };
 
-                            this.ReceivedMessage += d;
+                            this.ReceivedTransferComponentResponseMessage += d;
                             this.WaitingMessages.Add(tcr);
                             this.ManagedClient.SendMessage(tcr);
 
@@ -298,7 +303,7 @@ namespace ClientAgent
                                 Thread.Sleep(10);
                             }
 
-                            this.ReceivedMessage -= d;
+                            this.ReceivedTransferComponentResponseMessage -= d;
                             continue;
                         }
 
@@ -313,7 +318,7 @@ namespace ClientAgent
                         }
 
                         TransferJobResponse tjs = new TransferJobResponse();
-                        tjs.Result = JobExecutor.Execute(a, rq.InputData).ToArray();
+                        tjs.Result = JobExecutor.Execute(pth, rq.InputData).ToArray();
                         tjs.BelongsToRequest = rq.ComponentGuid;
                         this.ManagedClient.SendMessage(tjs);
                         return;
@@ -337,8 +342,8 @@ namespace ClientAgent
                 return;
             }
 
-            TransferComponentRequest rq =
-                this.WaitingMessages.ToArray().FirstOrDefault(msg => msg.MessageID == r.BelongsTo) as TransferComponentRequest;
+            IEnumerable<Message> ms = this.WaitingMessages.ToArray().Where(msg => msg.MessageID == r.BelongsTo);
+            TransferComponentRequest rq = ms.SingleOrDefault() as TransferComponentRequest;
 
             if (rq == null)
             {
@@ -355,7 +360,8 @@ namespace ClientAgent
                 return;
             }
 
-            File.WriteAllBytes("temp\\" + c.FriendlyName + ".dll", r.Component);
+            string filename = string.Format("temp\\{0}.dll", c.FriendlyName);
+            JobExecutor.StoreComponent(r.Component, filename);
             this.StoredComponents.Add(c.ComponentGuid, c.FriendlyName + ".dll");
         }
 
@@ -413,7 +419,7 @@ namespace ClientAgent
                 }
             }
 
-            if (!sent && m.MetadataComponents.Count > 0)
+            if (!sent && m.MetadataComponents.Count > 2)
             {
                 sent = true;
 

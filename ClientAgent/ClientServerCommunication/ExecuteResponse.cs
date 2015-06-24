@@ -17,7 +17,7 @@ namespace ClientServerCommunication
         {
         }
 
-        public ExecuteResponse(object[] result, bool error)
+        public ExecuteResponse(object[] result, bool error) : base()
         {
             this.Result = result;
             this.Error = error;
