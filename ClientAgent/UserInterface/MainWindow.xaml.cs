@@ -100,10 +100,10 @@ namespace UserInterface
 
             InitializeComponent();
 
-            this.lvComponents.DataContext = availableComps;
-            this.lvFavorites.DataContext = favorites;
-            this.lvMatchingIn.DataContext = matchingIn;
-            this.lvMatchingOut.DataContext = matchingOut;
+            this.lvComponents.DataContext = this.availableComps;
+            this.lvFavorites.DataContext = this.favorites;
+            this.lvMatchingIn.DataContext = this.matchingIn;
+            this.lvMatchingOut.DataContext = this.matchingOut;
 
             #region Test components TODO
             this.availableComps.Add(new MyComponent(new Component()
@@ -155,28 +155,28 @@ namespace UserInterface
         private void ComponentCanvas_MouseMove(object sender, MouseEventArgs e)
         {
             // If there is a moving item, drag it and its connected lines
-            if (movingItem != null && e.LeftButton == MouseButtonState.Pressed)
+            if (this.movingItem != null && e.LeftButton == MouseButtonState.Pressed)
             {
-                Vector newPosition = e.GetPosition(ComponentCanvas) - movingItemInnerPosition;
+                Vector newPosition = e.GetPosition(this.componentCanvas) - this.movingItemInnerPosition;
                 bool leftChanged = false;
                 bool topChanged = false;
 
                 // move item horizontal if inside canvas
-                if (newPosition.X > 0 && newPosition.X + movingItem.RenderSize.Width < ComponentCanvas.ActualWidth)
+                if (newPosition.X > 0 && newPosition.X + this.movingItem.RenderSize.Width < this.componentCanvas.ActualWidth)
                 {
-                    Canvas.SetLeft(movingItem, newPosition.X);
+                    Canvas.SetLeft(this.movingItem, newPosition.X);
                     leftChanged = true;
                 }
 
                 // move item vertical if inside canvas
-                if (newPosition.Y > 0 && newPosition.Y + movingItem.RenderSize.Height < ComponentCanvas.ActualHeight)
+                if (newPosition.Y > 0 && newPosition.Y + this.movingItem.RenderSize.Height < this.componentCanvas.ActualHeight)
                 {
-                    Canvas.SetTop(movingItem, newPosition.Y);
+                    Canvas.SetTop(this.movingItem, newPosition.Y);
                     topChanged = true;
                 }
 
                 // move the lines connected to the inputs of the moving item
-                foreach (InputControl input in movingItem.Inputs)
+                foreach (InputControl input in this.movingItem.Inputs)
                 {
                     if (input.IncomingLink != null)
                     {
@@ -193,13 +193,13 @@ namespace UserInterface
                 }
 
                 // move the lines connected to the outputs of the moving item
-                foreach (OutputControl output in movingItem.Outputs)
+                foreach (OutputControl output in this.movingItem.Outputs)
                 {
                     if (output.OutgoingLink != null)
                     {
                         if (leftChanged)
                         {
-                            output.OutgoingLink.Line.X1 = newPosition.X + movingItem.ActualWidth - 25;
+                            output.OutgoingLink.Line.X1 = newPosition.X + this.movingItem.ActualWidth - 25;
                         }
 
                         if (topChanged)
@@ -283,7 +283,7 @@ namespace UserInterface
                     if (src.ParentControl.Component == this.STATIC_STRING_COMPONENT)
                     {
                         // Show the line and remove it if the user cancels the input
-                        ComponentCanvas.Children.Add(line);
+                        this.componentCanvas.Children.Add(line);
 
                         StaticStringInputWindow dlg = new StaticStringInputWindow();
                         dlg.Owner = this;
@@ -298,12 +298,12 @@ namespace UserInterface
                         }
                         else
                         {
-                            ComponentCanvas.Children.Remove(line);
+                            this.componentCanvas.Children.Remove(line);
                         }
                     }
                     else
                     {
-                        ComponentCanvas.Children.Add(line);
+                        this.componentCanvas.Children.Add(line);
 
                         Link link = new Link(src, target, line);
                         this.edgeLayout.Add(link);
@@ -352,10 +352,10 @@ namespace UserInterface
 
             if (toggleLink.IsChecked == false)
             {
-                movingItem = (MyCompControl)sender;
-                movingItemInnerPosition = e.GetPosition(movingItem);
+                this.movingItem = (MyCompControl)sender;
+                this.movingItemInnerPosition = e.GetPosition(this.movingItem);
 
-                SelectItem(movingItem);
+                SelectItem(this.movingItem);
             }
         }
 
@@ -366,7 +366,7 @@ namespace UserInterface
         /// <param name="e"></param>
         private void component_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            movingItem = null;
+            this.movingItem = null;
         }
 
         /// <summary>
@@ -408,7 +408,7 @@ namespace UserInterface
 
             foreach (MyComponent c in this.availableComps)
             {
-                c.SetSelectedComponent(selectedItem.Component);
+                c.SetSelectedComponent(this.selectedItem.Component);
                 
                 if (c.HasMatchingInput)
                 {
@@ -483,7 +483,7 @@ namespace UserInterface
         {
             if (this.selectedLink != null)
             {
-                if (selectedLink.Source.ParentControl.Component == this.STATIC_STRING_COMPONENT)
+                if (this.selectedLink.Source.ParentControl.Component == this.STATIC_STRING_COMPONENT)
                 {
                     this.inputDescriptions.Remove(
                         new InputIdentifier(
@@ -493,7 +493,7 @@ namespace UserInterface
                 }
 
                 this.edgeLayout.Remove(this.selectedLink);
-                ComponentCanvas.Children.Remove(this.selectedLink.Line);
+                this.componentCanvas.Children.Remove(this.selectedLink.Line);
                 this.selectedLink.Source.OutgoingLink = null;
                 this.selectedLink.Target.IncomingLink = null;
                 this.selectedLink = null;
@@ -550,7 +550,7 @@ namespace UserInterface
                         }
 
                         this.edgeLayout.Remove(input.IncomingLink);
-                        this.ComponentCanvas.Children.Remove(input.IncomingLink.Line);
+                        this.componentCanvas.Children.Remove(input.IncomingLink.Line);
                         input.IncomingLink.Source.OutgoingLink = null;
                         input.IncomingLink = null;                        
                     }
@@ -567,7 +567,7 @@ namespace UserInterface
                         }
 
                         this.edgeLayout.Remove(output.OutgoingLink);
-                        this.ComponentCanvas.Children.Remove(output.OutgoingLink.Line);
+                        this.componentCanvas.Children.Remove(output.OutgoingLink.Line);
                         output.OutgoingLink.Target.IncomingLink = null;
                         output.OutgoingLink = null;                        
                     }
@@ -579,7 +579,7 @@ namespace UserInterface
             // reset HasMatching...-Properties of components
             ResetMatchingItems();
 
-            this.ComponentCanvas.Children.Remove(this.selectedItem);
+            this.componentCanvas.Children.Remove(this.selectedItem);
             this.selectedItem = null;
         }
 
@@ -592,7 +592,7 @@ namespace UserInterface
             this.edgeLayout.Clear();
             this.inputDescriptions.Clear();
             this.staticStringLinks.Clear();
-            this.ComponentCanvas.Children.Clear();
+            this.componentCanvas.Children.Clear();
 
             this.selectedItem = null;
             this.selectedLink = null;
@@ -672,8 +672,8 @@ namespace UserInterface
                 Canvas.SetLeft(newComponent, 10);
                 Canvas.SetTop(newComponent, 10);
                 
-                compLayout.Add(newComponent);
-                ComponentCanvas.Children.Add(newComponent);
+                this.compLayout.Add(newComponent);
+                this.componentCanvas.Children.Add(newComponent);
             }
         }
 
@@ -719,9 +719,9 @@ namespace UserInterface
             }
 
             // check if all inputs and outputs are connected
-            for (int i = 0; everythingConnected && i < compLayout.Count; i++)
+            for (int i = 0; everythingConnected && i < this.compLayout.Count; i++)
             {
-                comp = compLayout[i];
+                comp = this.compLayout[i];
 
                 for (int k = 0; everythingConnected && k < comp.Inputs.Count; k++)
                 {
@@ -772,13 +772,15 @@ namespace UserInterface
             List<string> inputDescs = new List<string>();
             List<string> outputHints = new List<string>();
             List<string> outputDescs = new List<string>();
-            List<Link> usefulLinks = new List<Link>(edgeLayout);
+            List<Link> usefulLinks = new List<Link>(this.edgeLayout);
 
-            foreach (Link unusefulLink in staticStringLinks)
+            // ignore the links which are only used for static inputs
+            foreach (Link unusefulLink in this.staticStringLinks)
             {
                 usefulLinks.Remove(unusefulLink);
             }
 
+            // generate the graph which represents the new component
             foreach (Link link in usefulLinks)
             {
                 ComponentEdge edge = new ComponentEdge();
@@ -793,7 +795,8 @@ namespace UserInterface
                 edges.Add(edge);
             }
             
-            foreach (MyCompControl comp in compLayout)
+            // define combined components input/output hints and descriptions
+            foreach (MyCompControl comp in this.compLayout)
             {
                 foreach (InputControl input in comp.Inputs)
                 {
@@ -875,9 +878,9 @@ namespace UserInterface
             CheckBox s = (CheckBox)sender;
             MyComponent comp = ((ContentPresenter)s.TemplatedParent).Content as MyComponent;
 
-            if (comp != null && !favorites.Contains(comp))
+            if (comp != null && !this.favorites.Contains(comp))
             {
-                favorites.Add(comp);
+                this.favorites.Add(comp);
             }
         }
 
@@ -891,9 +894,9 @@ namespace UserInterface
             CheckBox s = (CheckBox)sender;
             MyComponent comp = ((ContentPresenter)s.TemplatedParent).Content as MyComponent;
 
-            if (comp != null && favorites.Contains(comp))
+            if (comp != null && this.favorites.Contains(comp))
             {
-                favorites.Remove(comp);
+                this.favorites.Remove(comp);
             }
         }
 
@@ -913,7 +916,7 @@ namespace UserInterface
             Canvas.SetZIndex(staticInputComponent, 1); // move above connecting lines
             Canvas.SetLeft(staticInputComponent, 10);
             Canvas.SetTop(staticInputComponent, 10);
-            this.ComponentCanvas.Children.Add(staticInputComponent);
+            this.componentCanvas.Children.Add(staticInputComponent);
         }
 
         /// <summary>

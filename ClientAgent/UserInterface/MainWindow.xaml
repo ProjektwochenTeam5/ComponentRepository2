@@ -95,8 +95,8 @@
         
         <DockPanel Background="White"  Grid.Row="1" Grid.Column="2" Margin="5 0">
             <StackPanel DockPanel.Dock="Top">
-                <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="btnDelete_Click"/>
-                <Button x:Name="btnDeleteAll" Content="Delete All" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="btnDeleteAll_Click" />
+                <Button x:Name="btnDelete" Content="Delete" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="btnDelete_Click" ToolTip="remove the selected item"/>
+                <Button x:Name="btnDeleteAll" Content="Delete All" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Click="btnDeleteAll_Click" ToolTip="clear the blueprint space"/>
                 <ToggleButton x:Name="toggleLink" Content="Link" IsChecked="False" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Height="140" Checked="toggleLink_Checked" />
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
@@ -106,7 +106,7 @@
         </DockPanel>
         
         <ScrollViewer x:Name="scrollView" Grid.Row="1" Grid.Column="1" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
-            <Canvas x:Name="ComponentCanvas" Width="1300" Height="900"  Background="#FF384893" MouseMove="ComponentCanvas_MouseMove" AllowDrop="True" />
+            <Canvas x:Name="componentCanvas" Width="1300" Height="900"  Background="#FF384893" MouseMove="ComponentCanvas_MouseMove" AllowDrop="True" />
         </ScrollViewer>
         
         <TextBlock x:Name="tblJobStatus" Text="Job Status: " Margin="5" Padding="5"  Background="Silver" Grid.Row="2" Grid.ColumnSpan="3"/>
