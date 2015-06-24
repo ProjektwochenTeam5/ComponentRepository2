@@ -96,7 +96,9 @@ namespace Server
 
         private void TryToExecuteJob(JobRequest jobReq, TcpClient client)
         {
-            var results = SplitJob.Split(jobReq, this.TcpManager);
+            // TODO:
+            //var results = SplitJob.Split(jobReq, this.TcpManager);
+            List<object> results = null;
 
             JobResultRequest req = new JobResultRequest();
             req.JobGuid = jobReq.JobGuid;

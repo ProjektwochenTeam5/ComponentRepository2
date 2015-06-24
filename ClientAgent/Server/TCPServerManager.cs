@@ -274,7 +274,6 @@
                         this.MyTCPServer.SendAck(e.Info, request.MessageID);
 
                         Console.WriteLine("DoJobRequest recieved!");
-
                         Task t = new Task(new Action(() =>
                         SplitJob.Split(request, this)));
 
