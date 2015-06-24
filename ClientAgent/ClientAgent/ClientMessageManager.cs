@@ -342,7 +342,7 @@ namespace ClientAgent
                 return;
             }
 
-            IEnumerable<Message> ms = this.WaitingMessages.ToArray().Where(msg => msg.MessageID == r.BelongsTo);
+            IEnumerable<Message> ms = this.WaitingMessages.ToArray().Where(msg => msg as TransferComponentRequest != null && msg.MessageID == r.BelongsTo);
             TransferComponentRequest rq = ms.SingleOrDefault() as TransferComponentRequest;
 
             if (rq == null)
