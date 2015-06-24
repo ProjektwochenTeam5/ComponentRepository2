@@ -319,7 +319,7 @@ namespace ClientAgent
 
                         TransferJobResponse tjs = new TransferJobResponse();
                         tjs.Result = JobExecutor.Execute(pth, rq.InputData).ToArray();
-                        tjs.BelongsToRequest = rq.ComponentGuid;
+                        tjs.BelongsToRequest = rq.JobID;
                         this.ManagedClient.SendMessage(tjs);
                         return;
                     }

@@ -403,7 +403,6 @@ namespace ClientAgent
 
                     using (MemoryStream ms = new MemoryStream(body))
                     {
-                        while (!ms.CanRead) { Thread.Sleep(1); }
                         Message rcv = (Message)args.Client.formatter.Deserialize(ms);
                         args.Client.OnReceivedTCPMessage(new MessageReceivedEventArgs(rcv, args.Client.ConnectedEndPoint));
                     }
