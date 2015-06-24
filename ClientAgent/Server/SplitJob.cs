@@ -24,11 +24,11 @@ namespace Server
 
         public static Guid JobGuid { get; set; }
 
-        public static List<object> Split(JobRequest jobreq, TCPServerManager manager)
+        public static List<object> Split(DoJobRequest jobreq, TCPServerManager manager)
         {
             List<object> ResultList = new List<object>();
             Manager = manager;
-            var job = jobreq.JobComponent;
+            var job = jobreq.Job;
             JobGuid = Guid.NewGuid();
 
             //var addGuid = Guid.NewGuid();

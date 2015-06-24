@@ -52,6 +52,11 @@ namespace ClientAgent.UI
         private Label labelStatus;
 
         /// <summary>
+        /// The statuc stack text box.
+        /// </summary>
+        private StackTextBox stacktextboxStatus;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ClientMenu"/> class.
         /// </summary>
         /// <param name="outputs">
@@ -91,6 +96,11 @@ namespace ClientAgent.UI
             this.labelStatus = new Label(this.Renderers);
             this.labelStatus.Text = string.Empty;
             this.labelStatus.Rectangle = new ConsoleGUI.Rectangle(0, 0, 64, 5);
+
+            // Satus Stack Text Box
+            /*this.stacktextboxStatus = new StackTextBox(outputs);
+            this.stacktextboxStatus.BackgroundColor = ConsoleColor.Blue;
+            this.stacktextboxStatus.ForegroundColor = ConsoleColor.White;*/
 
             // Add buttons
             this.Buttons.AddRange(new[] { this.buttonCreateComponent, this.buttonShowComponents, this.buttonShowJobs, this.buttonQuit });
