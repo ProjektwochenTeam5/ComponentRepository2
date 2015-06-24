@@ -12,33 +12,35 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public class ComponentSubmitServerToServer
+    public class ClientUpdateServerToServer
     {
-        public ComponentSubmitServerToServer(TcpServerToServerManager manager)
+        public ClientUpdateServerToServer(TcpServerToServerManager manager)
         {
             this.Manager = manager;
         }
 
         public TcpServerToServerManager Manager { get; set; }
 
-        public void SendComponentSubmitRequest(Dictionary<Guid, IPEndPoint> servers, Component component)
+        public void SendClientUpdateRequest(Dictionary<Guid, IPEndPoint> servers, ClientInfo clientInfo, ClientState state)
         {
             foreach (var ipEndPoint in servers.Values)
             {
                 TcpClient client = new TcpClient();
-                client.Connect(ipEndPoint);
-
-                ComponentSubmitRequest req = new ComponentSubmitRequest();
-                req.Component = component;
-                req.ComponentSubmitRequestGuid = Guid.NewGuid();
-
-                string json = JsonConvert.SerializeObject(req);
-                var bytes = DataConverter.ConvertJsonToByteArray(MessageCode.KeepAlive, json);
-
-                int waitForResponse = 0;
 
                 try
                 {
+                    client.Connect(ipEndPoint);
+
+                    ClientUpdateRequest req = new ClientUpdateRequest();
+                    req.ClientUpdateRequestGuid = Guid.NewGuid();
+                    req.ClientInfo = clientInfo;
+                    req.ClientState = state;
+
+                    string json = JsonConvert.SerializeObject(req);
+                    var bytes = DataConverter.ConvertJsonToByteArray(MessageCode.ClientUpdate, json);
+
+                    int waitForResponse = 0;
+
                     NetworkStream ns = client.GetStream();
 
                     ns.Write(bytes, 0, bytes.Length);
@@ -92,9 +94,9 @@ namespace Server
                                     }
                                     else
                                     {
-                                        if ((int)messagetype == (int)MessageCode.ComponentSubmit)
+                                        if ((int)messagetype == (int)MessageCode.ClientUpdate)
                                         {
-                                            if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body))
+                                            if (this.CheckClientResponse(req.ClientUpdateRequestGuid, body))
                                             {
                                                 run = false;
                                             }
@@ -112,7 +114,7 @@ namespace Server
                                 {
                                     if ((int)messagetype == (int)MessageCode.ComponentSubmit)
                                     {
-                                        if (this.CheckComponentSubmit(req.ComponentSubmitRequestGuid, body))
+                                        if (this.CheckClientResponse(req.ClientUpdateRequestGuid, body))
                                         {
                                             run = false;
                                         }
@@ -131,16 +133,18 @@ namespace Server
                 {
                     Console.WriteLine(ex.Message);
                 }
-
-                client.Close();
+                finally
+                {
+                    client.Close();
+                }
             }
         }
 
-        private bool CheckComponentSubmit(Guid guid, byte[] body)
+        private bool CheckClientResponse(Guid guid, byte[] body)
         {
             string json = Encoding.ASCII.GetString(body);
-            ComponentSubmitResponse resp = JsonConvert.DeserializeObject<ComponentSubmitResponse>(json);
-            return (resp.IsAccepted && resp.ComponentSubmitRequestGuid == guid);
+            ClientUpdateResponse resp = JsonConvert.DeserializeObject<ClientUpdateResponse>(json);
+            return (resp.ClientUpdateRequestGuid == guid);
         }
     }
 }

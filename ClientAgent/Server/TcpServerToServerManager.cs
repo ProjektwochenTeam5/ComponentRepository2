@@ -52,13 +52,97 @@ namespace Server
 
                     break;
                 case Core.Network.MessageCode.RequestAssembly:
-                    
+                    AssemblyRequest assemblyRequest = JsonConvert.DeserializeObject<AssemblyRequest>(Encoding.ASCII.GetString(e.MessageBody));
+                    this.SendAssembly(e.Server, assemblyRequest.ComponentGuid);
                     break;
                 case Core.Network.MessageCode.ClientUpdate:
-                    ClientUpdateResponse clientUpdResp = JsonConvert.DeserializeObject<ClientUpdateResponse>(Encoding.ASCII.GetString(e.MessageBody));
+                    ClientUpdateRequest clientUpdReq = JsonConvert.DeserializeObject<ClientUpdateRequest>(Encoding.ASCII.GetString(e.MessageBody));
+                    this.SaveClientUpdate(clientUpdReq, (IPEndPoint)e.Server.Client.RemoteEndPoint);
+                    this.SendClientUpdateResponse(e.Server, clientUpdReq.ClientUpdateRequestGuid);
                     break;
                 default:
                     break;
+            }
+        }
+
+        private void SaveClientUpdate(ClientUpdateRequest clientUpdReq, IPEndPoint iPEndPoint)
+        {
+            var serverguid = this.Server.Servers.FirstOrDefault(x => x.Value.Address == iPEndPoint.Address && x.Value.Port == iPEndPoint.Port).Key;
+
+            if (clientUpdReq.ClientState == ClientState.Connected)
+            {
+                this.TcpManager.AllServerClients.FirstOrDefault(x => x.Key == serverguid).Value.Add(clientUpdReq.ClientInfo);
+            }
+            else if (clientUpdReq.ClientState == ClientState.Disconnected)
+            {
+                var listOfClients = this.TcpManager.AllServerClients.FirstOrDefault(x => x.Key == serverguid).Value;
+                foreach (var item in listOfClients)
+                {
+                    if (item.ClientGuid == clientUpdReq.ClientInfo.ClientGuid)
+                    {
+                        listOfClients.Remove(item);
+                        break;
+                    }
+                }
+            }
+        }
+
+        private void SendClientUpdateResponse(TcpClient tcpClient, Guid guid)
+        {
+            ClientUpdateResponse resp = new ClientUpdateResponse();
+            resp.ClientUpdateRequestGuid = guid;
+
+            string json = JsonConvert.SerializeObject(resp);
+            var bytes = DataConverter.ConvertJsonToByteArray(MessageCode.ClientUpdate, json);
+
+            try
+            {
+                NetworkStream ns = tcpClient.GetStream();
+
+                ns.Write(bytes, 0, bytes.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                tcpClient.Close();
+            }
+        }
+
+        private void SendAssembly(TcpClient tcpClient, Guid guid)
+        {
+            var component = this.TcpManager.Components.FirstOrDefault(x => x.Key == guid).Value;
+            string path = this.TcpManager.Dlls[guid];
+            byte[] data = DataConverter.ConvertDllToByteArray(path);
+            byte[] message = new byte[data.Length + 5];
+            message[0] = (byte)MessageCode.RequestAssembly;
+
+            var length = BitConverter.GetBytes(data.Length);
+            for (int i = 1; i < 5; i++)
+            {
+                message[i] = length[i - 1];
+            }
+
+            for (int i = 5; i < message.Length; i++)
+            {
+                message[i] = data[i];
+            }
+
+            try
+            {
+                NetworkStream ns = tcpClient.GetStream();
+
+                ns.Write(message, 0, message.Length);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            finally
+            {
+                tcpClient.Close();
             }
         }
 
@@ -85,7 +169,6 @@ namespace Server
             {
                 tcpClient.Close();
             }
-
         }
 
         private void SaveComponentData(ComponentSubmitRequest submitResp, IPEndPoint ipEndPoint)

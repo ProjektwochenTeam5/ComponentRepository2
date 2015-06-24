@@ -48,6 +48,7 @@
     <Compile Include="AssemblyServerToServer.cs" />
     <Compile Include="ClientFetchedEventArgs.cs" />
     <Compile Include="ClientTerminatedEventArgs.cs" />
+    <Compile Include="ClientUpdateServerToServer.cs" />
     <Compile Include="ComponentSubmitServerToServer.cs" />
     <Compile Include="DataBaseWrapper.cs" />
     <Compile Include="ExtendedComponentEdge.cs" />
