@@ -19,7 +19,7 @@ namespace UserInterface
             new MyComponent(
                 new Component()
                 {
-                    FriendlyName = "static string",
+                    FriendlyName = "STATIC STRING",
                     OutputHints = new string[] { "System.String" },
                     OutputDescriptions = new string[] { "out" }
                 });
@@ -68,9 +68,9 @@ namespace UserInterface
         private ObservableCollection<MyComponent> matchingOut = new ObservableCollection<MyComponent>();
 
         /// <summary>
-        /// The internal GUIDs of the input components along with their input descriptions.
+        /// The input identifiers of the input components along with their input descriptions.
         /// </summary>
-        private Dictionary<Guid, string> inputDescriptions = new Dictionary<Guid, string>();
+        private Dictionary<InputIdentifier, string> inputDescriptions = new Dictionary<InputIdentifier, string>();
 
         /// <summary>
         /// The list containing all components which are visible on the canvas.
@@ -82,6 +82,9 @@ namespace UserInterface
         /// </summary>
         private List<Link> edgeLayout = new List<Link>();
 
+        /// <summary>
+        /// The list containing all edges which are only used in the user interface to connect static strings and string inputs.
+        /// </summary>
         private List<Link> staticStringLinks = new List<Link>();
 
         public MainWindow()
@@ -99,12 +102,12 @@ namespace UserInterface
             this.lvMatchingIn.DataContext = matchingIn;
             this.lvMatchingOut.DataContext = matchingOut;
 
-            #region Test components
+            #region Test components TODO
             this.availableComps.Add(new MyComponent(new Component()
             {
                 FriendlyName = "Test-Komponente",
-                InputHints = new string[] { "System.Int32", "System.String", "System.Int64", "System.Double", "System.Double" },
-                InputDescriptions = new string[] { "int", "str", "long", "double", "double" },
+                InputHints = new string[] { "System.Int32", "System.String", "System.Int64", "System.Double", "System.String" },
+                InputDescriptions = new string[] { "int", "str", "long", "double", "str2" },
                 OutputHints = new string[] { "System.Int32", "System.Schiff" },
                 OutputDescriptions = new string[] { "int", "schiff" }
             }));
@@ -282,7 +285,7 @@ namespace UserInterface
 
                         if (dlg.ShowDialog() == true)
                         {
-                            this.inputDescriptions.Add(target.ParentControl.InternalComponentGuid, dlg.Description);
+                            this.inputDescriptions.Add(new InputIdentifier(target.ParentControl.InternalComponentGuid, target.InputValueID), dlg.Description);
 
                             Link staticInputLink = new Link(src, target, line);
                             this.edgeLayout.Add(staticInputLink);
@@ -477,7 +480,10 @@ namespace UserInterface
             {
                 if (selectedLink.Source.ParentControl.Component == this.STATIC_STRING_COMPONENT)
                 {
-                    this.inputDescriptions.Remove(this.selectedLink.Target.ParentControl.InternalComponentGuid);
+                    this.inputDescriptions.Remove(
+                        new InputIdentifier(
+                            this.selectedLink.Target.ParentControl.InternalComponentGuid, 
+                            this.selectedLink.Target.InputValueID));
                     this.staticStringLinks.Remove(this.selectedLink);
                 }
 
@@ -505,13 +511,24 @@ namespace UserInterface
             // Remove incoming links
             if (this.selectedItem.Inputs != null)
             {
+                if (this.selectedItem.Component == STATIC_STRING_COMPONENT && this.selectedItem.Outputs[0].OutgoingLink != null)
+                {
+                    this.inputDescriptions.Remove(
+                        new InputIdentifier(
+                            this.selectedItem.InternalComponentGuid,
+                            this.selectedItem.Outputs[0].OutgoingLink.Target.InputValueID));
+                }
+
                 foreach (InputControl input in this.selectedItem.Inputs)
                 {
                     if (input.IncomingLink != null)
                     {
-                        if (isStaticStringComponent)
+                        if (input.IncomingLink.Source.ParentControl.Component == STATIC_STRING_COMPONENT)
                         {
-                            staticStringLinks.Remove(input.IncomingLink);
+                            this.inputDescriptions.Remove(
+                                new InputIdentifier(
+                                    this.selectedItem.InternalComponentGuid,
+                                    input.IncomingLink.Target.InputValueID));
                         }
 
                         this.edgeLayout.Remove(input.IncomingLink);
@@ -546,7 +563,6 @@ namespace UserInterface
             ResetMatchingItems();
 
             this.compLayout.Remove(this.selectedItem);
-            this.inputDescriptions.Remove(this.selectedItem.InternalComponentGuid);
             this.ComponentCanvas.Children.Remove(this.selectedItem);
             this.selectedItem = null;
         }
@@ -890,12 +906,17 @@ namespace UserInterface
 
             if (descriptionOut.OutgoingLink != null)
             {
+                InputControl target = descriptionOut.OutgoingLink.Target;
                 StaticStringInputWindow dlg = new StaticStringInputWindow();
                 dlg.Owner = this;
                 
                 if (dlg.ShowDialog() == true)
                 {
-                    this.inputDescriptions[descriptionOut.OutgoingLink.Target.ParentControl.InternalComponentGuid] = dlg.Description;
+                    InputIdentifier inputId = new InputIdentifier(
+                        target.ParentControl.InternalComponentGuid, 
+                        target.InputValueID);
+
+                    this.inputDescriptions[inputId] = dlg.Description;
                 }
             }
         }        
