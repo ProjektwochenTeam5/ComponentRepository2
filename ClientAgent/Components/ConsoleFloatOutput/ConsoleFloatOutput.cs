@@ -26,7 +26,7 @@ namespace ConsoleFloatOutput
         public ConsoleFloatOutput()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(float).ToString() });
             this.OutputHints = new List<string>();
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();     

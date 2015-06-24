@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleUintOutput.cs" company="FHWN"> 
+// <copyright file="ConsoleListOutput.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleUintOutput
+namespace ConsoleListOutput
 {
     using System;
     using System.Collections.Generic;
@@ -18,15 +18,15 @@ namespace ConsoleUintOutput
     /// <summary>
     /// This is the component class for the console output.
     /// </summary>
-    public class ConsoleUintOutput
+    public class ConsoleListOutput
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleUintOutput"/> class.
+        /// Initializes a new instance of the <see cref="ConsoleListOutput"/> class.
         /// </summary>
-        public ConsoleUintOutput()
+        public ConsoleListOutput()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(List<int>).ToString() });
             this.OutputHints = new List<string>();
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();     
@@ -50,7 +50,7 @@ namespace ConsoleUintOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Uint Output"; }
+            get { return "Console List Output"; }
         }
 
         /// <summary>
@@ -105,18 +105,12 @@ namespace ConsoleUintOutput
                 return new object[] { new ArgumentException() };
             }
 
-            bool parseOK;
-            uint ioutput = 0;
-            string output = string.Empty;
+            List<int> something = (List<int>)values.ElementAt(0);
 
-            foreach (var item in values)
+            for (int i = 0; i < something.Count; i++)
             {
-                output += (string)item;
+                Console.WriteLine(something[i]);
             }
-
-            parseOK = uint.TryParse(output, out ioutput);
-
-            Console.WriteLine(ioutput);
 
             return null;
         }

@@ -102,18 +102,21 @@ namespace ConsoleIntInput
         {
             if (values.Count() != 1)
             {
-               //// return new object[] { new ArgumentException() };
+                return new object[] { new ArgumentException() };
             }
 
             while (true)
             {
-                Console.WriteLine(values.FirstOrDefault().ToString());////"Please enter the operating value.");
+                Console.WriteLine("Please enter the operating value.");
                 string userInput = Console.ReadLine();
+                bool parseOK;
                 int num = 0;
-                if (string.IsNullOrEmpty(userInput) || !int.TryParse(userInput, out num))
+                if (string.IsNullOrEmpty(userInput) == true)
                 {
-                    continue;
-                }
+                    Console.WriteLine("Please enter any value you want to operate with. ");
+                }               
+
+                parseOK = int.TryParse(userInput, out num);
                
                 return new object[] { num };
             }
