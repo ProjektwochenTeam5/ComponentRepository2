@@ -55,6 +55,9 @@
     </ApplicationDefinition>
     <Compile Include="InputIdentifier.cs" />
     <Compile Include="Job.cs" />
+    <Compile Include="JobCreateWindow.xaml.cs">
+      <DependentUpon>JobCreateWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="MyComponent.cs" />
     <Compile Include="StaticStringInputWindow.xaml.cs">
       <DependentUpon>StaticStringInputWindow.xaml</DependentUpon>
@@ -67,6 +70,10 @@
     <Page Include="InputControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="JobCreateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>

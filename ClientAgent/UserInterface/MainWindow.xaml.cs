@@ -749,11 +749,16 @@ namespace UserInterface
                 return;
             }
 
+            JobCreateWindow dlg = new JobCreateWindow();
+            dlg.Owner = this;
+            dlg.ShowDialog();
+
+            //TODO job: do something with the component and job name
+
             Job job = new Job();
             job.InputDescriptions = this.inputDescriptions;
             job.JobComponent = ConvertLayoutToComponent();
 
-            //TODO job
             MessageBox.Show("Job is executing...",
                 "Execute job",
                 MessageBoxButton.OK,

@@ -100,8 +100,8 @@
                 <ToggleButton x:Name="toggleLink" Content="Link" IsChecked="False" HorizontalAlignment="Stretch"  VerticalAlignment="Top" Margin="10" Height="140" Checked="toggleLink_Checked" />
             </StackPanel>
             <StackPanel DockPanel.Dock="Bottom" VerticalAlignment="Bottom">
-                <Button x:Name="btnCreateComp" Content="Create Comp" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateComp_Click" />
-                <Button x:Name="btnCreateJob" Content="Execute Job" HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateJob_Click" />
+                <Button x:Name="btnCreateComp" Content="Create Comp..." HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateComp_Click" />
+                <Button x:Name="btnCreateJob" Content="Execute Job..." HorizontalAlignment="Stretch"  VerticalAlignment="Bottom" Margin="10" Click="btnCreateJob_Click" />
             </StackPanel>
         </DockPanel>
         
