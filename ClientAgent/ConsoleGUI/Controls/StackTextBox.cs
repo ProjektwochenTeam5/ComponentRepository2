@@ -25,6 +25,11 @@ namespace ConsoleGUI.Controls
     public class StackTextBox : Control
     {
         /// <summary>
+        /// Contains the value for the <see cref="Text"/> property.
+        /// </summary>
+        private string textProperty;
+
+        /// <summary>
         /// 
         /// </summary>
         /// <param name="outputs"></param>
@@ -36,13 +41,21 @@ namespace ConsoleGUI.Controls
 
         public string Text
         {
-            get;
-            private set;
+            get
+            {
+                return this.textProperty;
+            }
+
+            private set
+            {
+                this.textProperty = value;
+                this.OnTextChanged(EventArgs.Empty);
+            }
         }
 
-        public void PushLine()
+        public void PushLine(string line)
         {
-
+            this.Text += line;
         }
 
         public string ReadLine()
@@ -63,6 +76,11 @@ namespace ConsoleGUI.Controls
         public override bool Receive(string s)
         {
             throw new NotImplementedException();
+        }
+
+        protected void OnTextChanged(EventArgs e)
+        {
+
         }
     }
 }
