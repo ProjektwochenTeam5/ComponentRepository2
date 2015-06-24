@@ -432,7 +432,7 @@ namespace ClientAgent
                 var intinpGuid2 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
                 var intinpGuid3 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
                 var intoutGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Output").ComponentGuid;
-
+                
                 //////////////// Testjob
                 Component job = new Component();
                 job.ComponentGuid = new Guid();
