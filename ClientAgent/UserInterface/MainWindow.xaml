@@ -56,7 +56,7 @@
             <RowDefinition Height="40"/>
         </Grid.RowDefinitions>
 
-        <Label Content="Blueprints: Components" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1"/>
+        <Label Content="Blueprint: Components" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="1"/>
         <Label Content="Components" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="0"/>
         <Label Content="Toolbox" HorizontalAlignment="Left" VerticalAlignment="Top" FontSize="16" FontWeight="Bold" Foreground="White" Grid.Column="2"/>
 
@@ -77,14 +77,14 @@
                     </Style>
                 </StackPanel.Resources>
                 
-                <Button x:Name="btnStaticInput" Content="add input description..." Margin="5" Click="btnStaticInput_Click"/>
+                <Button x:Name="btnStaticInput" Content="add input description..." Margin="5" Click="btnStaticInput_Click" ToolTip="enables you to enter a static string to describe inputs"/>
                 <Expander Header="Favorites">
                     <ListView x:Name="lvFavorites" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
                 </Expander>
-                <Expander Header="Matching input">
+                <Expander Header="Matching input" ToolTip="components with an input that matches one of the outputs of the selected component">
                     <ListView x:Name="lvMatchingIn" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
                 </Expander>
-                <Expander Header="Matching output">
+                <Expander Header="Matching output" ToolTip="components with an output that matches one of the inputs of the selected component">
                     <ListView x:Name="lvMatchingOut" MouseDoubleClick="ComponentsList_MouseDoubleClick" ItemsSource="{Binding}" Margin="25 0 0 0" BorderThickness="0" ItemTemplate="{StaticResource ComponentTemplate}"/>
                 </Expander>
                 <Expander Header="All components" IsExpanded="True">

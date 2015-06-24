@@ -15,6 +15,9 @@ namespace UserInterface
     /// </summary>
     public partial class MainWindow : Window
     {
+        /// <summary>
+        /// The component used to let the user enter static input.
+        /// </summary>
         private readonly MyComponent STATIC_STRING_COMPONENT =
             new MyComponent(
                 new Component()
@@ -276,8 +279,10 @@ namespace UserInterface
                     line.Y2 = Canvas.GetTop(target.ParentControl) + ((target.InputValueID - 1) * 30) + 7;
                     line.Stroke = Brushes.White;
                     
+                    // If linked a string input then enable the user to enter a string
                     if (src.ParentControl.Component == this.STATIC_STRING_COMPONENT)
                     {
+                        // Show the line and remove it if the user cancels the input
                         ComponentCanvas.Children.Add(line);
 
                         StaticStringInputWindow dlg = new StaticStringInputWindow();
@@ -285,7 +290,7 @@ namespace UserInterface
 
                         if (dlg.ShowDialog() == true)
                         {
-                            this.inputDescriptions.Add(new InputIdentifier(target.ParentControl.InternalComponentGuid, target.InputValueID), dlg.Description);
+                            this.inputDescriptions.Add(new InputIdentifier(target.ParentControl.InternalComponentGuid, target.InputValueID), dlg.Input);
 
                             Link staticInputLink = new Link(src, target, line);
                             this.edgeLayout.Add(staticInputLink);
@@ -506,63 +511,74 @@ namespace UserInterface
                 return;
             }
 
+            // Determines if the selected item is a static string component
             bool isStaticStringComponent = this.selectedItem.Component == STATIC_STRING_COMPONENT;
 
-            // Remove incoming links
-            if (this.selectedItem.Inputs != null)
+            if (isStaticStringComponent && this.selectedItem.Outputs[0].OutgoingLink != null)
             {
-                if (this.selectedItem.Component == STATIC_STRING_COMPONENT && this.selectedItem.Outputs[0].OutgoingLink != null)
-                {
-                    this.inputDescriptions.Remove(
-                        new InputIdentifier(
-                            this.selectedItem.InternalComponentGuid,
-                            this.selectedItem.Outputs[0].OutgoingLink.Target.InputValueID));
-                }
+                // Remove the outgoing link of the static string component from the link list
 
-                foreach (InputControl input in this.selectedItem.Inputs)
+                Link staticStringLink = this.selectedItem.Outputs[0].OutgoingLink;
+
+                this.inputDescriptions.Remove(
+                    new InputIdentifier(
+                        staticStringLink.Target.ParentControl.InternalComponentGuid,
+                        staticStringLink.Target.InputValueID));
+                
+                this.staticStringLinks.Remove(staticStringLink);
+            }
+            else if (!isStaticStringComponent)
+            {
+                // Remove incoming links
+                if (this.selectedItem.Inputs != null)
                 {
-                    if (input.IncomingLink != null)
+                    foreach (InputControl input in this.selectedItem.Inputs)
                     {
+                        if (input.IncomingLink == null)
+                        {
+                            continue;
+                        }
+
                         if (input.IncomingLink.Source.ParentControl.Component == STATIC_STRING_COMPONENT)
                         {
                             this.inputDescriptions.Remove(
                                 new InputIdentifier(
                                     this.selectedItem.InternalComponentGuid,
                                     input.IncomingLink.Target.InputValueID));
+
+                            this.staticStringLinks.Remove(input.IncomingLink);
                         }
 
                         this.edgeLayout.Remove(input.IncomingLink);
                         this.ComponentCanvas.Children.Remove(input.IncomingLink.Line);
                         input.IncomingLink.Source.OutgoingLink = null;
-                        input.IncomingLink = null;
+                        input.IncomingLink = null;                        
                     }
                 }
-            }
 
-            // Remove outgoing links
-            if (this.selectedItem.Outputs != null)
-            {
-                foreach (OutputControl output in this.selectedItem.Outputs)
+                // Remove outgoing links
+                if (this.selectedItem.Outputs != null)
                 {
-                    if (output.OutgoingLink != null)
+                    foreach (OutputControl output in this.selectedItem.Outputs)
                     {
-                        if (isStaticStringComponent)
+                        if (output.OutgoingLink == null)
                         {
-                            staticStringLinks.Remove(output.OutgoingLink);
+                            continue;
                         }
 
                         this.edgeLayout.Remove(output.OutgoingLink);
                         this.ComponentCanvas.Children.Remove(output.OutgoingLink.Line);
                         output.OutgoingLink.Target.IncomingLink = null;
-                        output.OutgoingLink = null;
+                        output.OutgoingLink = null;                        
                     }
                 }
+
+                this.compLayout.Remove(this.selectedItem);
             }
 
             // reset HasMatching...-Properties of components
             ResetMatchingItems();
 
-            this.compLayout.Remove(this.selectedItem);
             this.ComponentCanvas.Children.Remove(this.selectedItem);
             this.selectedItem = null;
         }
@@ -635,7 +651,7 @@ namespace UserInterface
         /// <summary>
         /// Adds the selected component to the layout on the canvas.
         /// </summary>
-        /// <param name="sender"></param>
+        /// <param name="sender">The list view containing the selected component.</param>
         /// <param name="e"></param>
         private void ComponentsList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
         {
@@ -881,6 +897,11 @@ namespace UserInterface
             }
         }
 
+        /// <summary>
+        /// Adds a static input component to the layout on the canvas.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void btnStaticInput_Click(object sender, RoutedEventArgs e)
         {
             MyCompControl staticInputComponent = new MyCompControl(this.STATIC_STRING_COMPONENT);
@@ -907,16 +928,15 @@ namespace UserInterface
             if (descriptionOut.OutgoingLink != null)
             {
                 InputControl target = descriptionOut.OutgoingLink.Target;
-                StaticStringInputWindow dlg = new StaticStringInputWindow();
+                InputIdentifier inputId = new InputIdentifier(
+                    target.ParentControl.InternalComponentGuid, 
+                    target.InputValueID);
+                StaticStringInputWindow dlg = new StaticStringInputWindow(this.inputDescriptions[inputId]);
                 dlg.Owner = this;
                 
                 if (dlg.ShowDialog() == true)
                 {
-                    InputIdentifier inputId = new InputIdentifier(
-                        target.ParentControl.InternalComponentGuid, 
-                        target.InputValueID);
-
-                    this.inputDescriptions[inputId] = dlg.Description;
+                    this.inputDescriptions[inputId] = dlg.Input;
                 }
             }
         }        

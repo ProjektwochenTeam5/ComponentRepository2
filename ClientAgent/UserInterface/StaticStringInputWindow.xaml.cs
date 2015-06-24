@@ -24,7 +24,15 @@ namespace UserInterface
             InitializeComponent();
         }
 
-        public string Description
+        public StaticStringInputWindow(string placeholder)
+            : this()
+        {
+            this.Input = placeholder;
+            this.txtDescription.Text = placeholder;
+            this.txtDescription.SelectAll();
+        }
+
+        public string Input
         {
             get;
             private set;
@@ -64,9 +72,9 @@ namespace UserInterface
         /// <returns>True, if the input is not empty.</returns>
         private bool CheckInput()
         {
-            this.Description = this.txtDescription.Text;
+            this.Input = this.txtDescription.Text;
 
-            if (string.IsNullOrWhiteSpace(this.Description))
+            if (string.IsNullOrWhiteSpace(this.Input))
             {
                 this.txtInfo.Text = "The input must not be empty.";
                 this.txtDescription.Background = Brushes.Yellow;

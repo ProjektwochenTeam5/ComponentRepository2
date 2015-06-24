@@ -42,7 +42,7 @@ namespace UserInterface
 
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return this.InternalComponentGuid.GetHashCode() + (int)this.InputPort;
         }
     }
 }
