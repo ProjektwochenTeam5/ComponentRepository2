@@ -422,17 +422,17 @@ namespace ClientAgent
             {
                 sent = true;
 
-                var addGuid = Guid.NewGuid();
-                var inpGuid = Guid.NewGuid();
-                var outGuid = Guid.NewGuid();
+                var addGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Add").ComponentGuid;
+                var inpGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
+                var outGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Output").ComponentGuid;
 
-                var intaddGuid1 = this.StoredComponentInfos.First(c => c.FriendlyName == "Add").ComponentGuid;
-                var intaddGuid2 = this.StoredComponentInfos.First(c => c.FriendlyName == "Add").ComponentGuid;
-                var intinpGuid1 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
-                var intinpGuid2 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
-                var intinpGuid3 = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
-                var intoutGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Output").ComponentGuid;
-
+                var intaddGuid1 = Guid.NewGuid();
+                var intaddGuid2 = Guid.NewGuid();
+                var intinpGuid1 = Guid.NewGuid();
+                var intinpGuid2 = Guid.NewGuid();
+                var intinpGuid3 = Guid.NewGuid();
+                var intoutGuid = Guid.NewGuid();
+                
                 //////////////// Testjob
                 Component job = new Component();
                 job.ComponentGuid = new Guid();

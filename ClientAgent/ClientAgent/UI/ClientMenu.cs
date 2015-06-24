@@ -19,6 +19,8 @@ namespace ClientAgent.UI
     using System.Net.Sockets;
     using ConsoleGUI.Controls;
     using ConsoleGUI.IO;
+    using System.Threading;
+    using System.Diagnostics;
 
     /// <summary>
     /// Provides the client's main menu.
@@ -55,6 +57,16 @@ namespace ClientAgent.UI
         /// The statuc stack text box.
         /// </summary>
         private StackTextBox stacktextboxStatus;
+
+        /// <summary>
+        /// The thread responsible for communicating wth the GUI.
+        /// </summary>
+        private Thread guiThread;
+
+        /// <summary>
+        /// The thread arguments for the GUI thread.
+        /// </summary>
+        private ThreadArgs guiThreadArgs;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientMenu"/> class.
@@ -198,7 +210,40 @@ namespace ClientAgent.UI
         /// </param>
         private void ButtonCreateComponent_ButtonKeyPressed(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            if (this.guiThread != null && !this.guiThread.IsAlive)
+            {
+                // stop
+                this.guiThreadArgs.Stop();
+                this.buttonCreateComponent.Text = "F2 Open GUI";
+                return;
+            }
+
+            this.guiThread = new Thread(this.GuiCommunication);
+            this.guiThreadArgs = new ThreadArgs();
+            this.guiThread.Start(this.guiThreadArgs);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        private void GuiCommunication(object data)
+        {
+            ThreadArgs args = (ThreadArgs)data;
+            TcpListener ls = new TcpListener(new IPEndPoint(IPAddress.Any, 14999));
+            ls.Start();
+            Process c = new Process();
+            c.StartInfo.FileName = "UserInterface.exe";
+            c.StartInfo.Arguments = "14999";
+
+
+            while (!args.Stopped)
+            {
+                
+
+
+                Thread.Sleep(10);
+            }
         }
 
         /// <summary>
