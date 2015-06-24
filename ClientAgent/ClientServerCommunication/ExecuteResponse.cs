@@ -13,7 +13,7 @@ namespace ClientServerCommunication
 
         public bool Error { get; set; }
 
-        public ExecuteResponse()
+        public ExecuteResponse() : base()
         {
         }
 
