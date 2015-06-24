@@ -395,7 +395,7 @@ namespace ClientAgent
                     // go to next iteration if header lengh != 9
                     if (!ParseHeader(hdr, out bodylen, out messagType))
                     {
-                        break;
+                        continue;
                     }
 
                     byte[] body = new byte[bodylen];
@@ -403,6 +403,7 @@ namespace ClientAgent
 
                     using (MemoryStream ms = new MemoryStream(body))
                     {
+                        while (!ms.CanRead) { Thread.Sleep(1); }
                         Message rcv = (Message)args.Client.formatter.Deserialize(ms);
                         args.Client.OnReceivedTCPMessage(new MessageReceivedEventArgs(rcv, args.Client.ConnectedEndPoint));
                     }

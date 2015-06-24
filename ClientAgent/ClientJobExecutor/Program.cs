@@ -79,8 +79,6 @@ namespace ClientJobExecutor
                                          where typeof(IComponent).IsAssignableFrom(type)
                                          select type;
 
-                            
-
                             componentInfo = result.Single();
                             Console.Title = a.GetName().Name;
 
@@ -102,7 +100,7 @@ namespace ClientJobExecutor
                                 b10000 = (byte)((len / 0x10000) % 0x100);
                                 b1000000 = (byte)((len / 0x1000000) % 0x100);
 
-                                resp.AddRange(new byte[] { 1, 1, 1, 1, b1, b100, b10000, b1000000 });
+                                resp.AddRange(new byte[] { 1, 1, 1, 1, b1, b100, b10000, b1000000, (byte)rsp.MessageType });
                                 resp.AddRange(resstr.ToArray());
                                 str.Write(resp.ToArray(), 0, resp.Count);
                                 break;
