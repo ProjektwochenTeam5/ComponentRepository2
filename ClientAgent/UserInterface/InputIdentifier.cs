@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace UserInterface
 {
+    /// <summary>
+    /// This class uniquely identifies an input in a job.
+    /// </summary>
     public class InputIdentifier
     {
         public InputIdentifier(Guid internalComponentGuid, uint inputPort)

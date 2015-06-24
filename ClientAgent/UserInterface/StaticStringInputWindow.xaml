@@ -8,8 +8,8 @@
 
         <StackPanel>
             <Label Content="Your static string"/>
-            <TextBox x:Name="txtDescription" Height="23" TextWrapping="Wrap" Margin="5" TextChanged="txtDescription_TextChanged" KeyDown="txtDescription_KeyDown"/>
-            <TextBlock x:Name="txtInfo" Height="23" Foreground="Tomato" Margin="5"/>
+            <TextBox x:Name="txtInput" Height="23" TextWrapping="Wrap" Margin="5" TextChanged="txtInput_TextChanged" KeyDown="txtInput_KeyDown"/>
+            <TextBlock x:Name="tbInfo" Height="23" Foreground="Tomato" Margin="5"/>
         </StackPanel>
     </DockPanel>
 </Window>
