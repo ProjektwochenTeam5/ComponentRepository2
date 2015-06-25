@@ -138,7 +138,7 @@
 
         public byte[] GetComplexComponent(string filename)
         {
-            using (FileStream fs = new FileStream(this.StorePath + "\\" + filename + ".dat", FileMode.Open, FileAccess.Read, FileShare.Read))
+            using (FileStream fs = new FileStream(Path.Combine(this.StorePath,filename), FileMode.Open, FileAccess.Read))
             {
                 try
                 {
