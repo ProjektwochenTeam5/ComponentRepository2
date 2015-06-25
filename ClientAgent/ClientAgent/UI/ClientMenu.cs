@@ -280,6 +280,7 @@ namespace ClientAgent.UI
             c.StartInfo.Arguments = port.ToString();
             c.StartInfo.CreateNoWindow = false;
             c.Start();
+            this.PushLine(new StringEventArgs("Started GUI"));
 
             if (!c.HasExited)
             {
@@ -298,7 +299,7 @@ namespace ClientAgent.UI
 
                 // send start components
                 SendComponentInfos sci = new SendComponentInfos();
-                sci.MetadataComponents = this.Manager.StoredComponentInfos.ToArray();
+                sci.MetadataComponents = this.Manager.StoredComponentInfos;
                 byte[] ci = Client.SerializeMessage(sci);
                 nstr.Write(ci, 0, ci.Length);
 
@@ -330,6 +331,7 @@ namespace ClientAgent.UI
                                 case StatusCode.ExecuteJob:
                                     ExecuteRequest eq = rcv as ExecuteRequest;
                                     this.Client.SendMessage(eq);
+
                                     break;
 
                                 case StatusCode.StorComponent:

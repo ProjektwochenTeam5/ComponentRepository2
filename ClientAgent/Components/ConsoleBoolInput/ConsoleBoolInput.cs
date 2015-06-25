@@ -18,7 +18,7 @@ namespace ConsoleBoolInput
     /// <summary>
     /// This is the component class for the console input.
     /// </summary>
-    public class ConsoleBoolInput
+    public class ConsoleBoolInput : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleBoolInput"/> class.
@@ -50,7 +50,7 @@ namespace ConsoleBoolInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Bool Input"; }
+            get { return "Console boolean input"; }
         }
 
         /// <summary>
@@ -115,10 +115,17 @@ namespace ConsoleBoolInput
                 {
                     Console.WriteLine("Please enter any value you want to operate with. ");
                 }
-
+               
                 parseOK = bool.TryParse(userInput, out b);
 
-                return new object[] { b };
+                if (parseOK == true)
+                {
+                    return new object[] { b };
+                }
+                else 
+                {
+                    return new object[] { new ArgumentException() };
+                }
             }
         }
     }

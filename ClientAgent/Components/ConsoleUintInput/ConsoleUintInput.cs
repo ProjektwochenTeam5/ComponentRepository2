@@ -26,7 +26,7 @@ namespace ConsoleUintInput
         public ConsoleUintInput()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() }); 
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() }); 
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
             this.InputDescriptions = new List<string>();
             this.OutputDescriptions = new List<string>();
@@ -50,7 +50,7 @@ namespace ConsoleUintInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Uint Input"; }
+            get { return "Console unsigned integer input"; }
         }
 
         /// <summary>
@@ -118,7 +118,14 @@ namespace ConsoleUintInput
 
                 parseOK = double.TryParse(userInput, out num);
 
-                return new object[] { num };
+                if (parseOK == true)
+                {
+                    return new object[] { num };
+                }
+                else 
+                {
+                    return new object[] { new ArgumentException() };
+                }
             }
         }
     }

@@ -107,6 +107,11 @@ namespace ConvertDoubleToString
 
             double d = 0;
 
+            foreach(var item in values)
+            {
+                d += (double)item;
+            }
+
             string s = Convert.ToString(d);
             
             return new object[] { s };

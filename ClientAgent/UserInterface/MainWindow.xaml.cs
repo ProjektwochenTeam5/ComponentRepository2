@@ -53,12 +53,12 @@ namespace UserInterface
         /// <summary>
         /// The collection containing all available components.
         /// </summary>
-        private ObservableCollection<MyComponent> availableComps = new ObservableCollection<MyComponent>();
+        private ThreadSafeObservableCollection<MyComponent> availableComps = new ThreadSafeObservableCollection<MyComponent>();
 
         /// <summary>
         /// The collection containing the components which are set as favorites by the user.
         /// </summary>
-        private ObservableCollection<MyComponent> favorites = new ObservableCollection<MyComponent>();
+        private ThreadSafeObservableCollection<MyComponent> favorites = new ThreadSafeObservableCollection<MyComponent>();
 
         /// <summary>
         /// The collection containing all components which have an input hint that matches the any output of the selected item.

@@ -146,6 +146,7 @@ namespace UserInterface
             }
 
             base.OnExit(e);
+            Environment.Exit(0);
         }
 
         /// <summary>
