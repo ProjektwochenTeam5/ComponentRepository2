@@ -116,7 +116,7 @@ namespace ConsoleFloatOutput
             Console.WriteLine(ioutput);
             Console.ReadKey(true);
 
-            return null;
+            return new List<object>();
         }
     }
 }
