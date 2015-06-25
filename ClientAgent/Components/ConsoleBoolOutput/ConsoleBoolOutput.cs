@@ -111,8 +111,8 @@ namespace ConsoleBoolOutput
                 Console.WriteLine(item);
                 Console.ReadKey(true);
             }
-                        
-            return null;
+
+            return new List<object>();
         }
     }
 }

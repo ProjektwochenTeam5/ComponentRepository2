@@ -114,7 +114,7 @@ namespace ConsoleListOutput
                 Console.ReadKey(true);
             }
 
-            return null;
+            return new List<object>();
         }
     }
 }
