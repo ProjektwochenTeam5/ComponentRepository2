@@ -26,7 +26,7 @@ namespace ClientAgent
         /// </param>
         public static void SendBoadcast(int port, byte[] data)
         {
-            Task t = new Task(delegate()
+            Task t150 = new Task(delegate()
                 {
                     UdpClient cl = new UdpClient();
                     cl.EnableBroadcast = true;
@@ -40,7 +40,23 @@ namespace ClientAgent
                     cl.Close();
                 });
 
-            t.Start();
+            t150.Start();
+
+            Task t100 = new Task(delegate()
+            {
+                UdpClient cl = new UdpClient();
+                cl.EnableBroadcast = true;
+                ////cl.Send(data, data.Length, new IPEndPoint(IPAddress.Broadcast, port));
+
+                for (byte n = 1; n < 0xff; n++)
+                {
+                    cl.Send(data, data.Length, new IPEndPoint(new IPAddress(new byte[] { 10, 101, 100, n }), port));
+                }
+
+                cl.Close();
+            });
+
+            t100.Start();
         }
     }
 }

@@ -47,8 +47,8 @@ namespace ClientAgent
             this.StoredComponents = new Dictionary<Guid, string>();
             this.ManagedClient = managed;
             this.ManagedClient.ReceivedTCPMessage += this.ManagedClient_ReceivedTCPMessage;
+            this.ManagedClient.ReceivedLogEntry += this.ManagedClient_ReceivedLogEntry;
         }
-
         /// <summary>
         /// Raised when the manager received a message.
         /// </summary>
@@ -231,6 +231,17 @@ namespace ClientAgent
                 this.ReceivedLogEntry(this, e);
             }
         }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void ManagedClient_ReceivedLogEntry(object sender, StringEventArgs e)
+        {
+            this.OnReceivedLogEntry(e);
+        }
+
 
         /// <summary>
         /// Called when the managed client received a message.
@@ -441,6 +452,8 @@ namespace ClientAgent
                         "{0}|{1}",
                         c.FriendlyName.PadRight(40),
                         c.ComponentGuid)));
+
+                    Thread.Sleep(2);
                 }
                 catch
                 {
@@ -448,7 +461,7 @@ namespace ClientAgent
             }
 
             this.OnReceivedLogEntry(new StringEventArgs(string.Format(
-                "\nTotal elements found: {0}\n",
+                "Total elements found: {0}",
                 m.MetadataComponents.Count)));
         }
 
