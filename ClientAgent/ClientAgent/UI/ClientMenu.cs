@@ -21,6 +21,9 @@ namespace ClientAgent.UI
     using ConsoleGUI.IO;
     using System.Threading;
     using System.Diagnostics;
+    using ClientServerCommunication;
+    using System.IO;
+    using System.Runtime.Serialization.Formatters.Binary;
 
     /// <summary>
     /// Provides the client's main menu.
@@ -28,6 +31,8 @@ namespace ClientAgent.UI
     public class ClientMenu
         : Menu
     {
+        private static int lastPort = 12000;
+
         /// <summary>
         /// The 'Create Component' button.
         /// </summary>
@@ -230,20 +235,130 @@ namespace ClientAgent.UI
         private void GuiCommunication(object data)
         {
             ThreadArgs args = (ThreadArgs)data;
-            TcpListener ls = new TcpListener(new IPEndPoint(IPAddress.Any, 14999));
-            ls.Start();
+
             Process c = new Process();
             c.StartInfo.FileName = "UserInterface.exe";
-            c.StartInfo.Arguments = "14999";
 
-
-            while (!args.Stopped)
+            int port = 0;
+            TcpListener l;
+            do
             {
-                
+                try
+                {
+                    port = lastPort;
+                    l = new TcpListener(new IPEndPoint(IPAddress.Any, lastPort++));
+                    l.Start();
+                    if (lastPort >= 15000)
+                    {
+                        lastPort = 12000;
+                    }
 
-
-                Thread.Sleep(10);
+                    break;
+                }
+                catch
+                {
+                    Thread.Sleep(20);
+                }
             }
+            while (true);
+
+            c.StartInfo.Arguments = port.ToString();
+            c.StartInfo.CreateNoWindow = false;
+            c.Start();
+
+            if (!c.HasExited)
+            {
+                TcpClient cl = l.AcceptTcpClient();
+                BinaryFormatter f = new BinaryFormatter();
+
+                SendComponentInfos sci = new SendComponentInfos();
+                sci.MetadataComponents = this.Manager.StoredComponentInfos.ToArray();
+                MemoryStream ms = new MemoryStream();
+
+                f.Serialize(ms, sci);
+                long length = ms.Length;
+
+                byte b1, b100, b10000, b1000000;
+
+                b1 = (byte)(length % 0x100);
+                b100 = (byte)((length / 0x100) % 0x100);
+                b10000 = (byte)((length / 0x10000) % 0x100);
+                b1000000 = (byte)((length / 0x1000000) % 0x100);
+
+                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)sci.MessageType });
+                send.AddRange(ms.ToArray());
+
+                NetworkStream nstr = cl.GetStream();
+                nstr.Write(send.ToArray(), 0, send.Count);
+
+                // wait for answer
+                while (nstr.CanRead && nstr.CanWrite)
+                {
+                    if (nstr.DataAvailable)
+                    {
+                        byte[] hdr = new byte[9];
+
+                        nstr.Read(hdr, 0, 9);
+
+                        uint len;
+                        StatusCode sc;
+
+                        if (!Client.ParseHeader(hdr, out len, out sc))
+                        {
+                            continue;
+                        }
+
+                        byte[] body = new byte[len];
+                        int rcvbody = nstr.Read(body, 0, (int)len);
+
+                        using (MemoryStream nms = new MemoryStream(body))
+                        {
+                            Message rcv = (Message)f.Deserialize(nms);
+                            switch (rcv.MessageType)
+                            {
+                                case StatusCode.ExecuteJob:
+                                    ExecuteRequest eq = rcv as ExecuteRequest;
+                                    this.Client.SendMessage(eq);
+                                    break;
+
+                                case StatusCode.StorComponent:
+                                    StoreComponent stc = rcv as StoreComponent;
+                                    stc.IsComplex = true;
+                                    this.Client.SendMessage(stc);
+                                    break;
+
+                                case StatusCode.KeepAlive:
+                                    KeepAlive ka = rcv as KeepAlive;
+                                    if (ka.Terminate)
+                                    {
+                                        nstr.Close();
+                                        cl.Close();
+                                    }
+
+                                    break;
+                            }
+                        }
+                    }
+
+                    Thread.Sleep(10);
+                }
+
+                try
+                {
+                    cl.Client.Disconnect(false);
+                }
+                catch
+                {
+                }
+                finally
+                {
+                    l.Stop();
+                }
+
+                c.WaitForExit();
+            }
+
+            l.Stop();
         }
 
         /// <summary>
