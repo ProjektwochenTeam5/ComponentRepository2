@@ -154,6 +154,10 @@ namespace ConsoleGUI.Controls
         private void StackTextBox_TextAppended(object sender, EventArgs e)
         {
             this.Draw(this.Rectangle);
+            /*if (this.Owner != null)
+            {
+                this.Owner.Draw(this.Owner.Rectangle);
+            }*/
         }
     }
 }
