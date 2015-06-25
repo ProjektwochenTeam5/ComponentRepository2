@@ -104,9 +104,9 @@
                             Console.WriteLine("60 seconds over - Client deleted!");
                             break;
                         }
-                        catch (Exception e)
+                        catch (Exception ex)
                         {
-                            Console.WriteLine(e.Message);
+                            Console.WriteLine(ex.Message);
                         }
 
                     }
