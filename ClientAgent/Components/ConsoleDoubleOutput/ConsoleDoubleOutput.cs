@@ -112,7 +112,9 @@ namespace ConsoleDoubleOutput
                 ioutput += (double)item;
             }
 
+            Console.WriteLine("Please press enter to continue");
             Console.WriteLine(ioutput);
+            Console.ReadKey(true);
 
             return null;
         }

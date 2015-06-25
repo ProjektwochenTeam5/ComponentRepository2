@@ -26,9 +26,9 @@ namespace ConsoleListOutput
         public ConsoleListOutput()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(List<int>).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(List<long>).ToString() });
             this.OutputHints = new List<string>();
-            this.InputDescriptions = new List<string>(new[] { "int List" });
+            this.InputDescriptions = new List<string>(new[] { "long List" });
             this.OutputDescriptions = new List<string>();     
         }
 
@@ -105,11 +105,13 @@ namespace ConsoleListOutput
                 return new object[] { new ArgumentException() };
             }
 
-            List<int> something = (List<int>)values.ElementAt(0);
+            List<long> something = (List<long>)values.ElementAt(0);
 
             for (int i = 0; i < something.Count; i++)
             {
-                Console.WriteLine(something[i]);
+                Console.WriteLine("Please press enter to continue");
+                Console.WriteLine(something[i]);              
+                Console.ReadKey(true);
             }
 
             return null;

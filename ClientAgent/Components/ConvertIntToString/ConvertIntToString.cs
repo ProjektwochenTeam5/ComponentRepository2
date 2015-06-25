@@ -26,9 +26,9 @@ namespace ConvertIntToString
         public ConvertIntToString()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
-            this.InputDescriptions = new List<string>(new[] { "int" });
+            this.InputDescriptions = new List<string>(new[] { "long" });
             this.OutputDescriptions = new List<string>(new[] { "string" });            
         }
 
@@ -105,7 +105,7 @@ namespace ConvertIntToString
                 return new object[] { new ArgumentException() };
             }
 
-            int num = 0;
+            long num = 0;
 
             string s = Convert.ToString(num);
                      

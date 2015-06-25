@@ -111,8 +111,10 @@ namespace ConsoleStringOutput
             {
                 output += (string)item;
             }
-           
+
+            Console.WriteLine("Please press enter to continue");
             Console.WriteLine(output);
+            Console.ReadKey(true);
 
             return null;
         }

@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleIntOutput.cs" company="FHWN"> 
+// <copyright file="ConsoleLongOutput.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleIntOutput
+namespace ConsoleLongOutput
 {
     using System;
     using System.Collections.Generic;
@@ -18,12 +18,12 @@ namespace ConsoleIntOutput
     /// <summary>
     /// This is the component class for the console output.
     /// </summary>
-    public class ConsoleIntOutput : IComponent
+    public class ConsoleLongOutput : IComponent
     {        
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleIntOutput"/> class.
+        /// Initializes a new instance of the <see cref="ConsoleLongOutput"/> class.
         /// </summary>
-        public ConsoleIntOutput()
+        public ConsoleLongOutput()
         {
             this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
@@ -50,7 +50,7 @@ namespace ConsoleIntOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console integer output"; }
+            get { return "Console long output"; }
         }
 
         /// <summary>
@@ -110,9 +110,11 @@ namespace ConsoleIntOutput
             foreach (var item in values)
             {
                 ioutput += (long)item;
-            }                      
+            }
 
+            Console.WriteLine("Please press enter to continue");
             Console.WriteLine(ioutput);
+            Console.ReadKey(true);
 
             return null;
         }
