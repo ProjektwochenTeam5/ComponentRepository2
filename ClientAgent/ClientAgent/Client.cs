@@ -24,6 +24,7 @@ namespace ClientAgent
     using System.Threading;
     using ClientServerCommunication;
     using Core.Network;
+    using ConsoleGUI;
 
     /// <summary>
     /// Provides an abstract view on a client.
@@ -91,6 +92,11 @@ namespace ClientAgent
         public event EventHandler<MessageReceivedEventArgs> ReceivedTCPMessage;
 
         /// <summary>
+        /// Raised when the client received a log entry.
+        /// </summary>
+        public event EventHandler<StringEventArgs> ReceivedLogEntry;
+
+        /// <summary>
         /// Gets a value indicating whether the client is connected.
         /// </summary>
         /// <value>
@@ -141,6 +147,36 @@ namespace ClientAgent
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="m"></param>
+        /// <returns></returns>
+        public static byte[] SerializeMessage(Message m)
+        {
+            byte[] ret = null;
+            BinaryFormatter f = new BinaryFormatter();
+            using (MemoryStream ms = new MemoryStream())
+            {
+                f.Serialize(ms, m);
+
+                long length = ms.Length;
+
+                byte b1, b100, b10000, b1000000;
+
+                b1 = (byte)(length % 0x100);
+                b100 = (byte)((length / 0x100) % 0x100);
+                b10000 = (byte)((length / 0x10000) % 0x100);
+                b1000000 = (byte)((length / 0x1000000) % 0x100);
+
+                List<byte> r = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)m.MessageType });
+                r.AddRange(ms.ToArray());
+                ret = r.ToArray();
+            }
+
+            return ret;
+        }
+
+        /// <summary>
         /// Starts searching for a server.
         /// </summary>
         /// <exception cref="System.InvalidOperationException">
@@ -157,6 +193,7 @@ namespace ClientAgent
             this.udpListenerThread = new Thread(UdpThread);
             this.udpListenerThreadArgs = new UdpClientThreadArgs(new UdpClient(new IPEndPoint(IPAddress.Any, 1234)), this);
             this.udpListenerThread.Start(this.udpListenerThreadArgs);
+            this.OnReceivedLogEntry(new StringEventArgs("Started connection search..."));
         }
 
         /// <summary>
@@ -183,6 +220,10 @@ namespace ClientAgent
                 this.ConnectionClient.Connect(pt);
                 this.ConnectedEndPoint = pt;
                 this.OnConnected(EventArgs.Empty);
+                this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                    "Connected to {0}:{1}",
+                    this.ConnectedEndPoint.Address,
+                    this.ConnectedEndPoint.Port)));
             }
             catch (SocketException)
             {
@@ -197,6 +238,11 @@ namespace ClientAgent
         {
             this.SendMessage(new KeepAlive() { Terminate = true });
             this.ConnectionClient.Close();
+            this.OnDisconnected(EventArgs.Empty);
+            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                "Disconnected from {0}:{1}",
+                this.ConnectedEndPoint.Address,
+                this.ConnectedEndPoint.Port)));
         }
 
         /// <summary>
@@ -283,6 +329,20 @@ namespace ClientAgent
             if (this.ReceivedTCPMessage != null)
             {
                 this.ReceivedTCPMessage(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ReceivedLogEntry"/> event.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains the string that shall be logged.
+        /// </param>
+        protected void OnReceivedLogEntry(StringEventArgs e)
+        {
+            if (this.ReceivedLogEntry != null)
+            {
+                this.ReceivedLogEntry(this, e);
             }
         }
 

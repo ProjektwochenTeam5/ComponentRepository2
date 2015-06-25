@@ -28,12 +28,12 @@ namespace ClientAgent
             ////byte current = 1;
             UdpClient cl = new UdpClient();
             cl.EnableBroadcast = true;
-            ////cl.Send(data, data.Length, new IPEndPoint(IPAddress.Broadcast, port));
+            cl.Send(data, data.Length, new IPEndPoint(IPAddress.Broadcast, port));
             
-            for (byte n = 1; n < 0xff; n++)
+            /*for (byte n = 1; n < 0xff; n++)
             {
                 cl.Send(data, data.Length, new IPEndPoint(new IPAddress(new byte[] { 10, 101, 150, n }), port));    
-            }
+            }*/
 
             cl.Close();
         }

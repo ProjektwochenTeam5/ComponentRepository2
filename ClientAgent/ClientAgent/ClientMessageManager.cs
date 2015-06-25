@@ -23,6 +23,7 @@ namespace ClientAgent
     using System.Threading.Tasks;
     using ClientServerCommunication;
     using Core.Network;
+    using ConsoleGUI;
 
     /// <summary>
     /// Manages messages received by a client.
@@ -77,6 +78,11 @@ namespace ClientAgent
         /// Raised when the manager received a transfer job request.
         /// </summary>
         public event EventHandler<MessageReceivedEventArgs> ReceivedTransferJobRequestMessage;
+
+        /// <summary>
+        /// Raised when the manager received a log entry.
+        /// </summary>
+        public event EventHandler<StringEventArgs> ReceivedLogEntry;
 
         /// <summary>
         /// Gets the received messages with their IDs.
@@ -209,6 +215,20 @@ namespace ClientAgent
             if (this.ReceivedTransferJobRequestMessage != null)
             {
                 this.ReceivedTransferJobRequestMessage(this, e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the <see cref="ReceivedLogEntry"/> event.
+        /// </summary>
+        /// <param name="e">
+        ///     Contains the string that shall be logged.
+        /// </param>
+        protected void OnReceivedLogEntry(StringEventArgs e)
+        {
+            if (this.ReceivedLogEntry != null)
+            {
+                this.ReceivedLogEntry(this, e);
             }
         }
 
@@ -422,6 +442,7 @@ namespace ClientAgent
             {
                 sent = true;
 
+                /*
                 var addGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Add").ComponentGuid;
                 var inpGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
                 var outGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Output").ComponentGuid;
@@ -495,9 +516,12 @@ namespace ClientAgent
                 rq.Job = job;
                 this.WaitingMessages.Add(rq);
                 this.ManagedClient.SendMessage(rq);
+                */
             }
 
-            Console.WriteLine("\nTotal elements found: {0}\n", m.MetadataComponents.Count);
+            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                "\nTotal elements found: {0}\n",
+                m.MetadataComponents.Count)));
         }
 
         static bool sent = false;

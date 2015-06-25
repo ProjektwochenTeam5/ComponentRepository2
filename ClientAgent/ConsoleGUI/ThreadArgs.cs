@@ -10,20 +10,20 @@
 namespace ConsoleGUI
 {
     /// <summary>
-    /// Provides a base class for all thread argument classes. This class is abstract.
+    /// Provides a base class for all thread argument classes.
     /// </summary>
-    public abstract class ThreadArgs
+    public class ThreadArgs
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ThreadArgs"/> class.
         /// </summary>
-        protected ThreadArgs()
+        public ThreadArgs()
         {
             this.Stopped = false;
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether the underlying thread shall be stopped.
+        /// Gets a value indicating whether the underlying thread shall be stopped.
         /// </summary>
         /// <value>
         ///     Contains a value indicating whether the underlying thread shall be stopped.
@@ -31,7 +31,15 @@ namespace ConsoleGUI
         public bool Stopped
         {
             get;
-            set;
+            private set;
+        }
+
+        /// <summary>
+        /// Stops the thread.
+        /// </summary>
+        public void Stop()
+        {
+            this.Stopped = true;
         }
     }
 }

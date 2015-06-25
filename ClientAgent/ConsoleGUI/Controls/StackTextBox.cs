@@ -36,6 +36,7 @@ namespace ConsoleGUI.Controls
         public StackTextBox(ICollection<IRenderer> outputs)
             : base(outputs)
         {
+            this.Lines = new List<string>(this.Rectangle.Height + 1);
             this.TextAppended += this.StackTextBox_TextAppended;
         }
 
@@ -59,29 +60,75 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
+        /// 
+        /// </summary>
+        private List<string> Lines
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
         /// Appeds a line to the text.
         /// </summary>
         /// <param name="line">
         ///     The string that shall be appended.
         /// </param>
-        public void PushLine(string line)
+        public void PushLine(StringEventArgs line)
         {
+            if (this.Lines.Count >= this.Rectangle.Height)
+            {
+                this.Lines.RemoveRange(0, this.Lines.Count - this.Rectangle.Height);
+            }
+
+            this.Lines.Add(string.Format("{0}: {1}", line.TimeStamp, line.String));
             this.Text += string.Format("{0}\n", line);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public override Pixel[,] GetPixels()
         {
-            throw new NotImplementedException();
+            Pixel[,] ret = new Pixel[this.Rectangle.Width, this.Rectangle.Height];
+            int mid = this.Rectangle.Height / 2;
+
+            for (int y = 0; y < this.Rectangle.Height; y++)
+            {
+                // get the line string
+                string curentLine = this.Lines.Count > y ? this.Lines[y] : string.Empty;
+
+                for (int x = 0; x < this.Rectangle.Width; x++)
+                {
+                    ret[x, y] = new Pixel(
+                        this.BackgroundColor,
+                        this.ForegroundColor,
+                        x < curentLine.Length ? curentLine[x] : ' ');
+                }
+            }
+
+            return ret;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="k"></param>
+        /// <returns></returns>
         public override bool Receive(ConsoleKeyInfo k)
         {
-            throw new NotImplementedException();
+            return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public override bool Receive(string s)
         {
-            this.Text += string.Format("{0}\n", s);
+            this.PushLine(new StringEventArgs(string.Format("{0}\n", s)));
             return true;
         }
 

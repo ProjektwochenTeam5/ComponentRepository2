@@ -40,7 +40,6 @@ namespace ConsoleGUI.IO
         /// </summary>
         public ConsoleInput()
         {
-            this.readerArgs = new InputThreadArgs();
         }
 
         /// <summary>
@@ -58,7 +57,7 @@ namespace ConsoleGUI.IO
                 throw new InvalidOperationException("Reader is already running.");
             }
 
-            this.readerArgs.Stopped = false;
+            this.readerArgs = new InputThreadArgs();
             this.readerThread = new Thread(this.Reader);
             this.readerThread.Start(this.readerArgs);
         }
@@ -73,7 +72,7 @@ namespace ConsoleGUI.IO
                 throw new InvalidOperationException("Reader is already stopped.");
             }
 
-            this.readerArgs.Stopped = true;
+            this.readerArgs.Stop();
         }
 
         /// <summary>

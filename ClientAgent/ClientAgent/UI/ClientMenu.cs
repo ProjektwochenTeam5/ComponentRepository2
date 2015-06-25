@@ -12,18 +12,19 @@
 
 namespace ClientAgent.UI
 {
+    using ClientServerCommunication;
+    using ConsoleGUI;
+    using ConsoleGUI.Controls;
+    using ConsoleGUI.IO;
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
-    using ConsoleGUI.Controls;
-    using ConsoleGUI.IO;
-    using System.Threading;
-    using System.Diagnostics;
-    using ClientServerCommunication;
-    using System.IO;
     using System.Runtime.Serialization.Formatters.Binary;
+    using System.Threading;
 
     /// <summary>
     /// Provides the client's main menu.
@@ -31,6 +32,9 @@ namespace ClientAgent.UI
     public class ClientMenu
         : Menu
     {
+        /// <summary>
+        /// The last tried port for the GUI connection.
+        /// </summary>
         private static int lastPort = 12000;
 
         /// <summary>
@@ -54,17 +58,12 @@ namespace ClientAgent.UI
         private MenuButton buttonQuit;
 
         /// <summary>
-        /// The status label.
-        /// </summary>
-        private Label labelStatus;
-
-        /// <summary>
-        /// The statuc stack text box.
+        /// The status stack text box.
         /// </summary>
         private StackTextBox stacktextboxStatus;
 
         /// <summary>
-        /// The thread responsible for communicating wth the GUI.
+        /// The thread responsible for communicating with the GUI.
         /// </summary>
         private Thread guiThread;
 
@@ -109,30 +108,27 @@ namespace ClientAgent.UI
             this.buttonQuit = new MenuButton() { Enabled = true, LinkedKey = ConsoleKey.F12, Text = "F12 Quit", Visible = true };
             this.buttonQuit.ButtonKeyPressed += this.ButtonQuit_ButtonKeyPressed;
 
-            // Status Label
-            this.labelStatus = new Label(this.Renderers);
-            this.labelStatus.Text = string.Empty;
-            this.labelStatus.Rectangle = new ConsoleGUI.Rectangle(0, 0, 64, 5);
-
             // Satus Stack Text Box
-            /*this.stacktextboxStatus = new StackTextBox(outputs);
+            this.stacktextboxStatus = new StackTextBox(this.Renderers) { Visible = true };
             this.stacktextboxStatus.BackgroundColor = ConsoleColor.Blue;
-            this.stacktextboxStatus.ForegroundColor = ConsoleColor.White;*/
+            this.stacktextboxStatus.ForegroundColor = ConsoleColor.White;
+            this.stacktextboxStatus.Rectangle = new ConsoleGUI.Rectangle(0, 0, 80, 25);
 
             // Add buttons
             this.Buttons.AddRange(new[] { this.buttonCreateComponent, this.buttonShowComponents, this.buttonShowJobs, this.buttonQuit });
 
             // Add controls
-            this.Controls.Add(this.labelStatus);
+            this.Controls.Add(this.stacktextboxStatus);
 
             // Add Input Receivers
-            // ++++++++++
-            // Events
             // ++++++++++
             // Initialize Client
             this.Client = new Client(c);
             this.Client.Connected += this.Client_Connected;
             this.Manager = new ClientMessageManager(this.Client);
+            
+            // Events
+            this.Client.ReceivedLogEntry += this.Client_ReceivedLogEntry;
         }
 
         /// <summary>
@@ -160,12 +156,20 @@ namespace ClientAgent.UI
         }
 
         /// <summary>
+        /// Appends a line to the 
+        /// </summary>
+        /// <param name="text"></param>
+        public void PushLine(StringEventArgs text)
+        {
+            this.stacktextboxStatus.PushLine(text);
+        }
+
+        /// <summary>
         /// Starts the underlying client.
         /// </summary>
         public void StartWork()
         {
             this.Client.StartConnectionSearch();
-            this.labelStatus.Text = "Started Connection search...";
         }
 
         /// <summary>
@@ -174,6 +178,20 @@ namespace ClientAgent.UI
         public void StopWork()
         {
             this.Client.StopAll();
+        }
+
+        /// <summary>
+        /// Called when the linked key of the 'Show Jobs' button was pressed.
+        /// </summary>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains the received logging string.
+        /// </param>
+        private void Client_ReceivedLogEntry(object sender, StringEventArgs e)
+        {
+            this.PushLine(e);
         }
 
         /// <summary>
@@ -248,10 +266,7 @@ namespace ClientAgent.UI
                     port = lastPort;
                     l = new TcpListener(new IPEndPoint(IPAddress.Any, lastPort++));
                     l.Start();
-                    if (lastPort >= 15000)
-                    {
-                        lastPort = 12000;
-                    }
+                    lastPort = lastPort >= 15000 ? 12000 : lastPort;
 
                     break;
                 }
@@ -269,27 +284,23 @@ namespace ClientAgent.UI
             if (!c.HasExited)
             {
                 TcpClient cl = l.AcceptTcpClient();
-                BinaryFormatter f = new BinaryFormatter();
-
-                SendComponentInfos sci = new SendComponentInfos();
-                sci.MetadataComponents = this.Manager.StoredComponentInfos.ToArray();
-                MemoryStream ms = new MemoryStream();
-
-                f.Serialize(ms, sci);
-                long length = ms.Length;
-
-                byte b1, b100, b10000, b1000000;
-
-                b1 = (byte)(length % 0x100);
-                b100 = (byte)((length / 0x100) % 0x100);
-                b10000 = (byte)((length / 0x10000) % 0x100);
-                b1000000 = (byte)((length / 0x1000000) % 0x100);
-
-                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)sci.MessageType });
-                send.AddRange(ms.ToArray());
 
                 NetworkStream nstr = cl.GetStream();
-                nstr.Write(send.ToArray(), 0, send.Count);
+
+                EventHandler<MessageReceivedEventArgs> receivedCompInfo = delegate(object sender, MessageReceivedEventArgs e)
+                {
+                    byte[] msg = Client.SerializeMessage(e.ReceivedMessage);
+                    nstr.Write(msg, 0, msg.Length);
+                };
+
+                this.Manager.ReceivedSendComponentInfoMessage += receivedCompInfo;
+                BinaryFormatter f = new BinaryFormatter();
+
+                // send start components
+                SendComponentInfos sci = new SendComponentInfos();
+                sci.MetadataComponents = this.Manager.StoredComponentInfos.ToArray();
+                byte[] ci = Client.SerializeMessage(sci);
+                nstr.Write(ci, 0, ci.Length);
 
                 // wait for answer
                 while (nstr.CanRead && nstr.CanWrite)
@@ -387,7 +398,6 @@ namespace ClientAgent.UI
         /// </param>
         private void Client_Connected(object sender, EventArgs e)
         {
-            this.labelStatus.Text = "Connected to a server!";
         }
     }
 }
