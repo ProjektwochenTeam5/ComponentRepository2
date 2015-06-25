@@ -167,6 +167,10 @@ namespace Server
                         //Console.WriteLine("Ergebnis: " + ((int)resultEdge.ComponentResult).ToString());
                         ResultList.Add(resultEdge.ComponentResult);
                     }
+
+                    Manager.SendJobToClient(outputGuid, ResultList, JobGuid);
+
+                    ResultList = new List<object>();
                 }
 
                 // jetzt haben wir alle Ergebnisse abgearbeitet --> fertig!!!

@@ -399,7 +399,10 @@ namespace ClientAgent
             }
 
             Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
-            Console.WriteLine("Error from {0}: {1}", snd.MessageID, received.Message);
+            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                "Error from {0}: {1}",
+                snd.MessageID,
+                received.Message)));
 
             if (snd == null)
             {
@@ -425,106 +428,29 @@ namespace ClientAgent
 
             this.storedComponentInfos = new Collection<Component>(m.MetadataComponents.ToList());
 
-            Console.WriteLine("{0}|{1}", "Friendly Name".PadRight(40), "Guid");
+            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                "{0}|{1}",
+                "Friendly Name".PadRight(40),
+                "Guid")));
 
             foreach (Component c in m.MetadataComponents)
             {
                 try
                 {
-                    Console.WriteLine("{0}|{1}", c.FriendlyName.PadRight(40), c.ComponentGuid);
+                    this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                        "{0}|{1}",
+                        c.FriendlyName.PadRight(40),
+                        c.ComponentGuid)));
                 }
                 catch
                 {
                 }
             }
 
-            if (!sent && m.MetadataComponents.Count > 2)
-            {
-                sent = true;
-
-                /*
-                var addGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Add").ComponentGuid;
-                var inpGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Int Input").ComponentGuid;
-                var outGuid = this.StoredComponentInfos.First(c => c.FriendlyName == "Console Output").ComponentGuid;
-
-                var intaddGuid1 = Guid.NewGuid();
-                var intaddGuid2 = Guid.NewGuid();
-                var intinpGuid1 = Guid.NewGuid();
-                var intinpGuid2 = Guid.NewGuid();
-                var intinpGuid3 = Guid.NewGuid();
-                var intoutGuid = Guid.NewGuid();
-                
-                //////////////// Testjob
-                Component job = new Component();
-                job.ComponentGuid = new Guid();
-                job.FriendlyName = "Addieren von 3 Zahlen";
-                job.InputDescriptions = new List<string>() { "zahl1", "zahl2", "zahl3" };
-                job.OutputDescriptions = new List<string>() { "zahl" };
-                job.InputHints = new List<string>() { typeof(int).ToString(), typeof(int).ToString(), typeof(int).ToString() };
-                job.IsAtomic = false;
-                job.Edges = new List<ComponentEdge>();
-
-                var edge1 = new ComponentEdge();
-                edge1.InputComponentGuid = addGuid;
-                edge1.OutputComponentGuid = inpGuid;
-                edge1.InternalInputComponentGuid = intaddGuid1;
-                edge1.InternalOutputComponentGuid = intinpGuid1;
-                edge1.InputValueID = 1;
-                edge1.OutputValueID = 1;
-
-                var edge2 = new ComponentEdge();
-                edge2.InputComponentGuid = addGuid;
-                edge2.OutputComponentGuid = inpGuid;
-                edge2.InternalInputComponentGuid = intaddGuid1;
-                edge2.InternalOutputComponentGuid = intinpGuid2;
-                edge2.InputValueID = 2;
-                edge2.OutputValueID = 1;
-
-                var edge3 = new ComponentEdge();
-                edge3.InputComponentGuid = addGuid;
-                edge3.OutputComponentGuid = addGuid;
-                edge3.InternalInputComponentGuid = intaddGuid2;
-                edge3.InternalOutputComponentGuid = intaddGuid1;
-                edge3.InputValueID = 1;
-                edge3.OutputValueID = 1;
-
-                var edge4 = new ComponentEdge();
-                edge4.InputComponentGuid = addGuid;
-                edge4.OutputComponentGuid = inpGuid;
-                edge4.InternalInputComponentGuid = intaddGuid2;
-                edge4.InternalOutputComponentGuid = intinpGuid3;
-                edge4.InputValueID = 2;
-                edge4.OutputValueID = 1;
-
-                var edge5 = new ComponentEdge();
-                edge5.InputComponentGuid = outGuid;
-                edge5.OutputComponentGuid = addGuid;
-                edge5.InternalInputComponentGuid = intoutGuid;
-                edge5.InternalOutputComponentGuid = intaddGuid2;
-                edge5.InputValueID = 1;
-                edge5.OutputValueID = 1;
-
-                List<ComponentEdge> myedges = new List<ComponentEdge>();
-
-                myedges.Add(edge1);
-                myedges.Add(edge2);
-                myedges.Add(edge3);
-                myedges.Add(edge4);
-                myedges.Add(edge5);
-                job.Edges = myedges.AsEnumerable();
-                DoJobRequest rq = new DoJobRequest();
-                rq.Job = job;
-                this.WaitingMessages.Add(rq);
-                this.ManagedClient.SendMessage(rq);
-                */
-            }
-
             this.OnReceivedLogEntry(new StringEventArgs(string.Format(
                 "\nTotal elements found: {0}\n",
                 m.MetadataComponents.Count)));
         }
-
-        static bool sent = false;
 
         /// <summary>
         /// Processes a received acknowledge message.
@@ -540,7 +466,10 @@ namespace ClientAgent
                 return;
             }
 
-            Console.WriteLine("Acknowledge {0}!", received.BelongsTo);
+            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                "Acknowledge {0}!",
+                received.BelongsTo)));
+
             Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
 
             if (snd == null)

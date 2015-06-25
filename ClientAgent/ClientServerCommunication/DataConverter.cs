@@ -114,6 +114,7 @@ namespace ClientServerCommunication
                 {
                     inde.Add(item);
                 }
+                c.InputDescriptions = inde;
             }
             else
             {
@@ -128,6 +129,8 @@ namespace ClientServerCommunication
                 {
                     outde.Add(item);
                 }
+
+                c.OutputDescriptions = outde;
             }
             else
             {

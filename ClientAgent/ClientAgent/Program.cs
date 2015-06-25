@@ -51,7 +51,12 @@ namespace ClientAgent
             ConsoleRenderer r = new ConsoleRenderer();
 
             // Main Menu
-            mainMenu = new ClientMenu(new[] { r }, input, new TcpClient(new IPEndPoint(IPAddress.Any, 12345)));
+            mainMenu = new ClientMenu(new[] { r }, input, new TcpClient(new IPEndPoint(IPAddress.Any, 12345))
+            {
+                ReceiveBufferSize = ushort.MaxValue * 16,
+                SendBufferSize = ushort.MaxValue * 16,
+                SendTimeout = 30
+            });
             mainMenu.StartWork();
             mainMenu.Show();
 

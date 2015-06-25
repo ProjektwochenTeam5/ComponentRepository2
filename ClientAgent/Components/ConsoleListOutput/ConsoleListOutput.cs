@@ -109,7 +109,9 @@ namespace ConsoleListOutput
 
             for (int i = 0; i < something.Count; i++)
             {
-                Console.WriteLine(something[i]);
+                Console.WriteLine("Please press enter to continue");
+                Console.WriteLine(something[i]);              
+                Console.ReadKey(true);
             }
 
             return null;

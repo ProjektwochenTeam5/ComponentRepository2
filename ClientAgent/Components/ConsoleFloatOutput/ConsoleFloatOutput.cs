@@ -110,9 +110,11 @@ namespace ConsoleFloatOutput
             foreach (var item in values)
             {
                 ioutput += (float)item;
-            }                        
-           
+            }
+
+            Console.WriteLine("Please press enter to continue");
             Console.WriteLine(ioutput);
+            Console.ReadKey(true);
 
             return null;
         }

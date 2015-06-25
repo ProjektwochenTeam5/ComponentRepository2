@@ -129,6 +129,7 @@ namespace ClientAgent.UI
             
             // Events
             this.Client.ReceivedLogEntry += this.Client_ReceivedLogEntry;
+            this.Manager.ReceivedLogEntry += this.Client_ReceivedLogEntry;
         }
 
         /// <summary>
@@ -219,7 +220,6 @@ namespace ClientAgent.UI
         /// </param>
         private void ButtonShowComponents_ButtonKeyPressed(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -233,7 +233,7 @@ namespace ClientAgent.UI
         /// </param>
         private void ButtonCreateComponent_ButtonKeyPressed(object sender, EventArgs e)
         {
-            if (this.guiThread != null && !this.guiThread.IsAlive)
+            if (this.guiThread != null && this.guiThread.IsAlive)
             {
                 // stop
                 this.guiThreadArgs.Stop();
@@ -285,6 +285,9 @@ namespace ClientAgent.UI
             if (!c.HasExited)
             {
                 TcpClient cl = l.AcceptTcpClient();
+                cl.SendTimeout = 30;
+                cl.SendBufferSize = ushort.MaxValue * 16;
+                cl.ReceiveBufferSize = ushort.MaxValue * 16;
 
                 NetworkStream nstr = cl.GetStream();
 
@@ -299,9 +302,12 @@ namespace ClientAgent.UI
 
                 // send start components
                 SendComponentInfos sci = new SendComponentInfos();
-                sci.MetadataComponents = this.Manager.StoredComponentInfos;
+                sci.MetadataComponents = this.Manager.StoredComponentInfos.ToArray();
                 byte[] ci = Client.SerializeMessage(sci);
+
+                Thread.Sleep(500);
                 nstr.Write(ci, 0, ci.Length);
+                nstr.Flush();
 
                 // wait for answer
                 while (nstr.CanRead && nstr.CanWrite)
@@ -321,15 +327,22 @@ namespace ClientAgent.UI
                         }
 
                         byte[] body = new byte[len];
+
                         int rcvbody = nstr.Read(body, 0, (int)len);
+
+                        do
+                        {
+                            Thread.Sleep(50);
+                        }
+                        while (rcvbody < len);
 
                         using (MemoryStream nms = new MemoryStream(body))
                         {
                             Message rcv = (Message)f.Deserialize(nms);
                             switch (rcv.MessageType)
                             {
-                                case StatusCode.ExecuteJob:
-                                    ExecuteRequest eq = rcv as ExecuteRequest;
+                                case StatusCode.DoJobRequest:
+                                    DoJobRequest eq = rcv as DoJobRequest;
                                     this.Client.SendMessage(eq);
                                     
                                     break;

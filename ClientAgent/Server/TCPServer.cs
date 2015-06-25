@@ -76,7 +76,10 @@ namespace Server
             clientInfo.ClientGuid = Guid.NewGuid();
             clientInfo.IpAddress = ((IPEndPoint)client.Client.RemoteEndPoint).Address;
             clientInfo.FriendlyName = "Markus";
+            client.SendTimeout = 30;
             this.Clients.Add(clientInfo, client);
+            client.SendBufferSize = UInt16.MaxValue * 16;
+            client.ReceiveBufferSize = UInt16.MaxValue * 16;
             NetworkStream ns = client.GetStream();
 
             this.FireOnClientFetched(new ClientFetchedEventArgs(clientInfo));
@@ -238,6 +241,8 @@ namespace Server
             try
             {
                 stream.Write(message, 0, message.Length);
+                stream.Flush();
+
                 Console.WriteLine("Sending Message! + {0} bytes!", message.Length);
             }
             catch (Exception ex)
@@ -254,6 +259,7 @@ namespace Server
                 try
                 {
                     stream.Write(message, 0, message.Length);
+                    stream.Flush();
                     Console.WriteLine("Sending Message!");
                 }
                 catch (Exception ex)
