@@ -44,6 +44,11 @@ namespace UserInterface
 
             if (childComponent.InputHints != null)
             {
+                if (childComponent.InputDescriptions == null)
+                {
+                    childComponent.InputDescriptions = new string[childComponent.InputHints.Count()];
+                }
+
                 hints = childComponent.InputHints.ToArray();
                 descs = childComponent.InputDescriptions.ToArray();
 
@@ -62,6 +67,11 @@ namespace UserInterface
 
             if (childComponent.OutputHints != null)
             {
+                if (childComponent.OutputDescriptions == null)
+                {
+                    childComponent.OutputDescriptions = new string[childComponent.OutputHints.Count()];
+                }
+
                 hints = childComponent.OutputHints.ToArray();
                 descs = childComponent.OutputDescriptions.ToArray();
 
