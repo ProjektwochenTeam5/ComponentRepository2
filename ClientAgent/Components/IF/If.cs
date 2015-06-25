@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleIntOutput.cs" company="FHWN"> 
+// <copyright file="If.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleIntOutput
+namespace If
 {
     using System;
     using System.Collections.Generic;
@@ -16,20 +16,20 @@ namespace ConsoleIntOutput
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for the console output.
+    /// This is the component class for doing IF-Statements.
     /// </summary>
-    public class ConsoleIntOutput : IComponent
-    {        
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleIntOutput"/> class.
+    public class If
+    {
+         /// <summary>
+        /// Initializes a new instance of the <see cref="If"/> class.
         /// </summary>
-        public ConsoleIntOutput()
+        public If()
         {
-            this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
-            this.OutputHints = new List<string>();
-            this.InputDescriptions = new List<string>(new[] { "long" });
-            this.OutputDescriptions = new List<string>();     
+            this.ComponentGuid = new Guid();
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString()});
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString(), typeof(bool).ToString() });
+            this.InputDescriptions = new List<string>();
+            this.OutputDescriptions = new List<string>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ConsoleIntOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console integer output"; }
+            get { return "If Statement"; }
         }
 
         /// <summary>
@@ -102,19 +102,18 @@ namespace ConsoleIntOutput
         {
             if (values.Count() != 1)
             {
-                return new object[] { new ArgumentException() };
+                yield return new object[] { new ArgumentException() };
             }
 
-            long ioutput = 0;
-            
-            foreach (var item in values)
+            bool check = (bool)values.ElementAt(0);
+
+            if (check == true)
             {
-                ioutput += (long)item;
-            }                      
 
-            Console.WriteLine(ioutput);
-
-            return null;
-        }
+            }
+            
+            
+            yield return result;
+        }       
     }
 }
