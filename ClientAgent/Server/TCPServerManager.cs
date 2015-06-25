@@ -162,12 +162,22 @@
                 componentlist.Add(this.MyTCPServer.Wrapper.ReadInfosFromDatFile(item.Key));
             }
 
+
             ///////////////// Componentlist fertig
 
             SendComponentInfos sendcompinfos = new SendComponentInfos();
             sendcompinfos.MetadataComponents = componentlist;
 
             byte[] senddata = DataConverter.ConvertMessageToByteArray(6, DataConverter.ConvertObjectToByteArray(sendcompinfos));
+
+
+            foreach (var item in componentlist)
+            {
+                if (!this.Components.Keys.Contains(item.ComponentGuid))
+                {
+                    this.Components.Add(item.ComponentGuid, item);
+                }
+            }
 
             return senddata;
         }
@@ -186,6 +196,56 @@
             foreach (var item in this.MyTCPServer.Wrapper.ComplexData)
             {
                 this.ComplexComponent.Add(Guid.NewGuid(), item.Key);
+            }
+
+            this.MyTCPServer.Wrapper.ReadData();
+            Dictionary<IComponent, Guid> componentdic = new Dictionary<IComponent, Guid>();
+
+            foreach (var item in this.MyTCPServer.Wrapper.AtomicData)
+            {
+                Guid g = default(Guid);
+
+                foreach (var keyvaluepair in this.Dlls)
+                {
+                    if (keyvaluepair.Value == item.Value)
+                    {
+                        g = keyvaluepair.Key;
+                        break;
+                    }
+                }
+
+                componentdic.Add(this.MyTCPServer.Wrapper.ReadComponentInfoFormDll(item.Key), g);
+            }
+
+
+            /////////////////// IComponentdictionary fertig
+
+            List<Component> componentlist = new List<Component>();
+
+            foreach (var item in componentdic)
+            {
+                componentlist.Add(DataConverter.MapIComponentToNetworkComponent(item.Key, item.Value));
+            }
+
+            foreach (var item in componentlist)
+            {
+                if (!this.Components.Keys.Contains(item.ComponentGuid))
+                {
+                    this.Components.Add(item.ComponentGuid, item);
+                }
+            }
+
+            foreach (var item in this.MyTCPServer.Wrapper.ComplexData)
+            {
+                componentlist.Add(this.MyTCPServer.Wrapper.ReadInfosFromDatFile(item.Key));
+            }
+
+            foreach (var item in componentlist)
+            {
+                if (!this.Components.Keys.Contains(item.ComponentGuid))
+                {
+                    this.Components.Add(item.ComponentGuid, item);
+                }
             }
 
             this.MyTCPServer.Run();
