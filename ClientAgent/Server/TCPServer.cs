@@ -103,72 +103,9 @@ namespace Server
                     Thread.Sleep(10);
                     int rcvbody = ns.Read(body, 0, (int)bodylen);
 
-
-
-
                     this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, messagType, clientInfo));
                 }
             }
-
-            //{
-            //    bool cont = true;
-            //    byte[] body = null;
-            //    byte messagetype = 0;
-
-            //    if (ns.DataAvailable)
-            //    {
-            //        int index = 0;
-            //        while (cont)
-            //        {
-            //            byte[] buffer = new byte[1024];
-
-            //            int recievedbytes = ns.Read(buffer, 0, buffer.Length);
-            //            Console.WriteLine(recievedbytes + " bytes recieved");
-
-            //            if (body == null)
-            //            {
-            //                byte[] messageLength = new byte[4];
-
-            //                for (int i = 0; i < 4; i++)
-            //                {
-            //                    messageLength[i] = buffer[4 + i];
-            //                }
-
-            //                var length = BitConverter.ToInt32(messageLength, 0) + 9;
-            //                messagetype = buffer[8];
-            //                body = new byte[length - 9];
-
-            //                for (int i = 9; i < body.Length + 9; i++)
-            //                {
-            //                    body[index] = buffer[i];
-            //                    index++;
-            //                }
-
-            //                if (length >= buffer.Length)
-            //                {
-            //                    continue;
-            //                }
-            //                else
-            //                {
-            //                    this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
-            //                    break;
-            //                }
-            //            }
-
-            //            for (int i = 0; i < recievedbytes; i++)
-            //            {
-            //                body[index] = buffer[i];
-            //                index++;
-            //            }
-
-            //            if (index >= body.Length)
-            //            {
-            //                this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, (StatusCode)messagetype, clientInfo));
-            //                break;
-            //            }
-            //        }
-                
-            
         }
 
         /// <summary>

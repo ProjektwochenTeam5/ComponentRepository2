@@ -89,6 +89,8 @@
                     Thread.Sleep(60000);
                     if (old == this.ClientPing[e.ClientInfo.ClientGuid])
                     {
+                        this.MyTCPServer.Clients[e.ClientInfo].GetStream().Close();
+                        this.MyTCPServer.Clients[e.ClientInfo].Close();
                         this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
                         this.MyTCPServer.Clients.Remove(e.ClientInfo);
                         Console.WriteLine("60 seconds over - Client deleted!");
@@ -362,6 +364,8 @@
         {
             if (ka.Terminate)
             {
+                this.MyTCPServer.Clients[info].GetStream().Close();
+                this.MyTCPServer.Clients[info].Close();
                 this.MyTCPServer.Clients.Remove(info);
                 this.IpAdressFriendlyName.Remove(info.IpAddress.ToString());
                 Console.WriteLine("Client deleted!");
