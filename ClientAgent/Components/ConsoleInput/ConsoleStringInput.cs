@@ -50,7 +50,7 @@ namespace ConsoleStringInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console String Input"; }
+            get { return "Console string input"; }
         }
 
         /// <summary>
@@ -108,13 +108,13 @@ namespace ConsoleStringInput
             while (true)
             {
                 Console.WriteLine("Please enter the operating value.");
-            string userInput = Console.ReadLine();
-            if (string.IsNullOrEmpty(userInput) == true)
-            {
-                Console.WriteLine("Please enter any value you want to operate with. ");              
-            }
+                string userInput = Console.ReadLine();
+                if (string.IsNullOrEmpty(userInput) == true)
+                {
+                    Console.WriteLine("Please enter any value you want to operate with. ");
+                }
 
-            return new object[] { userInput };
+                return new object[] { userInput };
             }
         }
     }

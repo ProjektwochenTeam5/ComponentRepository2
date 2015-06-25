@@ -50,7 +50,7 @@ namespace ConvertStringToUint
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Convert string to uint"; }
+            get { return "Convert string to unsigned integer"; }
         }
 
         /// <summary>
@@ -111,7 +111,14 @@ namespace ConvertStringToUint
 
             parseOK = uint.TryParse(st, out i);
 
-            return new object[] { i };
+            if (parseOK == true)
+            {
+                return new object[] { i };
+            }
+            else
+            {
+                return new object[] { new ArgumentException() };
+            }
         }
     }
 }

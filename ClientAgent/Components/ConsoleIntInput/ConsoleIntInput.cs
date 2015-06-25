@@ -50,7 +50,7 @@ namespace ConsoleIntInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Int Input"; }
+            get { return "Console integer input"; }
         }
 
         /// <summary>
@@ -117,8 +117,15 @@ namespace ConsoleIntInput
                 }               
 
                 parseOK = int.TryParse(userInput, out num);
-               
-                return new object[] { num };
+
+                if (parseOK == true)
+                {
+                    return new object[] { num };
+                }
+                else
+                {
+                    return new object[] { new ArgumentException() };
+                }
             }
         }
     }

@@ -18,7 +18,7 @@ namespace ConsoleUintOutput
     /// <summary>
     /// This is the component class for the console output.
     /// </summary>
-    public class ConsoleUintOutput
+    public class ConsoleUintOutput : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleUintOutput"/> class.
@@ -50,7 +50,7 @@ namespace ConsoleUintOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Uint Output"; }
+            get { return "Console unsigned integer output"; }
         }
 
         /// <summary>
@@ -105,16 +105,12 @@ namespace ConsoleUintOutput
                 return new object[] { new ArgumentException() };
             }
 
-            bool parseOK;
             uint ioutput = 0;
-            string output = string.Empty;
-
+            
             foreach (var item in values)
             {
-                output += (string)item;
+                ioutput += (uint)item;
             }
-
-            parseOK = uint.TryParse(output, out ioutput);
 
             Console.WriteLine(ioutput);
 

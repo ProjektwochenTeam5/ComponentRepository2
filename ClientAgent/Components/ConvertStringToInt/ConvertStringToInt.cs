@@ -105,13 +105,26 @@ namespace ConvertStringToInt
                 return new object[] { new ArgumentException() };
             }
 
+            string output = string.Empty;
+
+            foreach (var item in values)
+            {
+                output += (string)item;
+            }
+
             bool parseOK;
-            string s = null;
             int i;
 
-            parseOK = int.TryParse(s, out i);
+            parseOK = int.TryParse(output, out i);
 
-            return new object[] { i };
+            if (parseOK == true)
+            {
+                return new object[] { i };
+            }
+            else
+            {
+                return new object[] { new ArgumentException() };
+            }
         }
     }
 }

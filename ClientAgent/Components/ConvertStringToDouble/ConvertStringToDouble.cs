@@ -16,9 +16,9 @@ namespace ConvertStringToDouble
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for converting double to string.
+    /// This is the component class for converting string to double.
     /// </summary>
-    public class ConvertStringToDouble
+    public class ConvertStringToDouble : IComponent
     {
     /// <summary>
         /// Initializes a new instance of the <see cref="ConvertStringToDouble"/> class.
@@ -102,15 +102,29 @@ namespace ConvertStringToDouble
         {
             if (values.Count() != 1)
             {
-                yield return new object[] { new ArgumentException() };
+                return new object[] { new ArgumentException() };
             }
 
-            double num;
-            yield return
-                values.Count() == 1 &&
-                values.First().GetType() == typeof(string) &&
-                double.TryParse((string)values.First(), out num) ?
-                    num : new ArgumentException() as object;
+            string output = string.Empty;
+
+            foreach (var item in values)
+            {
+                output += (string)item;
+            }
+
+            bool parseOK;
+            double d;
+
+            parseOK = double.TryParse(output, out d);
+
+            if (parseOK == true)
+            {
+                return new object[] { d };
+            }
+            else
+            {
+                return new object[] { new ArgumentException() };
+            }
         }
     }
 }

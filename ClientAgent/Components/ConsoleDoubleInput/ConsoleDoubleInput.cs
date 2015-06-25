@@ -50,7 +50,7 @@ namespace ConsoleDoubleInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Double Input"; }
+            get { return "Console double input"; }
         }
 
         /// <summary>
@@ -118,7 +118,14 @@ namespace ConsoleDoubleInput
 
                 parseOK = double.TryParse(userInput, out num);
 
-                return new object[] { num };
+                if (parseOK == true)
+                {
+                    return new object[] { num };
+                }
+                else 
+                {
+                    return new object[] { new ArgumentException() };
+                }
             }
         }
     }

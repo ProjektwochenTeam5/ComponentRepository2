@@ -18,7 +18,7 @@ namespace ConsoleDoubleOutput
     /// <summary>
     /// This is the component class for the console output.
     /// </summary>
-    public class ConsoleDoubleOutput
+    public class ConsoleDoubleOutput : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleDoubleOutput"/> class.
@@ -50,7 +50,7 @@ namespace ConsoleDoubleOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Double Output"; }
+            get { return "Console double output"; }
         }
 
         /// <summary>
@@ -104,18 +104,14 @@ namespace ConsoleDoubleOutput
             {
                 return new object[] { new ArgumentException() };
             }
-
-            bool parseOK;
+            
             double ioutput = 0;
-            string output = string.Empty;
-
+            
             foreach (var item in values)
             {
-                output += (string)item;
+                ioutput += (double)item;
             }
 
-            parseOK = double.TryParse(output, out ioutput);
-           
             Console.WriteLine(ioutput);
 
             return null;
