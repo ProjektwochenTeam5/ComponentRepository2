@@ -95,12 +95,20 @@
                     Thread.Sleep(60000);
                     if (old == this.ClientPing[e.ClientInfo.ClientGuid])
                     {
-                        this.MyTCPServer.Clients[e.ClientInfo].Close();
-                        this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
-                        this.OnClientDisconnected(this, new ClientFetchedEventArgs(e.ClientInfo));
-                        this.MyTCPServer.Clients.Remove(e.ClientInfo);
-                        Console.WriteLine("60 seconds over - Client deleted!");
-                        break;
+                        try
+                        {
+                            this.MyTCPServer.Clients[e.ClientInfo].Close();
+                            this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
+                            this.OnClientDisconnected(this, new ClientFetchedEventArgs(e.ClientInfo));
+                            this.MyTCPServer.Clients.Remove(e.ClientInfo);
+                            Console.WriteLine("60 seconds over - Client deleted!");
+                            break;
+                        }
+                        catch (Exception ex)
+                        {
+                            Console.WriteLine(ex.Message);
+                        }
+
                     }
                 }
             }));
@@ -261,7 +269,7 @@
 
             if (req.InputData == null)
             {
-                req.InputData = new List<object>() { "Please enter a number: " };
+                req.InputData = new List<object>();
             }
 
             this.JobsQueued.Add(jobGuid);

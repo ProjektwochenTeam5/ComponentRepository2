@@ -182,7 +182,7 @@ namespace UserInterface
             b1000000 = (byte)((length / 0x1000000) % 0x100);
 
             List<byte> byteMsg = new List<byte>();
-            byteMsg.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)msg.MessageType });
+            byteMsg.AddRange(new byte[] { 1, 1, 1, 1, b1, b100, b10000, b1000000, (byte)msg.MessageType });
             byteMsg.AddRange(ms.ToArray());
 
             if (this.client.Connected && this.client.GetStream().CanWrite)
