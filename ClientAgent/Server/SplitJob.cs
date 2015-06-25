@@ -10,21 +10,21 @@ using System.Threading.Tasks;
 
 namespace Server
 {
-    public static class SplitJob
+    public class SplitJob
     {
-        private static List<ExtendedComponentEdge> edges;
+        private List<ExtendedComponentEdge> edges;
 
-        public static event EventHandler<SendJobToClientEventArgs> OnSendJobToClient;
+        public event EventHandler<SendJobToClientEventArgs> OnSendJobToClient;
 
-        public static bool GoOn { get; set; }
+        public bool GoOn { get; set; }
 
-        public static string CurrentMessageId { get; set; }
+        public string CurrentMessageId { get; set; }
 
-        public static TCPServerManager Manager { get; set; }
+        public TCPServerManager Manager { get; set; }
 
-        public static Guid JobGuid { get; set; }
+        public Guid JobGuid { get; set; }
 
-        public static List<object> Split(DoJobRequest jobreq, TCPServerManager manager)
+        public List<object> Split(DoJobRequest jobreq, TCPServerManager manager)
         {
             List<object> ResultList = new List<object>();
             Manager = manager;
@@ -123,14 +123,14 @@ namespace Server
                 //var outputs = edges.Where(x => x.InputComponentGuid == null);
 
                 // get all input and output component guids.
-                var edgesList = edges.ToList();
+                //var edgesList = edges.ToList();
                 List<Guid> allInputGuids = new List<Guid>();
                 List<Guid> allOutputGuids = new List<Guid>();
 
                 List<Guid> inputGuids = new List<Guid>();
                 List<Guid> outputGuids = new List<Guid>();
 
-                foreach(var edge in edgesList)
+                foreach(var edge in edges)
                 {
                     allInputGuids.Add(edge.InternalOutputComponentGuid);
                     allOutputGuids.Add(edge.InternalInputComponentGuid);
@@ -168,7 +168,12 @@ namespace Server
                         ResultList.Add(resultEdge.ComponentResult);
                     }
 
-                    Manager.SendJobToClient(edges.FirstOrDefault(x => x.InternalInputComponentGuid == outputGuid).InputComponentGuid, ResultList, JobGuid);
+                    var jobResult = Manager.SendJobToClient(edges.FirstOrDefault(x => x.InternalInputComponentGuid == outputGuid).InputComponentGuid, ResultList, JobGuid);
+
+                    if (jobResult.Count > 0)
+                    {
+                        return jobResult;
+                    }
 
                     ResultList = new List<object>();
                 }
@@ -207,7 +212,7 @@ namespace Server
             return result;
         }
 
-        private static void GoToNextEdge(Guid outputGuid, List<Guid> inputGuids)
+        private void GoToNextEdge(Guid outputGuid, List<Guid> inputGuids)
         {
             //var compInputEdges = edges.Where(x => x.InternalInputComponentGuid == outputGuid);
 

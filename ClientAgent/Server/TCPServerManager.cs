@@ -5,6 +5,7 @@
     using Core.Network;
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Linq;
     using System.Net.Sockets;
     using System.Text;
@@ -26,6 +27,8 @@
             this.AllServerComponents = new Dictionary<Guid, List<Component>>();
             this.ClientPing = new Dictionary<Guid, uint>();
             this.ComplexComponent = new Dictionary<Guid, string>();
+            this.AllServerClients = new Dictionary<Guid, List<ClientInfo>>();
+            this.AllServerCpuLoads = new Dictionary<Guid, int>();
 
         }
 
@@ -43,6 +46,8 @@
             this.AllServerComponents = new Dictionary<Guid, List<Component>>();
             this.ClientPing = new Dictionary<Guid, uint>();
             this.ComplexComponent = new Dictionary<Guid, string>();
+            this.AllServerClients = new Dictionary<Guid, List<ClientInfo>>();
+            this.AllServerCpuLoads = new Dictionary<Guid, int>();
         }
 
         public object locker = new object();
@@ -191,10 +196,16 @@
                 }
             }
 
+            Dictionary<Guid, string> newcomplexlist = new Dictionary<Guid, string>();
+
             foreach (var item in this.MyTCPServer.Wrapper.ComplexData)
             {
-                componentlist.Add(this.MyTCPServer.Wrapper.ReadInfosFromDatFile(item.Key));
+                Component c = this.MyTCPServer.Wrapper.ReadInfosFromDatFile(item.Key);
+                componentlist.Add(c);
+                newcomplexlist.Add(c.ComponentGuid, Path.Combine(this.MyTCPServer.Wrapper.StorePath, c.FriendlyName, ".dat"));
             }
+
+            this.ComplexComponent = newcomplexlist;
 
 
             ///////////////// Componentlist fertig
@@ -232,7 +243,6 @@
                 this.ComplexComponent.Add(Guid.NewGuid(), item.Key);
             }
 
-            this.MyTCPServer.Wrapper.ReadData();
             Dictionary<IComponent, Guid> componentdic = new Dictionary<IComponent, Guid>();
 
             foreach (var item in this.MyTCPServer.Wrapper.AtomicData)
@@ -269,10 +279,16 @@
                 }
             }
 
+            Dictionary<Guid, string> newcomplexlist = new Dictionary<Guid, string>();
+
             foreach (var item in this.MyTCPServer.Wrapper.ComplexData)
             {
-                componentlist.Add(this.MyTCPServer.Wrapper.ReadInfosFromDatFile(item.Key));
+                Component c = this.MyTCPServer.Wrapper.ReadInfosFromDatFile(item.Key);
+                componentlist.Add(c);
+                newcomplexlist.Add(c.ComponentGuid, Path.Combine(this.MyTCPServer.Wrapper.StorePath, c.FriendlyName, ".dat"));
             }
+
+            this.ComplexComponent = newcomplexlist;
 
             foreach (var item in componentlist)
             {
@@ -310,7 +326,8 @@
             {
                 DoJobRequest newjobrequest = new DoJobRequest();
                 newjobrequest.Job = this.Components.FirstOrDefault(x => x.Key == componentGuid).Value;
-                return SplitJob.Split(newjobrequest, this);
+                SplitJob splitter = new SplitJob();
+                return splitter.Split(newjobrequest, this);
             }
 
             EventHandler<JobResponseRecievedEventArgs> d = delegate(object sender, JobResponseRecievedEventArgs e)
@@ -350,8 +367,8 @@
             }
 
             this.MyTCPServer.SendMessage(sendData, client);
-
-            Console.WriteLine("Sending TransferJobReqest!");
+            string s = this.MyTCPServer.Clients.Keys.Where(x => x.ClientGuid == client).SingleOrDefault().FriendlyName;
+            Console.WriteLine("Sending TransferJobReqest to: " + s);
 
             try
             {
@@ -408,13 +425,16 @@
                         bool containscomplex = this.ComplexComponent.Keys.Contains(request.ComponentID);
 
                         Console.WriteLine("--------Transfer component request Recieved");
-                        if (contains)
+                        if (containscomplex)
+                        {
+
+                            this.GiveTransferComponentResponseIfComplex(e.Info, request.ComponentID, request.MessageID);
+
+                        }
+                        else if (contains)
                         {
                             this.GiveTransferComponentResponse(e.Info, request.ComponentID, request.MessageID);
-                        }
-                        else if (containscomplex)
-                        {
-                            this.GiveTransferComponentResponseIfComplex(e.Info, request.ComponentID, request.MessageID);
+
                         }
                         else
                         {
@@ -440,18 +460,41 @@
                         this.MyTCPServer.SendAck(e.Info, request.MessageID);
 
                         Console.WriteLine("DoJobRequest recieved!");
-                        var targetServer = this.AllServerCpuLoads.OrderBy(x => x.Value).First();
-                        if (this.ServerCpuLoad < targetServer.Value)
+                        try
                         {
-                        Task t = new Task(new Action(() =>
-                        SplitJob.Split(request, this)));
 
-                        t.Start();
+                        }
+                        catch (Exception)
+                        {
+                        }
+
+                        if (this.AllServerCpuLoads.Count > 0)
+                        {
+                            var targetServer = this.AllServerCpuLoads.OrderBy(x => x.Value).First();
+                            if (this.ServerCpuLoad < targetServer.Value)
+                            {
+                                SplitJob splitter = new SplitJob();
+
+                                Task t = new Task(new Action(() =>
+                                splitter.Split(request, this)));
+
+                                t.Start();
+                            }
+                            else
+                            {
+                                this.OnJobReadyToExecute(this, new JobEventArgs(request.Job, request.TargetDisplay, request.TargetDisplay, new List<object>(), request.Job.FriendlyName, targetServer.Key));
+                            }
                         }
                         else
                         {
-                            this.OnJobReadyToExecute(this, new JobEventArgs(request.Job, request.TargetDisplay, request.TargetDisplay, new List<object>(), request.Job.FriendlyName, targetServer.Key));
+                            SplitJob splitter = new SplitJob();
+
+                            Task t = new Task(new Action(() =>
+                                splitter.Split(request, this)));
+
+                            t.Start();
                         }
+
 
                         break;
                     }
@@ -481,6 +524,8 @@
                         {
                             this.ComplexComponent.Add(Guid.NewGuid(), storecomponent.FriendlyName);
                             this.MyTCPServer.Wrapper.StoreComplexComponent(storecomponent.Component, storecomponent.FriendlyName);
+                            this.SendInfosToAllClients();
+
                         }
 
                         Component c = null;
@@ -537,7 +582,7 @@
             string name = string.Empty;
             try
             {
-                name = this.ComplexComponent[guid];
+                name = this.Components[guid].FriendlyName;
 
             }
             catch (Exception)
@@ -547,6 +592,7 @@
             }
 
             byte[] data = this.MyTCPServer.Wrapper.GetComplexComponent(name);
+
             TransferComponentResponse response = new TransferComponentResponse();
             response.Component = data;
             response.BelongsTo = requestid;
