@@ -168,7 +168,7 @@ namespace Server
                         ResultList.Add(resultEdge.ComponentResult);
                     }
 
-                    Manager.SendJobToClient(outputGuid, ResultList, JobGuid);
+                    Manager.SendJobToClient(edges.FirstOrDefault(x => x.InternalInputComponentGuid == outputGuid).InputComponentGuid, ResultList, JobGuid);
 
                     ResultList = new List<object>();
                 }
