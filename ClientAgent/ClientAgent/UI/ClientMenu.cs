@@ -114,6 +114,7 @@ namespace ClientAgent.UI
             this.stacktextboxStatus.BackgroundColor = ConsoleColor.Blue;
             this.stacktextboxStatus.ForegroundColor = ConsoleColor.White;
             this.stacktextboxStatus.Rectangle = new ConsoleGUI.Rectangle(0, 0, 80, 25);
+            this.stacktextboxStatus.Owner = this;
 
             // Add buttons
             this.Buttons.AddRange(new[] { this.buttonCreateComponent, this.buttonShowComponents, this.buttonShowJobs, this.buttonQuit });
@@ -162,7 +163,7 @@ namespace ClientAgent.UI
         /// <param name="text"></param>
         public void PushLine(StringEventArgs text)
         {
-            this.stacktextboxStatus.PushLine(text);
+            this.stacktextboxStatus.PushLines(text);
         }
 
         /// <summary>
@@ -206,7 +207,14 @@ namespace ClientAgent.UI
         /// </param>
         private void ButtonShowJobs_ButtonKeyPressed(object sender, EventArgs e)
         {
-            throw new NotImplementedException();
+            List<string> strs = new List<string>(this.Manager.ExecutingJobs.Count);
+            strs.Add("All running jobs:");
+            foreach (Guid c in this.Manager.ExecutingJobs)
+            {
+                strs.Add(string.Format("{0}", c));
+            }
+
+            this.PushLine(new StringEventArgs(strs.ToArray()));
         }
 
         /// <summary>
@@ -220,10 +228,28 @@ namespace ClientAgent.UI
         /// </param>
         private void ButtonShowComponents_ButtonKeyPressed(object sender, EventArgs e)
         {
-            foreach (Component n in this.Manager.StoredComponentInfos)
+            List<string> strs = new List<string>(this.Manager.StoredComponentInfos.Count * 4);
+            strs.Add("All components:");
+            foreach (Component c in this.Manager.StoredComponentInfos)
             {
-                
+                strs.Add(string.Format("{0} ({1})", c.FriendlyName, c.ComponentGuid));
+
+                string[] indescs = c.InputDescriptions.ToArray();
+                string[] inhints = c.InputHints.ToArray();
+                for(int n = 0; n < indescs.Length; n++)
+                {
+                    strs.Add(string.Format("\t\t{0} : {1}", indescs[n], inhints[n]));
+                }
+
+                string[] outdescs = c.OutputDescriptions.ToArray();
+                string[] outhints = c.OutputHints.ToArray();
+                for (int n = 0; n < outdescs.Length; n++)
+                {
+                    strs.Add(string.Format("\t\t{0} : {1}", outdescs[n], outhints[n]));
+                }
             }
+
+            this.PushLine(new StringEventArgs(strs.ToArray()));
         }
 
         /// <summary>
@@ -284,7 +310,7 @@ namespace ClientAgent.UI
             c.StartInfo.Arguments = port.ToString();
             c.StartInfo.CreateNoWindow = false;
             c.Start();
-            this.PushLine(new StringEventArgs("Started GUI"));
+            this.PushLine(new StringEventArgs(new[] { "Started GUI" }));
 
             if (!c.HasExited)
             {

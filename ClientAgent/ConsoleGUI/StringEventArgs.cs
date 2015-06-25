@@ -12,9 +12,9 @@ namespace ConsoleGUI
         /// Initializes a new instance of the <see cref="StringEventArgs"/> class.
         /// </summary>
         /// <param name="str">
-        ///     The string that shall be received by the event handlers.
+        ///     The strings that shall be received by the event handlers.
         /// </param>
-        public StringEventArgs(string str) : base()
+        public StringEventArgs(string[] str) : base()
         {
             this.String = str;
             this.TimeStamp = DateTime.Now;
@@ -26,7 +26,7 @@ namespace ConsoleGUI
         /// <value>
         ///     Contains the string that shall be received by the event handlers.
         /// </value>
-        public string String
+        public string[] String
         {
             get;
             private set;

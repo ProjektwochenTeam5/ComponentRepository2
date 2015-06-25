@@ -22,8 +22,8 @@ namespace ClientAgent
     using System.Threading;
     using System.Threading.Tasks;
     using ClientServerCommunication;
-    using Core.Network;
     using ConsoleGUI;
+    using Core.Network;
 
     /// <summary>
     /// Manages messages received by a client.
@@ -36,6 +36,11 @@ namespace ClientAgent
         private Collection<Component> storedComponentInfos;
 
         /// <summary>
+        /// The value for the <see cref="ExecutingJobs"/> property.
+        /// </summary>
+        private Collection<Guid> executingJobs;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ClientMessageManager"/> class.
         /// </summary>
         /// <param name="managed">
@@ -45,10 +50,12 @@ namespace ClientAgent
         {
             this.WaitingMessages = new List<Message>(512);
             this.StoredComponents = new Dictionary<Guid, string>();
+            this.executingJobs = new Collection<Guid>();
             this.ManagedClient = managed;
             this.ManagedClient.ReceivedTCPMessage += this.ManagedClient_ReceivedTCPMessage;
             this.ManagedClient.ReceivedLogEntry += this.ManagedClient_ReceivedLogEntry;
         }
+
         /// <summary>
         /// Raised when the manager received a message.
         /// </summary>
@@ -120,6 +127,17 @@ namespace ClientAgent
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets the list of running jobs.
+        /// </summary>
+        /// <value>
+        ///     Contians the list of running jobs.
+        /// </value>
+        public ReadOnlyCollection<Guid> ExecutingJobs
+        {
+            get { return new ReadOnlyCollection<Guid>(this.executingJobs); }
         }
 
         /// <summary>
@@ -233,15 +251,18 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
+        /// Called when the client received a log entry.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
         private void ManagedClient_ReceivedLogEntry(object sender, StringEventArgs e)
         {
             this.OnReceivedLogEntry(e);
         }
-
 
         /// <summary>
         /// Called when the managed client received a message.
@@ -287,9 +308,11 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
+        /// Called when a transfer job request was received.
         /// </summary>
-        /// <param name="e"></param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
         private void ReceivedTransferJobRequest(MessageReceivedEventArgs e)
         {
             TransferJobRequest rq = e.ReceivedMessage as TransferJobRequest;
@@ -348,10 +371,12 @@ namespace ClientAgent
                             return;
                         }
 
+                        this.executingJobs.Add(this.StoredComponents.FirstOrDefault(k => k.Value == cmp).Key);
                         TransferJobResponse tjs = new TransferJobResponse();
                         tjs.Result = JobExecutor.Execute(pth, rq.InputData).ToArray();
                         tjs.BelongsToRequest = rq.JobID;
                         this.ManagedClient.SendMessage(tjs);
+                        this.executingJobs.Remove(this.StoredComponents.FirstOrDefault(k => k.Value == cmp).Key);
                         return;
                     }
                 });
@@ -410,10 +435,13 @@ namespace ClientAgent
             }
 
             Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
-            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+            this.OnReceivedLogEntry(new StringEventArgs(new[]
+            { 
+                string.Format(
                 "Error from {0}: {1}",
                 snd.MessageID,
-                received.Message)));
+                received.Message)
+            }));
 
             if (snd == null)
             {
@@ -439,30 +467,35 @@ namespace ClientAgent
 
             this.storedComponentInfos = new Collection<Component>(m.MetadataComponents.ToList());
 
-            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
-                "{0}|{1}",
-                "Friendly Name".PadRight(40),
-                "Guid")));
+            this.OnReceivedLogEntry(new StringEventArgs(new[]
+            {
+                string.Format(
+                    "{0}|{1}",
+                    "Friendly Name".PadRight(40),
+                    "Guid")
+            }));
+
+            List<string> strs = new List<string>(m.MetadataComponents.Count);
 
             foreach (Component c in m.MetadataComponents)
             {
                 try
                 {
-                    this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                    strs.Add(string.Format(
                         "{0}|{1}",
                         c.FriendlyName.PadRight(40),
-                        c.ComponentGuid)));
-
-                    Thread.Sleep(2);
+                        c.ComponentGuid));
                 }
                 catch
                 {
                 }
             }
 
-            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+            strs.Add(string.Format(
                 "Total elements found: {0}",
-                m.MetadataComponents.Count)));
+                m.MetadataComponents.Count));
+
+            this.OnReceivedLogEntry(new StringEventArgs(strs.ToArray()));
         }
 
         /// <summary>
@@ -479,9 +512,12 @@ namespace ClientAgent
                 return;
             }
 
-            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
-                "Acknowledge {0}!",
-                received.BelongsTo)));
+            this.OnReceivedLogEntry(new StringEventArgs(new[]
+            {
+                string.Format(
+                    "Acknowledge {0}!",
+                    received.BelongsTo)
+            }));
 
             Message snd = this.WaitingMessages.FirstOrDefault(msg => msg.MessageID == received.BelongsTo);
 

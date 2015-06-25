@@ -212,7 +212,6 @@ namespace ClientAgent
                     System.IO.FileMode.Create,
                     System.IO.FileAccess.Write))
                 {
-
                     fs.Write(dll, 0, dll.Length);
                 }
 
