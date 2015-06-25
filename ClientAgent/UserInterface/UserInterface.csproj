@@ -64,7 +64,9 @@
     <Compile Include="StaticStringInputWindow.xaml.cs">
       <DependentUpon>StaticStringInputWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="ThreadSafeObservableCollection.cs" />
     <Compile Include="Triangle.cs" />
+    <Compile Include="WPFControlThreadingExtensions.cs" />
     <Page Include="ComponentCreateWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
