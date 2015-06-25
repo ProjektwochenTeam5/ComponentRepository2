@@ -105,12 +105,7 @@ namespace Sub
                 yield return new object[] { new ArgumentException() };
             }
 
-            long result = 0;
-
-            foreach (var item in values)
-            {
-                result -= (long)item;
-            }
+            long result = (long)values.ElementAt(0) - (long)values.ElementAt(1);            
 
             yield return result;
         }       
