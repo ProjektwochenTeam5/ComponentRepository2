@@ -45,6 +45,8 @@
             this.ComplexComponent = new Dictionary<Guid, string>();
         }
 
+        public object locker = new object();
+
         public TCPServer MyTCPServer { get; set; }
 
         public event EventHandler<JobResponseRecievedEventArgs> OnJobResponseRecieved;
@@ -266,6 +268,7 @@
             req.InputData = inputData;
             req.ComponentGuid = componentGuid;
             req.JobID = jobGuid;
+            
 
             if (req.InputData == null)
             {
@@ -290,7 +293,21 @@
             this.OnJobResponseRecieved += d;
 
             var sendData = DataConverter.ConvertMessageToByteArray(5, DataConverter.ConvertObjectToByteArray(req));
-            var client = this.CPULoads.Where(y => y.Value == CPULoads.Min(x => x.Value)).Single().Key;
+
+            Guid client = new Guid();
+            lock (this.locker)
+            {
+                int smallest = 100;
+                foreach (var item in this.CPULoads)
+                {
+                    if (item.Value <= smallest)
+                    {
+                        smallest = item.Value;
+                        client = item.Key;
+                    }
+                }
+            }
+
             this.MyTCPServer.SendMessage(sendData, client);
 
             Console.WriteLine("Sending TransferJobReqest!");
