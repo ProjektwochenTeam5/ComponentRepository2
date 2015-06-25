@@ -107,9 +107,11 @@ namespace ConsoleBoolOutput
             
             foreach (bool item in values)
             {
+                Console.WriteLine("Please press enter to continue");
                 Console.WriteLine(item);
-            }                      
-
+                Console.ReadKey(true);
+            }
+                        
             return null;
         }
     }

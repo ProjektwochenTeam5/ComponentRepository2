@@ -1,35 +1,35 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleStringOutput.cs" company="FHWN"> 
+// <copyright file="ConvertLongToString.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleStringOutput
+namespace ConvertLongToString
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;    
-    using System.Linq;
+    using System.Collections.ObjectModel;
+    using System.Linq;    
     using System.Text;
     using System.Threading.Tasks;
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for the console output.
+    /// This is the component class for converting integer to string.
     /// </summary>
-    public class ConsoleStringOutput : IComponent
+    public class ConvertLongToString : IComponent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleStringOutput"/> class.
+        /// Initializes a new instance of the <see cref="ConvertLongToString"/> class.
         /// </summary>
-        public ConsoleStringOutput()
+        public ConvertLongToString()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
-            this.OutputHints = new List<string>();
-            this.InputDescriptions = new List<string>(new[] { "string" });
-            this.OutputDescriptions = new List<string>();     
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
+            this.InputDescriptions = new List<string>(new[] { "long" });
+            this.OutputDescriptions = new List<string>(new[] { "string" });            
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ConsoleStringOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console string output"; }
+            get { return "Convert long to string"; }
         }
 
         /// <summary>
@@ -105,18 +105,11 @@ namespace ConsoleStringOutput
                 return new object[] { new ArgumentException() };
             }
 
-            string output = string.Empty;
+            long num = 0;
 
-            foreach (var item in values)
-            {
-                output += (string)item;
-            }
-
-            Console.WriteLine("Please press enter to continue");
-            Console.WriteLine(output);
-            Console.ReadKey(true);
-
-            return null;
+            string s = Convert.ToString(num);
+                     
+            return new object[] { s };
         }
     }
 }
