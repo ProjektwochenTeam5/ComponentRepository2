@@ -304,6 +304,15 @@
             bool waiting = true;
             TransferJobResponse resp = null;
 
+            
+
+            if (this.ComplexComponent.Keys.Contains(componentGuid))
+            {
+                DoJobRequest newjobrequest = new DoJobRequest();
+                newjobrequest.Job = this.Components.FirstOrDefault(x => x.Key == componentGuid).Value;
+                return SplitJob.Split(newjobrequest, this);
+            }
+
             EventHandler<JobResponseRecievedEventArgs> d = delegate(object sender, JobResponseRecievedEventArgs e)
             {
                 if (e.BelongsToJob == jobGuid)
