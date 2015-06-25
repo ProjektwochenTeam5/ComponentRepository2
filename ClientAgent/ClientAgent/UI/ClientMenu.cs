@@ -16,6 +16,7 @@ namespace ClientAgent.UI
     using ConsoleGUI;
     using ConsoleGUI.Controls;
     using ConsoleGUI.IO;
+    using Core.Network;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -220,6 +221,10 @@ namespace ClientAgent.UI
         /// </param>
         private void ButtonShowComponents_ButtonKeyPressed(object sender, EventArgs e)
         {
+            foreach (Component n in this.Manager.StoredComponentInfos)
+            {
+                
+            }
         }
 
         /// <summary>
