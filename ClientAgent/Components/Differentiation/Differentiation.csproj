@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{CCDEEAAB-439C-40CC-9306-D7D2C8693977}</ProjectGuid>
+    <ProjectGuid>{A8BAED9B-EB22-4A52-B49F-6F559E90BA9A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>ConvertFloatToString</RootNamespace>
-    <AssemblyName>ConvertFloatToString</AssemblyName>
+    <RootNamespace>Differentiation</RootNamespace>
+    <AssemblyName>Differentiation</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -39,7 +39,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ConvertFloatToString.cs" />
+    <Compile Include="Differentiation.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
