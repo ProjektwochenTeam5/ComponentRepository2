@@ -25,7 +25,7 @@ namespace Server
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, this.UdpClientPort);
             UdpClient client = new UdpClient(groupEP);
             client.EnableBroadcast = true;
-            Console.WriteLine("--> UDP waiting for Broadcast!");
+            Console.WriteLine("--> UDP waiting for Server Broadcast!");
 
             try
             {
@@ -33,8 +33,10 @@ namespace Server
                 {
                     byte[] bytes = client.Receive(ref groupEP);
 
-                    if (bytes == Encoding.ASCII.GetBytes("PWSP"))
+                    if (Encoding.ASCII.GetString(bytes) == "PWSP" && (groupEP.Address != IPAddress.Parse(this.GetMyIP())))
                     {
+                        Console.WriteLine("Received Server Broadcast!");
+
                         if (this.Manager.Server.Servers.Values.FirstOrDefault(x => x.Address == groupEP.Address && x.Port == groupEP.Port) == null)
                         {
                             this.Manager.SendLogonRequest(groupEP);
@@ -50,6 +52,15 @@ namespace Server
             {
                 client.Close();
             }
+        }
+
+        public string GetMyIP()
+        {
+            string hostName = Dns.GetHostName();
+            IPHostEntry hostInfo = Dns.GetHostByName(hostName);
+            string ipAdress = hostInfo.AddressList[0].ToString();
+
+            return ipAdress;
         }
     }
 }

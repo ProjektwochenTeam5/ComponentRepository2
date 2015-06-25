@@ -34,6 +34,7 @@ namespace Server
         {
             try
             {
+                Console.WriteLine("Suche nach anderen Servern...");
                 this.Listener.Start();
 
                 while (true)
