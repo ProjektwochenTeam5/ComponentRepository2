@@ -46,12 +46,13 @@
 
         public event EventHandler<JobResponseRecievedEventArgs> OnJobResponseRecieved;
 
+        public event EventHandler<ClientFetchedEventArgs> OnClientDisconnected;
+
         public Dictionary<Guid, int> CPULoads { get; set; }
 
         public Dictionary<Guid,List<Component>> AllServerComponents { get; set; }
 
         public Dictionary<Guid, List<ClientInfo>> AllServerClients { get; set; }
-
 
         public Dictionary<Guid, int> AllServerCpuLoads { get; set; }
 
@@ -89,7 +90,10 @@
                     Thread.Sleep(60000);
                     if (old == this.ClientPing[e.ClientInfo.ClientGuid])
                     {
+                        this.MyTCPServer.Clients[e.ClientInfo].GetStream().Close();
+                        this.MyTCPServer.Clients[e.ClientInfo].Close();
                         this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
+                        this.OnClientDisconnected(this, new ClientFetchedEventArgs(e.ClientInfo));
                         this.MyTCPServer.Clients.Remove(e.ClientInfo);
                         Console.WriteLine("60 seconds over - Client deleted!");
                         break;
@@ -362,7 +366,10 @@
         {
             if (ka.Terminate)
             {
+                this.MyTCPServer.Clients[info].GetStream().Close();
+                this.MyTCPServer.Clients[info].Close();
                 this.MyTCPServer.Clients.Remove(info);
+                this.OnClientDisconnected(this, new ClientFetchedEventArgs(info));
                 this.IpAdressFriendlyName.Remove(info.IpAddress.ToString());
                 Console.WriteLine("Client deleted!");
             }
@@ -376,6 +383,14 @@
             if (this.OnJobResponseRecieved != null)
             {
                 this.OnJobResponseRecieved(this, e);
+            }
+        }
+
+        public void FireOnClientDisconnected(ClientFetchedEventArgs e)
+        {
+            if (this.OnClientDisconnected != null)
+            {
+                this.OnClientDisconnected(this, e);
             }
         }
 
