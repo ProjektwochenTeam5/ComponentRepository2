@@ -360,7 +360,7 @@ namespace ClientAgent
 
             while (!args.Stopped)
             {
-                if (DateTime.Now.Subtract(lastSend).TotalSeconds > 5)
+                if (DateTime.Now.Subtract(lastSend).TotalSeconds > 20)
                 {
                     try
                     {
