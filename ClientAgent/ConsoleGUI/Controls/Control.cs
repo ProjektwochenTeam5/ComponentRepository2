@@ -120,7 +120,7 @@ namespace ConsoleGUI.Controls
         public Control Owner
         {
             get;
-            private set;
+            set;
         }
 
         /// <summary>
@@ -393,6 +393,7 @@ namespace ConsoleGUI.Controls
         /// </param>
         private void Controls_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
+            this.Draw(this.rectangleProperty);
         }
     }
 }

@@ -30,7 +30,7 @@ namespace ConsoleGUI.Controls
         private string textProperty;
 
         /// <summary>
-        /// 
+        /// Initializes a new instance of the <see cref="StackTextBox"/> class.
         /// </summary>
         /// <param name="outputs"></param>
         public StackTextBox(ICollection<IRenderer> outputs)
@@ -40,11 +40,17 @@ namespace ConsoleGUI.Controls
             this.TextAppended += this.StackTextBox_TextAppended;
         }
 
+        /// <summary>
+        /// Raised when lines were appended to the text.
+        /// </summary>
         public event EventHandler TextAppended;
 
         /// <summary>
-        /// 
+        /// Gets the text of the control.
         /// </summary>
+        /// <value>
+        ///     Contains the text of the control.
+        /// </value>
         public string Text
         {
             get
@@ -60,8 +66,11 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Gets or sets the lines of the stack text box.
         /// </summary>
+        /// <value>
+        ///     Contains the lines of the stack text box.
+        /// </value>
         private List<string> Lines
         {
             get;
@@ -74,15 +83,22 @@ namespace ConsoleGUI.Controls
         /// <param name="line">
         ///     The string that shall be appended.
         /// </param>
-        public void PushLine(StringEventArgs line)
+        public void PushLines(StringEventArgs line)
         {
-            if (this.Lines.Count >= this.Rectangle.Height)
+            string app = string.Empty;
+
+            foreach(string l in line.String)
             {
-                this.Lines.RemoveRange(0, this.Lines.Count - this.Rectangle.Height);
+                this.Lines.Add(string.Format("{0}: {1}", line.TimeStamp, l));
+                while (this.Lines.Count > this.Rectangle.Height)
+                {
+                    this.Lines.RemoveRange(0, this.Lines.Count - this.Rectangle.Height);
+                }
+
+                app = string.Format("{0}{1}\n", app, l);
             }
 
-            this.Lines.Add(string.Format("{0}: {1}", line.TimeStamp, line.String));
-            this.Text += string.Format("{0}\n", line);
+            this.Text += app;
         }
 
         /// <summary>
@@ -128,7 +144,7 @@ namespace ConsoleGUI.Controls
         /// <returns></returns>
         public override bool Receive(string s)
         {
-            this.PushLine(new StringEventArgs(string.Format("{0}\n", s)));
+            this.PushLines(new StringEventArgs(new[] { string.Format("{0}\n", s) }));
             return true;
         }
 
@@ -149,15 +165,19 @@ namespace ConsoleGUI.Controls
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
+        /// <param name="sender">
+        ///     The sender of the event.
+        /// </param>
+        /// <param name="e">
+        ///     Contains additional information for this event.
+        /// </param>
         private void StackTextBox_TextAppended(object sender, EventArgs e)
         {
             this.Draw(this.Rectangle);
-            /*if (this.Owner != null)
+            if (this.Owner != null)
             {
                 this.Owner.Draw(this.Owner.Rectangle);
-            }*/
+            }
         }
     }
 }

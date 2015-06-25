@@ -193,7 +193,7 @@ namespace ClientAgent
             this.udpListenerThread = new Thread(UdpThread);
             this.udpListenerThreadArgs = new UdpClientThreadArgs(new UdpClient(new IPEndPoint(IPAddress.Any, 1234)), this);
             this.udpListenerThread.Start(this.udpListenerThreadArgs);
-            this.OnReceivedLogEntry(new StringEventArgs("Started connection search..."));
+            this.OnReceivedLogEntry(new StringEventArgs(new[] { "Started connection search..." }));
         }
 
         /// <summary>
@@ -222,10 +222,10 @@ namespace ClientAgent
                     this.ConnectionClient.Connect(pt);
                     this.ConnectedEndPoint = pt;
                     this.OnConnected(EventArgs.Empty);
-                    this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                    this.OnReceivedLogEntry(new StringEventArgs(new[] { string.Format(
                         "Connected to {0}:{1}",
                         this.ConnectedEndPoint.Address,
-                        this.ConnectedEndPoint.Port)));
+                        this.ConnectedEndPoint.Port) }));
                     break;
                 }
                 catch (SocketException)
@@ -242,10 +242,11 @@ namespace ClientAgent
             this.SendMessage(new KeepAlive() { Terminate = true });
             this.ConnectionClient.Close();
             this.OnDisconnected(EventArgs.Empty);
-            this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+            this.OnReceivedLogEntry(new StringEventArgs(new[] {
+                string.Format(
                 "Disconnected from {0}:{1}",
                 this.ConnectedEndPoint.Address,
-                this.ConnectedEndPoint.Port)));
+                this.ConnectedEndPoint.Port) }));
         }
 
         /// <summary>
@@ -295,7 +296,7 @@ namespace ClientAgent
                 }
                 catch (IOException exc)
                 {
-                    this.OnReceivedLogEntry(new StringEventArgs(exc.Message));
+                    this.OnReceivedLogEntry(new StringEventArgs(new[] { exc.Message }));
                 }
             }
         }
@@ -413,7 +414,7 @@ namespace ClientAgent
                         AgentAccept a = (AgentAccept)args.Client.formatter.Deserialize(ms);
                         Console.WriteLine(a.ServerIP);
                         args.Stop();
-                        args.Client.OnReceivedLogEntry(new StringEventArgs("Trying to connect..."));
+                        args.Client.OnReceivedLogEntry(new StringEventArgs(new[] { "Trying to connect..." }));
                         args.Client.ConnectTo(a.ServerIP);
                     }
                 }
@@ -443,7 +444,7 @@ namespace ClientAgent
                 // send keep alive
                 if (DateTime.Now.Subtract(lastKeepAlive).TotalSeconds >= 10)
                 {
-                    args.Client.OnReceivedLogEntry(new StringEventArgs("Keep Alive"));
+                    args.Client.OnReceivedLogEntry(new StringEventArgs(new[] { "Keep Alive" }));
                     lastKeepAlive = DateTime.Now;
                     args.Client.SendMessage(new KeepAlive() { CPUWorkload = (int)cpu.NextValue() });
                 }
