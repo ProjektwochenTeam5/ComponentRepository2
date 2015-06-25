@@ -36,6 +36,11 @@ namespace ClientAgent
         private Collection<Component> storedComponentInfos;
 
         /// <summary>
+        /// The value for the <see cref="ExecutingJobs"/> property.
+        /// </summary>
+        private Collection<Guid> executingJobs;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ClientMessageManager"/> class.
         /// </summary>
         /// <param name="managed">
@@ -45,6 +50,7 @@ namespace ClientAgent
         {
             this.WaitingMessages = new List<Message>(512);
             this.StoredComponents = new Dictionary<Guid, string>();
+            this.executingJobs = new Collection<Guid>();
             this.ManagedClient = managed;
             this.ManagedClient.ReceivedTCPMessage += this.ManagedClient_ReceivedTCPMessage;
             this.ManagedClient.ReceivedLogEntry += this.ManagedClient_ReceivedLogEntry;
@@ -121,6 +127,17 @@ namespace ClientAgent
         {
             get;
             private set;
+        }
+
+        /// <summary>
+        /// Gets the list of running jobs.
+        /// </summary>
+        /// <value>
+        ///     Contians the list of running jobs.
+        /// </value>
+        public ReadOnlyCollection<Guid> ExecutingJobs
+        {
+            get { return new ReadOnlyCollection<Guid>(this.executingJobs); }
         }
 
         /// <summary>
@@ -354,10 +371,12 @@ namespace ClientAgent
                             return;
                         }
 
+                        this.executingJobs.Add(this.StoredComponents.FirstOrDefault(k => k.Value == cmp).Key);
                         TransferJobResponse tjs = new TransferJobResponse();
                         tjs.Result = JobExecutor.Execute(pth, rq.InputData).ToArray();
                         tjs.BelongsToRequest = rq.JobID;
                         this.ManagedClient.SendMessage(tjs);
+                        this.executingJobs.Remove(this.StoredComponents.FirstOrDefault(k => k.Value == cmp).Key);
                         return;
                     }
                 });
