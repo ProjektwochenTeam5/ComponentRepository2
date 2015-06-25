@@ -25,11 +25,11 @@ namespace ConsoleBoolInput
         /// </summary>
         public ConsoleBoolInput()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "desc" });
+            this.OutputDescriptions = new List<string>(new[] { "out" });
         }
 
         /// <summary>
@@ -100,33 +100,18 @@ namespace ConsoleBoolInput
         /// <returns>Collection of output arguments.</returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            if (values.Count() != 1)
-            {
-                return new object[] { new ArgumentException() };
-            }
+            string desc = values.Count() == 1 ?
+                values.Single().ToString() :
+                "Please enter the operating value (true or false): ";
 
-            while (true)
+            bool b;
+            do
             {
-                Console.WriteLine("Please enter the operating value. (true or false)");
-                string userInput = Console.ReadLine();
-                bool parseOK;
-                bool b = true;
-                if (string.IsNullOrEmpty(userInput) == true)
-                {
-                    Console.WriteLine("Please enter any value you want to operate with. ");
-                }
-               
-                parseOK = bool.TryParse(userInput, out b);
-
-                if (parseOK == true)
-                {
-                    return new object[] { b };
-                }
-                else 
-                {
-                    return new object[] { new ArgumentException() };
-                }
+                Console.Write(desc);
             }
+            while (!bool.TryParse(Console.ReadLine(), out b));
+
+            return new object[] { b };
         }
     }
 }
