@@ -129,7 +129,6 @@ namespace ClientAgent.UI
             this.Manager = new ClientMessageManager(this.Client);
             
             // Events
-            this.Client.ReceivedLogEntry += this.Client_ReceivedLogEntry;
             this.Manager.ReceivedLogEntry += this.Client_ReceivedLogEntry;
         }
 

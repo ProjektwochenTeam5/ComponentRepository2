@@ -368,6 +368,7 @@
         private void AddDllToDictionary(string filename)
         {
             this.Dlls.Add(Guid.NewGuid(), this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll");
+
         }
 
         ///////////////////////////////////////////////// ON MESSAGE RECIEVED /////////////////////////////////////////////////
