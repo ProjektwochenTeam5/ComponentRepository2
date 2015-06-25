@@ -443,10 +443,10 @@
                         var targetServer = this.AllServerCpuLoads.OrderBy(x => x.Value).First();
                         if (this.ServerCpuLoad < targetServer.Value)
                         {
-                            Task t = new Task(new Action(() =>
-                            SplitJob.Split(request, this)));
+                        Task t = new Task(new Action(() =>
+                        SplitJob.Split(request, this)));
 
-                            t.Start();
+                        t.Start();
                         }
                         else
                         {
