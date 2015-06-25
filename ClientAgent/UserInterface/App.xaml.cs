@@ -67,7 +67,8 @@ namespace UserInterface
 
         /// <summary>
         /// Connects to the underlying client using the provided port argument.
-        /// If the port argument is omitted or the port is invalid 
+        /// If the port argument is omitted or the port is invalid, shows an error message
+        /// and exits the program.
         /// </summary>
         /// <param name="e">The arguments of the startup event.</param>
         protected override void OnStartup(StartupEventArgs e)

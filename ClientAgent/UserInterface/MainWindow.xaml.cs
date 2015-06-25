@@ -156,20 +156,40 @@ namespace UserInterface
         }
 
         /// <summary>
-        /// Overwrites the available components with the received components.
+        /// Overwrites the available components with the received components and
+        /// keeps favorites by comparing the component GUIDs.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         private void App_OnComponentsReceived(object sender, ComponentEventArgs e)
         {
             //TODO component received
+            
+            List<Guid> prevFavoriteCompGuids = new List<Guid>();
+
+            // temporarily save favorites
+            foreach (MyComponent comp in this.favorites)
+            {
+                prevFavoriteCompGuids.Add(comp.Component.ComponentGuid);
+            }
+            this.favorites.Clear();
+            
             lock (this.availableComps)
             {
+
                 this.availableComps.Clear();
 
-                foreach (Component comp in e.Components)
+                foreach (Component rcvdComp in e.Components)
                 {
-                    this.availableComps.Add(new MyComponent(comp));
+                    MyComponent comp = new MyComponent(rcvdComp);
+                    comp.IsFavorite = prevFavoriteCompGuids.Contains(rcvdComp.ComponentGuid);
+
+                    this.availableComps.Add(comp);
+
+                    if (comp.IsFavorite)
+                    {
+                        this.favorites.Add(comp);
+                    }
                 }
             }
 
