@@ -25,11 +25,11 @@ namespace EFunction
         /// </summary>
         public EFunction()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new List<string>();
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.OutputDescriptions = new List<string>(new[] { "double" });
         }
 
         /// <summary>

@@ -25,15 +25,11 @@ namespace Squrt
         /// </summary>
         public Squrt()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
-
-            this.InputHints.ToList().Add(typeof(int).ToString());
-
-            this.OutputHints.ToList().Add(typeof(int).ToString());
+            this.InputDescriptions = new List<string>(new[] { "num" });
+            this.OutputDescriptions = new List<string>(new[] { "result" });           
         }
 
         /// <summary>

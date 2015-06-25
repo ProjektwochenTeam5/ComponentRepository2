@@ -25,11 +25,11 @@ namespace Log
         /// </summary>
         public Log()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString(), typeof(double).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "num", "base" });
+            this.OutputDescriptions = new List<string>(new[] { "result" });
         }
 
         /// <summary>

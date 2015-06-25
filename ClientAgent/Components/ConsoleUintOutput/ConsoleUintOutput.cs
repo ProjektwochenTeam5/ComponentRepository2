@@ -25,10 +25,10 @@ namespace ConsoleUintOutput
         /// </summary>
         public ConsoleUintOutput()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
             this.OutputHints = new List<string>();
-            this.InputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "uint" });
             this.OutputDescriptions = new List<string>();     
         }
 

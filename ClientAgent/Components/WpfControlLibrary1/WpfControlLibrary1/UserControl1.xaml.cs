@@ -27,12 +27,12 @@
         /// </summary>
         public UserControl1()
         {
-            InitializeComponent();            
-            this.ComponentGuid = new Guid();
-            this.InputHints = new List<string>();
+            InitializeComponent();
+            this.ComponentGuid = Guid.NewGuid();
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "desc" });
+            this.OutputDescriptions = new List<string>(new[] { "string" });
         }
 
         /// <summary>

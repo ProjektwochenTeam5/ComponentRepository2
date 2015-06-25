@@ -25,11 +25,11 @@ namespace ConvertUintToString
         /// </summary>
         public ConvertUintToString()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "uint" });
+            this.OutputDescriptions = new List<string>(new[] { "string" });
         }
 
         /// <summary>

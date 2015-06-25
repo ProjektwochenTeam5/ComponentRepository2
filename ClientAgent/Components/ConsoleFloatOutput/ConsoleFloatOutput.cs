@@ -25,10 +25,10 @@ namespace ConsoleFloatOutput
         /// </summary>
         public ConsoleFloatOutput()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(float).ToString() });
             this.OutputHints = new List<string>();
-            this.InputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "float" });
             this.OutputDescriptions = new List<string>();     
         }
 

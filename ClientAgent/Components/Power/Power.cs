@@ -25,11 +25,11 @@ namespace Power
         /// </summary>
         public Power()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString(), typeof(double).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "number", "power"});
+            this.OutputDescriptions = new List<string>(new[] { "result" });
         }
 
         /// <summary>

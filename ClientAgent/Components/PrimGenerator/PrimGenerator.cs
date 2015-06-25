@@ -25,11 +25,11 @@ namespace PrimGenerator
         /// </summary>
         public PrimGenerator()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(List<int>).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "nth" });
+            this.OutputDescriptions = new List<string>(new[] { "int List" });
         }
 
         /// <summary>
