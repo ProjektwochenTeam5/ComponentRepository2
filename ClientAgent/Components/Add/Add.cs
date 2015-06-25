@@ -25,7 +25,7 @@ namespace Add
         /// </summary>
         public Add()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString(), typeof(int).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
             this.InputDescriptions = new List<string>(new [] { "int 1", "int 2" });
