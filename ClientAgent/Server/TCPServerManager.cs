@@ -93,7 +93,6 @@
 
                 return load / this.CPULoads.Count;
             }
-            set; 
         }
 
         public double AllClientLoad { get; set; }
