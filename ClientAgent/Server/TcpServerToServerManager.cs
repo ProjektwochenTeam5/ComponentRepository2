@@ -18,8 +18,9 @@ namespace Server
             this.Server = new ServerReceiver();
 
             this.Server.OnMessageRecieved += Server_OnMessageRecieved;
-            this.TcpManager.OnClientDisconnected += TcpManager_OnClientDisconnected;
             this.TcpManager = manager;
+            this.TcpManager.OnClientDisconnected += TcpManager_OnClientDisconnected;
+
             this.TcpManager.MyTCPServer.OnClientFetched += MyTCPServer_OnClientFetched;
 
             Task serverReceiverTask = new Task(() => this.Server.StartReceiving());

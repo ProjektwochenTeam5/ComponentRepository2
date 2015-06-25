@@ -13,18 +13,20 @@
 
     public class DataBaseWrapper
     {
-        public Dictionary<byte[], string> Data { get; set; }
+        public Dictionary<byte[], string> AtomicData { get; set; }
+
+        public Dictionary<string, byte[]> ComplexData { get; set; }
 
         public object locker = new object();
 
         public string StorePath { get { return Path.Combine(Directory.GetParent(Directory.GetCurrentDirectory()).Parent.FullName) + "\\Store"; } }
 
-        public void GetAssemblies()
+        public void ReadData()
         {
             lock (this.locker)
             {
-                this.Data = new Dictionary<byte[], string>();
-
+                this.AtomicData = new Dictionary<byte[], string>();
+                this.ComplexData = new Dictionary<string, byte[]>();
                 foreach (string item in Directory.GetFiles(this.StorePath))
                 {
                     if (Path.GetFileName(item) == "Core.Component.dll")
@@ -32,8 +34,17 @@
                         continue;
                     }
 
-                    byte[] data = File.ReadAllBytes(item);
-                    this.Data.Add(data, item);
+                    if (Path.GetExtension(item) == ".dll")
+                    {
+                        byte[] data = File.ReadAllBytes(item);
+                        this.AtomicData.Add(data, item);
+                    }
+
+                    if (Path.GetExtension(item) == ".dat")
+                    {
+                        byte[] data = File.ReadAllBytes(item);
+                        this.ComplexData.Add(item, data);
+                    }
                 }
             }
         }
@@ -56,6 +67,27 @@
                 return comp;
             }
         }
+
+        public Component ReadInfosFromDatFile(string name)
+        {
+            byte[] data = this.GetComplexComponent(name);
+
+            using (MemoryStream ms = new MemoryStream(data))
+            {
+                try
+                {
+                    BinaryFormatter fs = new BinaryFormatter();
+                    Component c = (Component)fs.Deserialize(ms);
+                    return c;
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine("Exception was thrown at deserializing complex byte array to Network.Component\n" + e.Message);
+                    return null;
+                }
+            }
+        }
+
 
         public bool StoreComponent(byte[] dll, string filename)
         {
@@ -106,7 +138,7 @@
 
         public byte[] GetComplexComponent(string filename)
         {
-            using (FileStream fs = new FileStream(this.StorePath + "\\" + filename + ".dat", FileMode.Create, FileAccess.Write, FileShare.Read))
+            using (FileStream fs = new FileStream(this.StorePath + "\\" + filename + ".dat", FileMode.Open, FileAccess.Read, FileShare.Read))
             {
                 try
                 {
