@@ -18,7 +18,9 @@ namespace Server
             this.Server = new ServerReceiver();
 
             this.Server.OnMessageRecieved += Server_OnMessageRecieved;
+            this.TcpManager.OnClientDisconnected += TcpManager_OnClientDisconnected;
             this.TcpManager = manager;
+            this.TcpManager.MyTCPServer.OnClientFetched += MyTCPServer_OnClientFetched;
 
             Task serverReceiverTask = new Task(() => this.Server.StartReceiving());
             serverReceiverTask.Start();
@@ -26,6 +28,20 @@ namespace Server
             KeepAliveServerToServer keepAlive = new KeepAliveServerToServer(this);
             Task keepAliveTask = new Task(() => keepAlive.SendKeepAlives(this.Server.Servers));
             keepAliveTask.Start();
+        }
+
+        void TcpManager_OnClientDisconnected(object sender, ClientFetchedEventArgs e)
+        {
+            ClientUpdateServerToServer upd = new ClientUpdateServerToServer(this);
+            Task clientUpdateTask = new Task(() => upd.SendClientUpdateRequest(this.Server.Servers, e.ClientInfo, ClientState.Disconnected));
+            clientUpdateTask.Start();
+        }
+
+        void MyTCPServer_OnClientFetched(object sender, ClientFetchedEventArgs e)
+        {
+            ClientUpdateServerToServer upd = new ClientUpdateServerToServer(this);
+            Task clientUpdateTask = new Task(() => upd.SendClientUpdateRequest(this.Server.Servers, e.ClientInfo, ClientState.Connected));
+            clientUpdateTask.Start();
         }
 
         public TCPServerManager TcpManager { get; set; }

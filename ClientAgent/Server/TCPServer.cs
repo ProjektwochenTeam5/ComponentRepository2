@@ -34,7 +34,7 @@ namespace Server
         public event EventHandler<MessageRecievedEventArgs> OnMessageRecieved;
 
         public event EventHandler<ClientFetchedEventArgs> OnClientFetched;
-
+        
         public TCPServer()
         {
             this.MyListener = new TcpListener(IPAddress.Any, 12345);
