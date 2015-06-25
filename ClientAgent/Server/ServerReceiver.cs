@@ -24,7 +24,7 @@ namespace Server
 
         public ServerReceiver()
         {
-            this.ServerGuid = new Guid();
+            this.ServerGuid = Guid.NewGuid();
             this.Listener = new TcpListener(IPAddress.Any, 8080);
             this.Servers = new Dictionary<Guid, IPEndPoint>();
             this.FriendlyName = "Team 5 Server";
