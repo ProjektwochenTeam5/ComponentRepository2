@@ -477,7 +477,6 @@ namespace ClientAgent
                 m.MetadataComponents.Count));
 
             this.OnReceivedLogEntry(new StringEventArgs(strs.ToArray()));
-
         }
 
         /// <summary>
