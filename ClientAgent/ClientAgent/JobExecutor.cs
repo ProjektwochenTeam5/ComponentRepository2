@@ -84,6 +84,10 @@ namespace ClientAgent
             if (!client.HasExited)
             {
                 TcpClient cl = l.AcceptTcpClient();
+                cl.SendBufferSize = ushort.MaxValue * 16;
+                cl.ReceiveBufferSize = ushort.MaxValue * 16;
+                cl.ReceiveTimeout = 30;
+
                 BinaryFormatter f = new BinaryFormatter();
 
                 FileInfo dlli = new FileInfo("temp\\" + dll);

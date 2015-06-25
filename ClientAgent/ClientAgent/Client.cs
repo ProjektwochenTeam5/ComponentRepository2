@@ -215,19 +215,22 @@ namespace ClientAgent
                 throw new InvalidOperationException();
             }
 
-            try
+            while (true)
             {
-                this.ConnectionClient.Connect(pt);
-                this.ConnectedEndPoint = pt;
-                this.OnConnected(EventArgs.Empty);
-                this.OnReceivedLogEntry(new StringEventArgs(string.Format(
-                    "Connected to {0}:{1}",
-                    this.ConnectedEndPoint.Address,
-                    this.ConnectedEndPoint.Port)));
-            }
-            catch (SocketException)
-            {
-                throw;
+                try
+                {
+                    this.ConnectionClient.Connect(pt);
+                    this.ConnectedEndPoint = pt;
+                    this.OnConnected(EventArgs.Empty);
+                    this.OnReceivedLogEntry(new StringEventArgs(string.Format(
+                        "Connected to {0}:{1}",
+                        this.ConnectedEndPoint.Address,
+                        this.ConnectedEndPoint.Port)));
+                    break;
+                }
+                catch (SocketException)
+                {
+                }
             }
         }
 
@@ -284,9 +287,16 @@ namespace ClientAgent
             mes.AddRange(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)msg.MessageType });
             mes.AddRange(ms.ToArray());
 
-            if (this.ConnectionClient.GetStream().CanWrite && this.ConnectionClient.Connected)
+            if (this.ConnectionClient.Connected && this.ConnectionClient.GetStream().CanWrite)
             {
-                this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
+                try
+                {
+                    this.ConnectionClient.GetStream().Write(mes.ToArray(), 0, mes.Count);
+                }
+                catch (IOException exc)
+                {
+                    this.OnReceivedLogEntry(new StringEventArgs(exc.Message));
+                }
             }
         }
 
@@ -403,9 +413,8 @@ namespace ClientAgent
                         AgentAccept a = (AgentAccept)args.Client.formatter.Deserialize(ms);
                         Console.WriteLine(a.ServerIP);
                         args.Stop();
-                        Console.WriteLine("Trying to connect...");
+                        args.Client.OnReceivedLogEntry(new StringEventArgs("Trying to connect..."));
                         args.Client.ConnectTo(a.ServerIP);
-                        Console.WriteLine("Connected");
                     }
                 }
 
@@ -434,7 +443,7 @@ namespace ClientAgent
                 // send keep alive
                 if (DateTime.Now.Subtract(lastKeepAlive).TotalSeconds >= 10)
                 {
-                    Console.WriteLine("Keep Alive {0}", DateTime.Now);
+                    args.Client.OnReceivedLogEntry(new StringEventArgs("Keep Alive"));
                     lastKeepAlive = DateTime.Now;
                     args.Client.SendMessage(new KeepAlive() { CPUWorkload = (int)cpu.NextValue() });
                 }
@@ -454,7 +463,15 @@ namespace ClientAgent
                     }
 
                     byte[] body = new byte[bodylen];
+
+                    do
+                    {
+                        Thread.Sleep(50);
+                    }
+                    while (args.Client.ConnectionClient.Available < bodylen);
+
                     int rcvbody = str.Read(body, 0, (int)bodylen);
+
 
                     using (MemoryStream ms = new MemoryStream(body))
                     {

@@ -237,12 +237,15 @@ namespace UserInterface
 
                     byte[] body = new byte[bodylen];
                     
-                    while (args.Client.Available < bodylen)
-                    {
-                        Thread.Sleep(5);
-                    }
-
                     int rcvbody = stream.Read(body, 0, (int)bodylen);
+
+                    do
+                    {
+                        Thread.Sleep(10);
+                    }
+                    while (rcvbody < bodylen);
+
+                    ////MessageBox.Show(rcvbody.ToString() + " | " + bodylen.ToString());
 
                     using (MemoryStream ms = new MemoryStream(body))
                     {
