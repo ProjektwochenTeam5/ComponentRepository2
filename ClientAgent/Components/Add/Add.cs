@@ -28,8 +28,8 @@ namespace Add
             this.ComponentGuid = new Guid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString(), typeof(int).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new [] { "int 1", "int 2" });
+            this.OutputDescriptions = new List<string>(new[] { "result" });
         }
        
         /// <summary>
@@ -102,7 +102,7 @@ namespace Add
         {
             if (values.Count() != 2)
             {
-                yield return new object[] { new ArgumentException() };
+                yield return new ArgumentException();
             }
            
             int result = 0;

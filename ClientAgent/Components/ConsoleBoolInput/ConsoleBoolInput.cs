@@ -25,11 +25,11 @@ namespace ConsoleBoolInput
         /// </summary>
         public ConsoleBoolInput()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new [] { "Description" });
+            this.OutputDescriptions = new List<string>(new [] { "Result" });
         }
 
         /// <summary>
@@ -105,21 +105,15 @@ namespace ConsoleBoolInput
                 return new object[] { new ArgumentException() };
             }
 
-            while (true)
+            bool b;
+            do
             {
-                Console.WriteLine("Please enter the operating value. (true or false)");
-                string userInput = Console.ReadLine();
-                bool parseOK;
-                bool b = true;
-                if (string.IsNullOrEmpty(userInput) == true)
-                {
-                    Console.WriteLine("Please enter any value you want to operate with. ");
-                }
+                Console.Write("Please enter the operating value. (true or false)");
 
-                parseOK = bool.TryParse(userInput, out b);
-
-                return new object[] { b };
             }
+            while (!bool.TryParse(Console.ReadLine(), out b));
+
+            return new object[] { b };
         }
     }
 }
