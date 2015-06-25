@@ -26,8 +26,8 @@ namespace Div
         public Div()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString(), typeof(int).ToString() });
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString(), typeof(long).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
             this.InputDescriptions = new List<string>(new[] { "Dividend", "Divisor" });
             this.OutputDescriptions = new List<string>(new[] { "Result" });
         }
@@ -105,8 +105,8 @@ namespace Div
                 return new object[] { new ArgumentException() };
             }
 
-            int dividend = (int)values.ElementAt(0);
-            int divisor = (int)values.ElementAt(1);
+            long dividend = (long)values.ElementAt(0);
+            long divisor = (long)values.ElementAt(1);
             
             if (divisor == 0)
             {

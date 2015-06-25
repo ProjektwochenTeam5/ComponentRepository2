@@ -29,7 +29,7 @@ namespace ConvertStringToInt
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
             this.InputDescriptions = new List<string>(new[] { "string" });
-            this.OutputDescriptions = new List<string>(new[] { "int" });            
+            this.OutputDescriptions = new List<string>(new[] { "long" });            
         }
 
         /// <summary>
@@ -113,9 +113,9 @@ namespace ConvertStringToInt
             }
 
             bool parseOK;
-            int i;
+            long i;
 
-            parseOK = int.TryParse(output, out i);
+            parseOK = long.TryParse(output, out i);
 
             if (parseOK == true)
             {
