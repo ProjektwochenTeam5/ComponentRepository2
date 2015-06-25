@@ -331,7 +331,7 @@ namespace ClientAgent.UI
                                 case StatusCode.ExecuteJob:
                                     ExecuteRequest eq = rcv as ExecuteRequest;
                                     this.Client.SendMessage(eq);
-
+                                    
                                     break;
 
                                 case StatusCode.StorComponent:

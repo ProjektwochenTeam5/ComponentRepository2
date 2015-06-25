@@ -25,11 +25,11 @@ namespace ConsoleUintInput
         /// </summary>
         public ConsoleUintInput()
         {
-            this.ComponentGuid = new Guid();
+            this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() }); 
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
-            this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();
+            this.InputDescriptions = new List<string>(new[] { "desc" });
+            this.OutputDescriptions = new List<string>(new[] { "out" });
         }
 
         /// <summary>
@@ -100,33 +100,18 @@ namespace ConsoleUintInput
         /// <returns>Collection of output arguments.</returns>
         public IEnumerable<object> Evaluate(IEnumerable<object> values)
         {
-            if (values.Count() != 1)
+            string desc = values.Count() == 1 ?
+                values.Single().ToString() :
+                "Please enter the operating value (uint): ";
+
+            uint b;
+            do
             {
-                return new object[] { new ArgumentException() };
+                Console.Write(desc);
             }
+            while (!uint.TryParse(Console.ReadLine(), out b));
 
-            while (true)
-            {
-                Console.WriteLine("Please enter the operating value.");
-                string userInput = Console.ReadLine();
-                bool parseOK;
-                double num = 0;
-                if (string.IsNullOrEmpty(userInput) == true)
-                {
-                    Console.WriteLine("Please enter any value you want to operate with. ");
-                }
-
-                parseOK = double.TryParse(userInput, out num);
-
-                if (parseOK == true)
-                {
-                    return new object[] { num };
-                }
-                else 
-                {
-                    return new object[] { new ArgumentException() };
-                }
-            }
+            return new object[] { b };
         }
     }
 }

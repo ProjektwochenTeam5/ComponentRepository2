@@ -25,10 +25,10 @@ namespace Add
         /// </summary>
         public Add()
         {
-            this.ComponentGuid = Guid.NewGuid();
+            this.ComponentGuid = new Guid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString(), typeof(int).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
-            this.InputDescriptions = new List<string>(new[] { "num1", "num2" });
+            this.InputDescriptions = new List<string>(new [] { "int 1", "int 2" });
             this.OutputDescriptions = new List<string>(new[] { "result" });
         }
        
@@ -102,7 +102,7 @@ namespace Add
         {
             if (values.Count() != 2)
             {
-                yield return new object[] { new ArgumentException() };
+                yield return new ArgumentException();
             }
            
             int result = 0;
