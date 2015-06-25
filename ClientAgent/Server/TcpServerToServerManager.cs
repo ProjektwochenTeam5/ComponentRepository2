@@ -22,6 +22,9 @@ namespace Server
             this.TcpManager.OnClientDisconnected += TcpManager_OnClientDisconnected;
 
             this.TcpManager.MyTCPServer.OnClientFetched += MyTCPServer_OnClientFetched;
+            this.TcpManager.OnAssemblyNotInStore += TcpManager_OnAssemblyNotInStore;
+            this.TcpManager.OnComponentSubmitted += TcpManager_OnComponentSubmitted;
+            this.TcpManager.OnJobReadyToExecute += TcpManager_OnJobReadyToExecute;
 
             Task serverReceiverTask = new Task(() => this.Server.StartReceiving());
             serverReceiverTask.Start();
@@ -29,6 +32,36 @@ namespace Server
             KeepAliveServerToServer keepAlive = new KeepAliveServerToServer(this);
             Task keepAliveTask = new Task(() => keepAlive.SendKeepAlives(this.Server.Servers));
             keepAliveTask.Start();
+        }
+
+        void TcpManager_OnJobReadyToExecute(object sender, JobEventArgs e)
+        {
+            JobServerToServer jobExec = new JobServerToServer(this);
+            var ipEndPoint = this.Server.Servers.FirstOrDefault(x => x.Key == e.TargetServer).Value;
+            Task jobExecTask = new Task(() => jobExec.SendJobRequest(ipEndPoint, e.MyComponent, e.TargetDisplay, e.TargetCalc, e.InputData, e.Friendly));
+            jobExecTask.Start();
+        }
+
+        void TcpManager_OnComponentSubmitted(object sender, ComponentSubmitEventArgs e)
+        {
+            ComponentSubmitServerToServer componentSubmit = new ComponentSubmitServerToServer(this);
+            Task componentSubmitTask = new Task(() => componentSubmit.SendComponentSubmitRequest(this.Server.Servers, e.MyComponent));
+            componentSubmitTask.Start();
+        }
+
+        void TcpManager_OnAssemblyNotInStore(object sender, GetAssemblyEventArgs e)
+        {
+            AssemblyServerToServer assembly = new AssemblyServerToServer(this);
+            var ass = assembly.SendAssemblyRequest(this.Server.Servers, e.ComponentID);
+            if (ass != null)
+            {
+                this.TcpManager.GiveTransferComponentResponse(e.Info, e.ComponentID, e.MessageID);
+            }
+            else
+            {
+                Console.WriteLine("We don't have this component in store!");
+                this.TcpManager.MyTCPServer.SendError(e.Info, e.MessageID);
+            }
         }
 
         void TcpManager_OnClientDisconnected(object sender, ClientFetchedEventArgs e)
