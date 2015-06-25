@@ -42,11 +42,11 @@ namespace UserInterface
         /// Sends a job request to the underlying client.
         /// </summary>
         /// <param name="job">The job to execute.</param>
-        public void SendJobRequest(Component job)
+        public bool SendJobRequest(Component job)
         {
-            //TODO send job request to agent
             DoJobRequest req = new DoJobRequest() { Job = job };
-            SendMessage(req);
+
+            return SendMessage(req);
         }
 
         /// <summary>
@@ -54,7 +54,7 @@ namespace UserInterface
         /// </summary>
         /// <param name="friendlyName">The friendly name of the component to send.</param>
         /// <param name="component">The component to send.</param>
-        public void SendComplexComponent(string friendlyName, Component component)
+        public bool SendComplexComponent(string friendlyName, Component component)
         {
             //TODO send complex component
             StoreComponent storeReq = new StoreComponent();            
@@ -65,6 +65,8 @@ namespace UserInterface
             storeReq.FriendlyName = friendlyName;
             storeReq.Component = ms.ToArray();
             storeReq.IsComplex = true;
+
+            return SendMessage(storeReq);
         }
 
         /// <summary>
@@ -163,13 +165,14 @@ namespace UserInterface
         /// Sends a message to the client which started this GUI application.
         /// </summary>
         /// <param name="msg">The message to send.</param>
-        private void SendMessage(Message msg)
+        private bool SendMessage(Message msg)
         {
             if (this.client == null)
             {
-                return;
+                return false;
             }
 
+            bool sendSuccess = false;
             MemoryStream ms = new MemoryStream();
             this.formatter.Serialize(ms, msg);
 
@@ -187,8 +190,17 @@ namespace UserInterface
 
             if (this.client.Connected && this.client.GetStream().CanWrite)
             {
-                this.client.GetStream().Write(byteMsg.ToArray(), 0, byteMsg.Count);
+                try
+                {
+                    this.client.GetStream().Write(byteMsg.ToArray(), 0, byteMsg.Count);
+                    sendSuccess = true;
+                }
+                catch
+                {
+                }
             }
+
+            return sendSuccess;
         }
 
         /// <summary>
@@ -224,6 +236,12 @@ namespace UserInterface
                     }
 
                     byte[] body = new byte[bodylen];
+                    
+                    while (args.Client.Available < bodylen)
+                    {
+                        Thread.Sleep(5);
+                    }
+
                     int rcvbody = stream.Read(body, 0, (int)bodylen);
 
                     using (MemoryStream ms = new MemoryStream(body))

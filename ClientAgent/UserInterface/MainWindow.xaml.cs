@@ -764,18 +764,17 @@ namespace UserInterface
             job.InputDescriptions = this.inputDescriptions;
             job.JobComponent = ConvertLayoutToComponent();
 
-            try
+            if (this.app.SendJobRequest(job.JobComponent))
             {
-                this.app.SendJobRequest(job.JobComponent); //TODO
-
+                //TODO
                 MessageBox.Show("Job is executing...",
                     "Execute job",
                     MessageBoxButton.OK,
                     MessageBoxImage.Information);
             }
-            catch (ApplicationException ex)
+            else
             {
-                MessageBox.Show("Could not execute job.\n\n" + ex.Message,
+                MessageBox.Show("Could send job to underlying client for execution.",
                     "Execute job",
                     MessageBoxButton.OK,
                     MessageBoxImage.Warning);
@@ -873,27 +872,22 @@ namespace UserInterface
                         this.availableComps.Add(new MyComponent(newComp));
                     }
 
-                    try
+                    if (!this.app.SendComplexComponent(newComp.FriendlyName, newComp))
                     {
-                        this.app.SendComplexComponent(newComp.FriendlyName, newComp);
-                    }
-                    catch (ApplicationException ex)
-                    {
-                        MessageBox.Show("Could not send component to server.\n\n" + ex.Message,
+                        MessageBox.Show("Could not send component to server.",
                             "Create component",
                             MessageBoxButton.OK,
                             MessageBoxImage.Warning);
                     }
-                    
-                    if (MessageBox.Show(
-                            "Do you wish to clear the blueprint space?", 
-                            "Clear blueprint space", 
-                            MessageBoxButton.YesNo, 
-                            MessageBoxImage.Question) == MessageBoxResult.Yes)
+                    else if (MessageBox.Show(
+                                "Do you wish to clear the blueprint space?",
+                                "Clear blueprint space",
+                                MessageBoxButton.YesNo,
+                                MessageBoxImage.Question) == MessageBoxResult.Yes)
                     {
                         this.toggleLink.IsChecked = false;
                         DeleteAll();
-                    }
+                    }                    
                 }
             }
             else
