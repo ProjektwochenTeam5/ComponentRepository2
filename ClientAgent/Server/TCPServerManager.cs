@@ -53,6 +53,12 @@
 
         public event EventHandler<ClientFetchedEventArgs> OnClientDisconnected;
 
+        public event EventHandler<GetAssemblyEventArgs> OnAssemblyNotInStore;
+
+        public event EventHandler<ComponentSubmitEventArgs> OnComponentSubmitted;
+
+        public event EventHandler<JobEventArgs> OnJobReadyToExecute;
+
         public Dictionary<Guid, int> CPULoads { get; set; }
 
         public Dictionary<Guid,List<Component>> AllServerComponents { get; set; }
@@ -74,6 +80,20 @@
         public List<Guid> JobsQueued { get; set; }
 
         public Guid ServerGuid { get; set; }
+
+        public int ServerCpuLoad 
+        { 
+            get
+            {
+                var load = 0;
+                foreach (var item in this.CPULoads)
+                {
+                    load += item.Value;
+                }
+
+                return load / this.CPULoads.Count;
+            }
+        }
 
         public double AllClientLoad { get; set; }
 
@@ -389,8 +409,9 @@
                         }
                         else
                         {
-                            Console.WriteLine("We don't have this component in store!");
-                            this.MyTCPServer.SendError(e.Info, request.MessageID);
+                            this.FireOnAssemblyNotInStore(new GetAssemblyEventArgs(e.Info, request.MessageID, request.ComponentID));
+                            //Console.WriteLine("We don't have this component in store!");
+                            //this.MyTCPServer.SendError(e.Info, request.MessageID);
                         }
 
                         break;                        
@@ -410,10 +431,18 @@
                         this.MyTCPServer.SendAck(e.Info, request.MessageID);
 
                         Console.WriteLine("DoJobRequest recieved!");
+                        var targetServer = this.AllServerCpuLoads.OrderBy(x => x.Value).First();
+                        if (this.ServerCpuLoad < targetServer.Value)
+                        {
                         Task t = new Task(new Action(() =>
                         SplitJob.Split(request, this)));
 
                         t.Start();
+                        }
+                        else
+                        {
+                            this.OnJobReadyToExecute(this, new JobEventArgs(request.Job, request.TargetDisplay, request.TargetDisplay, new List<object>(), request.Job.FriendlyName, targetServer.Key));
+                        }
 
                         break;
                     }
@@ -443,9 +472,21 @@
                         {
                             this.ComplexComponent.Add(Guid.NewGuid(), storecomponent.FriendlyName);
                             this.MyTCPServer.Wrapper.StoreComplexComponent(storecomponent.Component, storecomponent.FriendlyName);
-                           
                         }
 
+                        Component c = null;
+                        foreach (var item in this.Components)
+                        {
+                            if (item.Value.FriendlyName == e.Info.FriendlyName)
+                            {
+                                c = item.Value;
+                            }
+                        }
+
+                        if (c != null)
+                        {
+                            this.FireOnComponentSubmitted(new ComponentSubmitEventArgs(c));
+                        }
 
                         break;
                     }
@@ -456,7 +497,7 @@
 
         ///////////////////////////////////////////////// ON MESSAGE RECIEVED /////////////////////////////////////////////////
 
-        private void GiveTransferComponentResponse(ClientInfo clientInfo, Guid guid, Guid requestid)
+        public void GiveTransferComponentResponse(ClientInfo clientInfo, Guid guid, Guid requestid)
         {
             string path = string.Empty;
             try
@@ -549,5 +590,28 @@
             }
         }
 
+        public void FireOnAssemblyNotInStore(GetAssemblyEventArgs e)
+        {
+            if (this.OnAssemblyNotInStore != null)
+            {
+                this.OnAssemblyNotInStore(this, e);
+            }
+        }
+
+        public void FireOnComponentSubmitted(ComponentSubmitEventArgs e)
+        {
+            if (this.OnComponentSubmitted != null)
+            {
+                this.OnComponentSubmitted(this, e);
+            }
+        }
+
+        public void FireOnJobReadyToExecute(JobEventArgs e)
+        {
+            if (this.OnJobReadyToExecute != null)
+            {
+                this.OnJobReadyToExecute(this, e);
+            }
+        }
     }
 }

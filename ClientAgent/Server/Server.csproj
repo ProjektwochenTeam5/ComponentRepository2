@@ -49,10 +49,13 @@
     <Compile Include="ClientFetchedEventArgs.cs" />
     <Compile Include="ClientTerminatedEventArgs.cs" />
     <Compile Include="ClientUpdateServerToServer.cs" />
+    <Compile Include="ComponentSubmitEventArgs.cs" />
     <Compile Include="ComponentSubmitServerToServer.cs" />
     <Compile Include="DataBaseWrapper.cs" />
     <Compile Include="ExtendedComponentEdge.cs" />
+    <Compile Include="GetAssemblyEventArgs.cs" />
     <Compile Include="GUI.cs" />
+    <Compile Include="JobEventArgs.cs" />
     <Compile Include="JobResponseRecievedEventArgs.cs" />
     <Compile Include="JobServerToServer.cs" />
     <Compile Include="KeepAliveServerToServer.cs" />
