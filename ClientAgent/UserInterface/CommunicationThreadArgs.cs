@@ -13,6 +13,13 @@ namespace UserInterface
             }
 
             this.Client = client;
+            this.Exit = false;
+        }
+
+        public bool Exit
+        {
+            get;
+            set;
         }
 
         public TcpClient Client

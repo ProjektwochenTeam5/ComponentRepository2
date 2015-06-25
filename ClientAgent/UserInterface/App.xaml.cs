@@ -36,6 +36,8 @@ namespace UserInterface
         /// </summary>
         private Thread readingThread = null;
 
+        private CommunicationThreadArgs readingThreadArgs = null;
+
         /// <summary>
         /// Sends a job request to the underlying client.
         /// </summary>
@@ -107,7 +109,8 @@ namespace UserInterface
                 this.client.Connect(new IPEndPoint(IPAddress.Loopback, clientPort));
 
                 this.readingThread = new Thread(new ParameterizedThreadStart(HandleIncomingMessages));
-                this.readingThread.Start(new CommunicationThreadArgs(client));                
+                this.readingThreadArgs = new CommunicationThreadArgs(client);
+                this.readingThread.Start(this.readingThreadArgs);                
             }
             catch (Exception ex)
             {
@@ -132,6 +135,7 @@ namespace UserInterface
             {
                 try
                 {
+                    readingThreadArgs.Exit = true;
                     SendTerminateSignal();
                     this.client.GetStream().Close();
                     this.client.Close();
@@ -202,7 +206,7 @@ namespace UserInterface
 
             stream = args.Client.GetStream();
 
-            while (true)
+            while (!args.Exit)
             {
                 if (stream.DataAvailable)
                 {
@@ -235,8 +239,6 @@ namespace UserInterface
                                     this.OnComponentsReceived(this, new ComponentEventArgs(compInfos.MetadataComponents));
                                 }
                                 break;
-
-                                //TODO
                         }
                     }
                 }
