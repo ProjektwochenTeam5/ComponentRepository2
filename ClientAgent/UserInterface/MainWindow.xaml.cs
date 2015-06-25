@@ -142,8 +142,6 @@ namespace UserInterface
                     }
                 }
             }
-
-            MessageBox.Show("New components received."); //TODO test output
         }
 
         /// <summary>
