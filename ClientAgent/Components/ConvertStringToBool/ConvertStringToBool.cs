@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleListOutput.cs" company="FHWN"> 
+// <copyright file="ConvertStringToBool.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleListOutput
+namespace ConvertStringToBool
 {
     using System;
     using System.Collections.Generic;
@@ -16,20 +16,20 @@ namespace ConsoleListOutput
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for the console output.
+    /// This is the component class for converting string to bool.
     /// </summary>
-    public class ConsoleListOutput : IComponent
+    public class ConvertStringToBool : IComponent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleListOutput"/> class.
+        /// Initializes a new instance of the <see cref="ConvertStringToBool"/> class.
         /// </summary>
-        public ConsoleListOutput()
+        public ConvertStringToBool()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(List<int>).ToString() });
-            this.OutputHints = new List<string>();
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString() });
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();     
+            this.OutputDescriptions = new List<string>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ConsoleListOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console list output"; }
+            get { return "Convert string to bool"; }
         }
 
         /// <summary>
@@ -105,14 +105,26 @@ namespace ConsoleListOutput
                 return new object[] { new ArgumentException() };
             }
 
-            List<int> something = (List<int>)values.ElementAt(0);
+            string output = string.Empty;
 
-            for (int i = 0; i < something.Count; i++)
+            foreach (var item in values)
             {
-                Console.WriteLine(something[i]);
+                output += (string)item;
             }
 
-            return null;
+            bool parseOK;
+            bool b;
+
+            parseOK = bool.TryParse(output, out b);
+
+            if (parseOK == true)
+            {
+                return new object[] { b };
+            }
+            else
+            {
+                return new object[] { new ArgumentException() };
+            }
         }
     }
 }

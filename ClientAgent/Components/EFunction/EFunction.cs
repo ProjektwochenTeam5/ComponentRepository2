@@ -16,7 +16,7 @@ namespace EFunction
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for multiplying a number with e.
+    /// This is the component class for creating the number e.
     /// </summary>
     public class EFunction
     {  
@@ -50,7 +50,7 @@ namespace EFunction
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Use e function"; }
+            get { return "Use E function"; }
         }
 
         /// <summary>

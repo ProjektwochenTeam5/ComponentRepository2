@@ -18,7 +18,7 @@ namespace ConsoleFloatOutput
     /// <summary>
     /// This is the component class for the console output.
     /// </summary>
-    public class ConsoleFloatOutput
+    public class ConsoleFloatOutput : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleFloatOutput"/> class.
@@ -50,7 +50,7 @@ namespace ConsoleFloatOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Float Output"; }
+            get { return "Console float output"; }
         }
 
         /// <summary>
@@ -104,17 +104,13 @@ namespace ConsoleFloatOutput
             {
                 return new object[] { new ArgumentException() };
             }
-
-            bool parseOK;
+            
             float ioutput = 0;
-            string output = string.Empty;
-
+            
             foreach (var item in values)
             {
-                output += (string)item;
-            }
-
-            parseOK = float.TryParse(output, out ioutput);
+                ioutput += (float)item;
+            }                        
            
             Console.WriteLine(ioutput);
 

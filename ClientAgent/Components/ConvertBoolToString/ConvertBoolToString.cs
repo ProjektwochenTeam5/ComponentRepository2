@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleListOutput.cs" company="FHWN"> 
+// <copyright file="ConvertBoolToString.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleListOutput
+namespace ConvertBoolToString
 {
     using System;
     using System.Collections.Generic;
@@ -16,20 +16,20 @@ namespace ConsoleListOutput
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for the console output.
+    /// This is the component class for converting bool to string.
     /// </summary>
-    public class ConsoleListOutput : IComponent
+    public class ConvertBoolToString : IComponent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleListOutput"/> class.
+        /// Initializes a new instance of the <see cref="ConvertBoolToString"/> class.
         /// </summary>
-        public ConsoleListOutput()
+        public ConvertBoolToString()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(List<int>).ToString() });
-            this.OutputHints = new List<string>();
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();     
+            this.OutputDescriptions = new List<string>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ConsoleListOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console list output"; }
+            get { return "Convert boolean to string"; }
         }
 
         /// <summary>
@@ -105,14 +105,16 @@ namespace ConsoleListOutput
                 return new object[] { new ArgumentException() };
             }
 
-            List<int> something = (List<int>)values.ElementAt(0);
+            bool b = true;
 
-            for (int i = 0; i < something.Count; i++)
+            foreach(bool item in values)
             {
-                Console.WriteLine(something[i]);
+                b = item;
             }
 
-            return null;
+            string s = Convert.ToString(b);
+
+            return new object[] { s };
         }
     }
 }

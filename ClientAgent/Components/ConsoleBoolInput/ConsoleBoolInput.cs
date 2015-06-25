@@ -18,18 +18,18 @@ namespace ConsoleBoolInput
     /// <summary>
     /// This is the component class for the console input.
     /// </summary>
-    public class ConsoleBoolInput
+    public class ConsoleBoolInput : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleBoolInput"/> class.
         /// </summary>
         public ConsoleBoolInput()
         {
-            this.ComponentGuid = Guid.NewGuid();
+            this.ComponentGuid = new Guid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(bool).ToString() });
-            this.InputDescriptions = new List<string>(new [] { "Description" });
-            this.OutputDescriptions = new List<string>(new [] { "Result" });
+            this.InputDescriptions = new List<string>();
+            this.OutputDescriptions = new List<string>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ConsoleBoolInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Bool Input"; }
+            get { return "Console boolean input"; }
         }
 
         /// <summary>
@@ -105,15 +105,28 @@ namespace ConsoleBoolInput
                 return new object[] { new ArgumentException() };
             }
 
-            bool b;
-            do
+            while (true)
             {
-                Console.Write("Please enter the operating value. (true or false)");
+                Console.WriteLine("Please enter the operating value. (true or false)");
+                string userInput = Console.ReadLine();
+                bool parseOK;
+                bool b = true;
+                if (string.IsNullOrEmpty(userInput) == true)
+                {
+                    Console.WriteLine("Please enter any value you want to operate with. ");
+                }
+               
+                parseOK = bool.TryParse(userInput, out b);
 
+                if (parseOK == true)
+                {
+                    return new object[] { b };
+                }
+                else 
+                {
+                    return new object[] { new ArgumentException() };
+                }
             }
-            while (!bool.TryParse(Console.ReadLine(), out b));
-
-            return new object[] { b };
         }
     }
 }

@@ -1,35 +1,35 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleOutput.cs" company="FHWN"> 
+// <copyright file="ConvertFloatToString.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleOutput
+namespace ConvertFloatToString
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;    
+    using System.Collections.ObjectModel;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for the console output.
+    /// This is the component class for converting float to string.
     /// </summary>
-    public class ConsoleOutput : IComponent
+    public class ConvertFloatToString : IComponent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleOutput"/> class.
+        /// Initializes a new instance of the <see cref="ConvertFloatToString"/> class.
         /// </summary>
-        public ConsoleOutput()
+        public ConvertFloatToString()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
-            this.OutputHints = new List<string>();
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();     
+            this.OutputDescriptions = new List<string>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ConsoleOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Output"; }
+            get { return "Convert float to string"; }
         }
 
         /// <summary>
@@ -105,16 +105,16 @@ namespace ConsoleOutput
                 return new object[] { new ArgumentException() };
             }
 
-            string output = string.Empty;
+            float f = 0;
 
             foreach (var item in values)
             {
-                output += (string)item;
+                f += (float)item;
             }
-           
-            Console.WriteLine(output);
 
-            return null;
+            string s = Convert.ToString(f);
+
+            return new object[] { s };
         }
     }
 }

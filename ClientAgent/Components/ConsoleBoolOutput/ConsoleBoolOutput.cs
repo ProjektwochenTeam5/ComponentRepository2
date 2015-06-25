@@ -18,7 +18,7 @@ namespace ConsoleBoolOutput
     /// <summary>
     /// This is the component class for the console output.
     /// </summary>
-    public class ConsoleBoolOutput
+    public class ConsoleBoolOutput : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleBoolOutput"/> class.
@@ -50,7 +50,7 @@ namespace ConsoleBoolOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Boolean Output"; }
+            get { return "Console boolean output"; }
         }
 
         /// <summary>
@@ -104,19 +104,11 @@ namespace ConsoleBoolOutput
             {
                 return new object[] { new ArgumentException() };
             }
-
-            bool parseOK;
-            bool ioutput = true;
-            string output = string.Empty;
-
-            foreach (var item in values)
+            
+            foreach (bool item in values)
             {
-                output += (string)item;
-            }
-
-            parseOK = bool.TryParse(output, out ioutput);
-           
-            Console.WriteLine(ioutput);
+                Console.WriteLine(item);
+            }                      
 
             return null;
         }

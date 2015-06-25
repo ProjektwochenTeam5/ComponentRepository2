@@ -18,7 +18,7 @@ namespace ConsoleFloatInput
     /// <summary>
     /// This is the component class for the console input.
     /// </summary>
-    public class ConsoleFloatInput
+    public class ConsoleFloatInput : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ConsoleFloatInput"/> class.
@@ -50,7 +50,7 @@ namespace ConsoleFloatInput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console Float Input"; }
+            get { return "Console float input"; }
         }
 
         /// <summary>
@@ -118,8 +118,15 @@ namespace ConsoleFloatInput
 
                 parseOK = float.TryParse(userInput, out num);
 
-                return new object[] { num };
-            }
+                if (parseOK == true)
+                {
+                    return new object[] { num };
+                }  
+                else
+                {
+                    return new object[] { new ArgumentException() };
+                }
+           }
         }
     }
 }

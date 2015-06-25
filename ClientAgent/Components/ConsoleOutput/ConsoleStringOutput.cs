@@ -50,7 +50,7 @@ namespace ConsoleStringOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console String Output"; }
+            get { return "Console string output"; }
         }
 
         /// <summary>

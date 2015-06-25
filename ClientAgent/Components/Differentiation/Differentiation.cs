@@ -1,11 +1,11 @@
 ﻿// ----------------------------------------------------------------------- 
-// <copyright file="ConsoleListOutput.cs" company="FHWN"> 
+// <copyright file="Differentiation.cs" company="FHWN"> 
 // Copyright (c) FHWN. All rights reserved. 
 // </copyright> 
 // <summary>Component classlibary.</summary> 
 // <author>Matthias Böhm</author> 
 // -----------------------------------------------------------------------
-namespace ConsoleListOutput
+namespace Differentiation
 {
     using System;
     using System.Collections.Generic;
@@ -16,20 +16,20 @@ namespace ConsoleListOutput
     using Core.Component;
 
     /// <summary>
-    /// This is the component class for the console output.
+    /// This is the component class for differentiating numerical.
     /// </summary>
-    public class ConsoleListOutput : IComponent
+    public class Differentiation
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConsoleListOutput"/> class.
+        /// Initializes a new instance of the <see cref="Differentiation"/> class.
         /// </summary>
-        public ConsoleListOutput()
+        public Differentiation()
         {
             this.ComponentGuid = new Guid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(List<int>).ToString() });
-            this.OutputHints = new List<string>();
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString()});
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(double).ToString() });
             this.InputDescriptions = new List<string>();
-            this.OutputDescriptions = new List<string>();     
+            this.OutputDescriptions = new List<string>();
         }
 
         /// <summary>
@@ -50,7 +50,7 @@ namespace ConsoleListOutput
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Console list output"; }
+            get { return "Differentiation"; }
         }
 
         /// <summary>
@@ -102,17 +102,15 @@ namespace ConsoleListOutput
         {
             if (values.Count() != 1)
             {
-                return new object[] { new ArgumentException() };
+                yield return new object[] { new ArgumentException() };
             }
 
-            List<int> something = (List<int>)values.ElementAt(0);
+            Func<double, double> f = (Func<double, double>)values.First();
+            double x = (double)values.Last();
 
-            for (int i = 0; i < something.Count; i++)
-            {
-                Console.WriteLine(something[i]);
-            }
+            double result = (f(x + double.Epsilon) - f(x - double.Epsilon)) / 2 * double.Epsilon;
 
-            return null;
-        }
+            yield return result;
+        }       
     }
 }
