@@ -39,8 +39,6 @@ namespace Server
 
             TcpServerToServerManager tcpServerToServerManager = new TcpServerToServerManager(tcpservermanager);
             
-            //SplitJob.Split(new Component());
-
             Console.ReadLine();
         }
     }

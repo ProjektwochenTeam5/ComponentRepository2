@@ -25,6 +25,8 @@
             this.ServerGuid = Guid.NewGuid();
             this.AllServerComponents = new Dictionary<Guid, List<Component>>();
             this.ClientPing = new Dictionary<Guid, uint>();
+            this.ComplexComponent = new Dictionary<Guid, string>();
+
         }
 
         public TCPServerManager(RecBroadcast broadcast)
@@ -40,6 +42,7 @@
             broadcast.OnUdpClientDiscovered += broadcast_OnUdpClientDiscovered;
             this.AllServerComponents = new Dictionary<Guid, List<Component>>();
             this.ClientPing = new Dictionary<Guid, uint>();
+            this.ComplexComponent = new Dictionary<Guid, string>();
         }
 
         public TCPServer MyTCPServer { get; set; }
@@ -61,6 +64,8 @@
         public Dictionary<Guid, string> Dlls { get; set; }
 
         public Dictionary<Guid, Component> Components { get; set; }
+
+        public Dictionary<Guid, string> ComplexComponent { get; set; }
 
         public Dictionary<string, string> IpAdressFriendlyName { get; set; }
 
@@ -90,7 +95,6 @@
                     Thread.Sleep(60000);
                     if (old == this.ClientPing[e.ClientInfo.ClientGuid])
                     {
-                        this.MyTCPServer.Clients[e.ClientInfo].GetStream().Close();
                         this.MyTCPServer.Clients[e.ClientInfo].Close();
                         this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
                         this.OnClientDisconnected(this, new ClientFetchedEventArgs(e.ClientInfo));
@@ -116,10 +120,10 @@
 
         private byte[] BuildComponentInfos()
         {
-            this.MyTCPServer.Wrapper.GetAssemblies();
+            this.MyTCPServer.Wrapper.ReadData();
             Dictionary<IComponent, Guid> componentdic = new Dictionary<IComponent, Guid>();
 
-            foreach (var item in this.MyTCPServer.Wrapper.Data)
+            foreach (var item in this.MyTCPServer.Wrapper.AtomicData)
             {
                 Guid g = default(Guid);
 
@@ -134,6 +138,7 @@
 
                 componentdic.Add(this.MyTCPServer.Wrapper.ReadComponentInfoFormDll(item.Key), g);
             }
+
 
             /////////////////// IComponentdictionary fertig
 
@@ -152,6 +157,11 @@
                 }
             }
 
+            foreach (var item in this.MyTCPServer.Wrapper.ComplexData)
+            {
+                componentlist.Add(this.MyTCPServer.Wrapper.ReadInfosFromDatFile(item.Key));
+            }
+
             ///////////////// Componentlist fertig
 
             SendComponentInfos sendcompinfos = new SendComponentInfos();
@@ -164,13 +174,18 @@
 
         public void RunMyServer()
         {
-            this.MyTCPServer.Wrapper.GetAssemblies();
+            this.MyTCPServer.Wrapper.ReadData();
             this.Dlls = new Dictionary<Guid, string>();
 
-            foreach (var item in this.MyTCPServer.Wrapper.Data)
+            foreach (var item in this.MyTCPServer.Wrapper.AtomicData)
             {
                 Guid g;
                 this.Dlls.Add(g = Guid.NewGuid(), item.Value);
+            }
+
+            foreach (var item in this.MyTCPServer.Wrapper.ComplexData)
+            {
+                this.ComplexComponent.Add(Guid.NewGuid(), item.Key);
             }
 
             this.MyTCPServer.Run();
@@ -237,6 +252,13 @@
             this.Dlls.Add(Guid.NewGuid(), this.MyTCPServer.Wrapper.StorePath + "\\" + filename + ".dll");
         }
 
+        ///////////////////////////////////////////////// ON MESSAGE RECIEVED /////////////////////////////////////////////////
+        
+        /// <summary>
+        /// On Message recieved callback function.
+        /// </summary>
+        /// <param name="sender">The owner of the event.</param>
+        /// <param name="e">Some arguments.</param>
         private void MyTCPServer_OnMessageRecieved(object sender, MessageRecievedEventArgs e)
         {
             switch (e.MessageType)
@@ -254,11 +276,18 @@
                 case ClientServerCommunication.StatusCode.TransferComponent:
                     {
                         TransferComponentRequest request = (TransferComponentRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
+                        
                         bool contains = this.Components.Keys.Contains(request.ComponentID);
+                        bool containscomplex = this.ComplexComponent.Keys.Contains(request.ComponentID);
+
                         Console.WriteLine("--------Transfer component request Recieved");
                         if (contains)
                         {
                             this.GiveTransferComponentResponse(e.Info, request.ComponentID, request.MessageID);
+                        }
+                        else if (containscomplex)
+                        {
+                            this.GiveTransferComponentResponseIfComplex(e.Info, request.ComponentID, request.MessageID);
                         }
                         else
                         {
@@ -314,7 +343,8 @@
                         }
                         else
                         {
-
+                            this.ComplexComponent.Add(Guid.NewGuid(), storecomponent.FriendlyName);
+                            this.MyTCPServer.Wrapper.StoreComplexComponent(storecomponent.Component, storecomponent.FriendlyName);
 
                         }
 
@@ -325,6 +355,8 @@
                     break;
             }
         }
+
+        ///////////////////////////////////////////////// ON MESSAGE RECIEVED /////////////////////////////////////////////////
 
         private void GiveTransferComponentResponse(ClientInfo clientInfo, Guid guid, Guid requestid)
         {
@@ -352,6 +384,32 @@
             this.MyTCPServer.SendMessage(send, clientInfo.ClientGuid);
         }
 
+        public void GiveTransferComponentResponseIfComplex(ClientInfo clientInfo, Guid guid, Guid requestid)
+        {
+            string name = string.Empty;
+            try
+            {
+                name = this.ComplexComponent[guid];
+
+            }
+            catch (Exception)
+            {
+                Console.WriteLine("We don't have this dll");
+                return;
+            }
+
+            byte[] data = this.MyTCPServer.Wrapper.GetComplexComponent(name);
+            TransferComponentResponse response = new TransferComponentResponse();
+            response.Component = data;
+            response.BelongsTo = requestid;
+
+            byte[] body = DataConverter.ConvertObjectToByteArray(response);
+
+            byte[] send = DataConverter.ConvertMessageToByteArray(4, body);
+            Console.WriteLine("sending: " + name);
+            this.MyTCPServer.SendMessage(send, clientInfo.ClientGuid);
+        }
+
         private void SendInfosToAllClients()
         {
             this.MyTCPServer.SendMessageToAll(this.BuildComponentInfos());
@@ -366,7 +424,6 @@
         {
             if (ka.Terminate)
             {
-                this.MyTCPServer.Clients[info].GetStream().Close();
                 this.MyTCPServer.Clients[info].Close();
                 this.MyTCPServer.Clients.Remove(info);
                 this.OnClientDisconnected(this, new ClientFetchedEventArgs(info));
