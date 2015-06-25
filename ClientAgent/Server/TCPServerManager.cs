@@ -443,7 +443,7 @@
                         {
                             this.ComplexComponent.Add(Guid.NewGuid(), storecomponent.FriendlyName);
                             this.MyTCPServer.Wrapper.StoreComplexComponent(storecomponent.Component, storecomponent.FriendlyName);
-
+                           
                         }
 
 
