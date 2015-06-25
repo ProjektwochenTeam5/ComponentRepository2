@@ -235,8 +235,22 @@ namespace Server
 
         public void SendMessage(byte[] message, Guid clientID)
         {
-            TcpClient client = this.Clients.Where(x => x.Key.ClientGuid == clientID).Single().Value;
-            NetworkStream stream = client.GetStream();
+            TcpClient client = null;
+            NetworkStream stream = null;
+
+            try
+            {
+                 client = this.Clients.Where(x => x.Key.ClientGuid == clientID).SingleOrDefault().Value;
+                 stream = client.GetStream();
+            }
+            catch (Exception)
+            {
+                if (stream == null || client == null)
+                {
+                    return;
+                }
+            }
+
 
             try
             {

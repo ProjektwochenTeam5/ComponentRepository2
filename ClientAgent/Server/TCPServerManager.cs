@@ -79,6 +79,10 @@
 
         void broadcast_OnUdpClientDiscovered(object sender, UdpClientDiscoverRecievedEventArgs e)
         {
+            if (this.IpAdressFriendlyName.Keys.Contains(e.IPAdress))
+            {
+                return;
+            }
             this.IpAdressFriendlyName.Add(e.IPAdress, e.FriendlyName);
         }
 
@@ -284,9 +288,17 @@
             {
                 if (e.BelongsToJob == jobGuid)
                 {
-                    Console.WriteLine("Answer from Client matches Request! Result is: " + e.Data.Result.ElementAt(0));
-                    resp = e.Data;
-                    waiting = false;
+                    try
+                    {
+                        Console.WriteLine("Answer from Client matches Request! Result is: " + e.Data.Result.ElementAt(0));
+                        resp = e.Data;
+                        waiting = false;
+                    }
+                    catch (ArgumentOutOfRangeException ex)
+                    {
+                        Console.WriteLine(ex.Message);
+                    }
+
                 }
             };
 
