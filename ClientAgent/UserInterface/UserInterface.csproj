@@ -53,6 +53,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="CommunicationThreadArgs.cs" />
+    <Compile Include="ComponentEventArgs.cs" />
     <Compile Include="InputIdentifier.cs" />
     <Compile Include="Job.cs" />
     <Compile Include="JobCreateWindow.xaml.cs">
@@ -142,6 +144,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\ClientServerCommunication\ClientServerCommunication.csproj">
+      <Project>{7e87af0b-6fd2-438d-a795-a6b7d6194cd8}</Project>
+      <Name>ClientServerCommunication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Core.Network\Core.Network.csproj">
       <Project>{b1b4b865-f61c-4ed7-93ec-01c6339a82b6}</Project>
       <Name>Core.Network</Name>

@@ -27,6 +27,8 @@ namespace UserInterface
                     OutputDescriptions = new string[] { "out" }
                 });
 
+        private App app = null;
+
         /// <summary>
         /// The component to drag when clicked on.
         /// </summary>
@@ -98,6 +100,9 @@ namespace UserInterface
             dlg.ShowDialog();
             */
 
+            this.app = (App)Application.Current;
+            this.app.OnComponentsReceived += App_OnComponentsReceived; //TODO component received
+
             InitializeComponent();
 
             this.lvComponents.DataContext = this.availableComps;
@@ -106,45 +111,69 @@ namespace UserInterface
             this.lvMatchingOut.DataContext = this.matchingOut;
 
             #region Test components TODO
-            this.availableComps.Add(new MyComponent(new Component()
+            lock (this.availableComps)
             {
-                FriendlyName = "Test-Komponente 12345678901234567890",
-                InputHints = new string[] { "System.Int32", "System.String", "System.Int64", "System.Double", "System.String" },
-                InputDescriptions = new string[] { "int", "str", "long", "double", "str2" },
-                OutputHints = new string[] { "System.Int32", "System.Schiff" },
-                OutputDescriptions = new string[] { "int", "schiff" }
-            }));
-            
-            this.availableComps.Add(new MyComponent(new Component()
-            {
-                FriendlyName = "Input",
-                InputHints = new string[] { "System.String" },
-                InputDescriptions = new string[] { "descr" },
-                OutputHints = new string[] { "System.String" },
-                OutputDescriptions = new string[] { "string" },
-            }));
+                this.availableComps.Add(new MyComponent(new Component()
+                {
+                    FriendlyName = "Test-Komponente 12345678901234567890",
+                    InputHints = new string[] { "System.Int32", "System.String", "System.Int64", "System.Double", "System.String" },
+                    InputDescriptions = new string[] { "int", "str", "long", "double", "str2" },
+                    OutputHints = new string[] { "System.Int32", "System.Schiff" },
+                    OutputDescriptions = new string[] { "int", "schiff" }
+                }));
 
-            this.availableComps.Add(new MyComponent(new Component()
-            {
-                FriendlyName = "Output",
-                InputHints = new string[] { "System.String" },
-                InputDescriptions = new string[] { "string" },
-            }));
+                this.availableComps.Add(new MyComponent(new Component()
+                {
+                    FriendlyName = "Input",
+                    InputHints = new string[] { "System.String" },
+                    InputDescriptions = new string[] { "descr" },
+                    OutputHints = new string[] { "System.String" },
+                    OutputDescriptions = new string[] { "string" },
+                }));
 
-            this.availableComps.Add(new MyComponent(new Component()
-            {
-                FriendlyName = "Schiff-Output",
-                InputHints = new string[] { "System.Schiff", "System.String" },
-                InputDescriptions = new string[] { "schiff", "string"},
-            }));
+                this.availableComps.Add(new MyComponent(new Component()
+                {
+                    FriendlyName = "Output",
+                    InputHints = new string[] { "System.String" },
+                    InputDescriptions = new string[] { "string" },
+                }));
 
-            this.availableComps.Add(new MyComponent(new Component()
-            {
-                FriendlyName = "Schiff-Input",
-                OutputHints = new string[] { "System.Schiff", "System.String" },
-                OutputDescriptions = new string[] { "schiff", "string" },
-            }));
+                this.availableComps.Add(new MyComponent(new Component()
+                {
+                    FriendlyName = "Schiff-Output",
+                    InputHints = new string[] { "System.Schiff", "System.String" },
+                    InputDescriptions = new string[] { "schiff", "string" },
+                }));
+
+                this.availableComps.Add(new MyComponent(new Component()
+                {
+                    FriendlyName = "Schiff-Input",
+                    OutputHints = new string[] { "System.Schiff", "System.String" },
+                    OutputDescriptions = new string[] { "schiff", "string" },
+                }));
+            }
             #endregion Test components
+        }
+
+        /// <summary>
+        /// Overwrites the available components with the received components.
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void App_OnComponentsReceived(object sender, ComponentEventArgs e)
+        {
+            //TODO component received
+            lock (this.availableComps)
+            {
+                this.availableComps.Clear();
+
+                foreach (Component comp in e.Components)
+                {
+                    this.availableComps.Add(new MyComponent(comp));
+                }
+            }
+
+            MessageBox.Show("New components received.");
         }
 
         /// <summary>
@@ -406,18 +435,21 @@ namespace UserInterface
             this.matchingIn.Clear();
             this.matchingOut.Clear();
 
-            foreach (MyComponent c in this.availableComps)
+            lock (this.availableComps)
             {
-                c.SetSelectedComponent(this.selectedItem.Component);
-                
-                if (c.HasMatchingInput)
+                foreach (MyComponent c in this.availableComps)
                 {
-                    this.matchingIn.Add(c);
-                }
+                    c.SetSelectedComponent(this.selectedItem.Component);
 
-                if (c.HasMatchingOutput)
-                {
-                    this.matchingOut.Add(c);
+                    if (c.HasMatchingInput)
+                    {
+                        this.matchingIn.Add(c);
+                    }
+
+                    if (c.HasMatchingOutput)
+                    {
+                        this.matchingOut.Add(c);
+                    }
                 }
             }
         }
@@ -610,9 +642,12 @@ namespace UserInterface
             this.matchingIn.Clear();
             this.matchingOut.Clear();
 
-            foreach (MyComponent c in this.availableComps)
+            lock (this.availableComps)
             {
-                c.SetSelectedComponent(null);
+                foreach (MyComponent c in this.availableComps)
+                {
+                    c.SetSelectedComponent(null);
+                }
             }
         }
                 
@@ -759,10 +794,22 @@ namespace UserInterface
             job.InputDescriptions = this.inputDescriptions;
             job.JobComponent = ConvertLayoutToComponent();
 
-            MessageBox.Show("Job is executing...",
-                "Execute job",
-                MessageBoxButton.OK,
-                MessageBoxImage.Information);
+            try
+            {
+                this.app.SendJobRequest(job.JobComponent); //TODO
+
+                MessageBox.Show("Job is executing...",
+                    "Execute job",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Information);
+            }
+            catch (ApplicationException ex)
+            {
+                MessageBox.Show("Could not execute job.\n\n" + ex.Message,
+                    "Execute job",
+                    MessageBoxButton.OK,
+                    MessageBoxImage.Warning);
+            }
         }
 
         /// <summary>
@@ -843,7 +890,7 @@ namespace UserInterface
         {
             if (this.edgeLayout.Count > 0)
             {
-                ComponentCreateWindow createDlg = new ComponentCreateWindow(this.availableComps);
+                ComponentCreateWindow createDlg = new ComponentCreateWindow(new List<MyComponent>(this.availableComps));
                 createDlg.Owner = this;
 
                 if (createDlg.ShowDialog() == true)
@@ -851,8 +898,23 @@ namespace UserInterface
                     Component newComp = ConvertLayoutToComponent();
                     newComp.FriendlyName = createDlg.FriendlyName;
 
-                    this.availableComps.Add(new MyComponent(newComp));
+                    lock (this.availableComps)
+                    {
+                        this.availableComps.Add(new MyComponent(newComp));
+                    }
 
+                    try
+                    {
+                        this.app.SendComplexComponent(newComp.FriendlyName, newComp);
+                    }
+                    catch (ApplicationException ex)
+                    {
+                        MessageBox.Show("Could not send component to server.\n\n" + ex.Message,
+                            "Create component",
+                            MessageBoxButton.OK,
+                            MessageBoxImage.Warning);
+                    }
+                    
                     if (MessageBox.Show(
                             "Do you wish to clear the blueprint space?", 
                             "Clear blueprint space", 
