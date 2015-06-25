@@ -105,19 +105,17 @@ namespace Squrt
                 yield return new object[] { new ArgumentException() };
             }
 
-            double num = 0;
-            double result = 0;
-
+            double num = (double)values.ElementAt(0);
+            
             if (num < 0)
             {
                 yield return new object[] { new ArgumentException() };
             }
             else
             {
-               result = Math.Sqrt(num);
-            }
-                        
-            yield return result;
+               double result = Math.Sqrt(num);
+               yield return result;
+            }                              
         }
     }
 }

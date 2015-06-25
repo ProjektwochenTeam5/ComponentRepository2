@@ -105,8 +105,8 @@ namespace Log
                 return new object[] { new ArgumentException() };
             }
 
-            double num = 0;
-            double log_base = 0;
+            double num = (double)values.ElementAt(0);
+            double log_base = (double)values.ElementAt(1);
 
             if (log_base <= 0)
             {

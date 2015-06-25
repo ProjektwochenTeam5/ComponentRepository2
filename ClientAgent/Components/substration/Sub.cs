@@ -50,7 +50,7 @@ namespace Sub
         /// <value>A name string.</value>
         public string FriendlyName
         {
-            get { return "Substraction"; }
+            get { return "Subtraction"; }
         }
 
         /// <summary>

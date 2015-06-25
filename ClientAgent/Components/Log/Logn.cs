@@ -105,7 +105,7 @@ namespace Power
                 return new object[] { new ArgumentException() };
             }
 
-            double num = 0;
+            double num = (double)values.ElementAt(0);
             double result = Math.Log(num);
 
             return new object[] { result };                 

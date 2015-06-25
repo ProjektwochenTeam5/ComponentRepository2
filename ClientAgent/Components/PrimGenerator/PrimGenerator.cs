@@ -105,7 +105,7 @@ namespace PrimGenerator
                 return new object[] { new ArgumentException() };
             }
 
-            long limit = 0;
+            long limit = (long)values.ElementAt(0);
 
             List<long> primeList = new List<long>();
 

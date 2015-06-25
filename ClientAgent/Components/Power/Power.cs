@@ -105,8 +105,8 @@ namespace Power
                 return new object[] { new ArgumentException() };
             }
 
-            double num = 0;
-            double exp = 0;
+            double num = (double)values.ElementAt(0);
+            double exp = (double)values.ElementAt(1);
             double result = Math.Pow(num, exp);
 
             return new object[] { result };            
