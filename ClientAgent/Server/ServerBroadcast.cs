@@ -30,7 +30,7 @@ namespace Server
                 IPEndPoint ip = new IPEndPoint(IPAddress.Broadcast, 8081);
                 byte[] bytes = Encoding.ASCII.GetBytes("PWSP");
                 this.Client.Send(bytes, bytes.Length, ip);
-
+                Console.WriteLine("Broadcast sent.");
                 Thread.Sleep(180000);
             }
         }
