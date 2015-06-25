@@ -84,27 +84,45 @@ namespace Server
 
             while (true)
             {
-                if (ns.DataAvailable)
+                try
                 {
-                    byte[] hdr = new byte[9];
-
-                    int hlen = ns.Read(hdr, 0, 9);
-                    uint bodylen;
-                    StatusCode messagType;
-
-                    // go to next iteration if header lengh != 9
-                    if (!ParseHeader(hdr, out bodylen, out messagType))
+                    if (ns.DataAvailable)
                     {
-                        continue;
+                        byte[] hdr = new byte[9];
+
+                        int hlen = ns.Read(hdr, 0, 9);
+                        uint bodylen;
+                        StatusCode messagType;
+
+                        // go to next iteration if header lengh != 9
+                        if (!ParseHeader(hdr, out bodylen, out messagType))
+                        {
+                            continue;
+                        }
+
+                        byte[] body = new byte[bodylen];
+
+                        Thread.Sleep(10);
+                        int rcvbody = ns.Read(body, 0, (int)bodylen);
+
+                        this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, messagType, clientInfo));
                     }
-
-                    byte[] body = new byte[bodylen];
-
-                    Thread.Sleep(10);
-                    int rcvbody = ns.Read(body, 0, (int)bodylen);
-
-                    this.FireOnMessageRecieved(new MessageRecievedEventArgs(body, messagType, clientInfo));
                 }
+                catch (ObjectDisposedException e)
+                {
+                    break;
+                }
+            }
+
+            try
+            {
+                client.Close();
+                ns.Close();
+                ns.Dispose();
+            }
+            catch (Exception)
+            {
+
             }
         }
 
