@@ -26,10 +26,10 @@ namespace PrimGenerator
         public PrimGenerator()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(List<int>).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(List<long>).ToString() });
             this.InputDescriptions = new List<string>(new[] { "nth" });
-            this.OutputDescriptions = new List<string>(new[] { "int List" });
+            this.OutputDescriptions = new List<string>(new[] { "long List" });
         }
 
         /// <summary>
@@ -105,15 +105,15 @@ namespace PrimGenerator
                 return new object[] { new ArgumentException() };
             }
 
-            int limit = 0;
+            long limit = 0;
 
-            List<int> primeList = new List<int>();
+            List<long> primeList = new List<long>();
 
-            for (int i = 2; i <= limit; i++)
+            for (long i = 2; i <= limit; i++)
             {
                 bool isPrime = true;
 
-                for (int j = 2; j < i; j++)
+                for (long j = 2; j < i; j++)
                 {
                     if (i % j == 0)
                     {

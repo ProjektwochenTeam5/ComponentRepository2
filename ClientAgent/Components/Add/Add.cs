@@ -26,9 +26,9 @@ namespace Add
         public Add()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString(), typeof(int).ToString() });
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
-            this.InputDescriptions = new List<string>(new [] { "int 1", "int 2" });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString(), typeof(long).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
+            this.InputDescriptions = new List<string>(new [] { "num1", "num2" });
             this.OutputDescriptions = new List<string>(new[] { "result" });
         }
        
@@ -104,12 +104,12 @@ namespace Add
             {
                 yield return new ArgumentException();
             }
-           
-            int result = 0;
+
+            long result = 0;
 
             foreach (var item in values)
             {
-                result += (int)item;
+                result += (long)item;
             }
 
             yield return result;

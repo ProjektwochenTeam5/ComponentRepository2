@@ -26,9 +26,9 @@ namespace ConsoleIntOutput
         public ConsoleIntOutput()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
             this.OutputHints = new List<string>();
-            this.InputDescriptions = new List<string>(new[] { "int" });
+            this.InputDescriptions = new List<string>(new[] { "long" });
             this.OutputDescriptions = new List<string>();     
         }
 
@@ -104,12 +104,12 @@ namespace ConsoleIntOutput
             {
                 return new object[] { new ArgumentException() };
             }
-            
-            int ioutput = 0;
+
+            long ioutput = 0;
             
             foreach (var item in values)
             {
-                ioutput += (int)item;
+                ioutput += (long)item;
             }                      
 
             Console.WriteLine(ioutput);

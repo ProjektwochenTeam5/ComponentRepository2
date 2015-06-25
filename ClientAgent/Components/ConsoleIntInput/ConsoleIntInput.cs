@@ -27,7 +27,7 @@ namespace ConsoleIntInput
         {
             this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(int).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
             this.InputDescriptions = new List<string>(new[] { "desc" });
             this.OutputDescriptions = new List<string>(new[] { "out" });
         }
@@ -102,14 +102,14 @@ namespace ConsoleIntInput
         {
             string desc = values.Count() == 1 ?
                 values.Single().ToString() :
-                "Please enter the operating value (int): ";
+                "Please enter the operating value (long): ";
 
-            int i;
+            long i;
             do
             {
                 Console.Write(desc);
             }
-            while (!int.TryParse(Console.ReadLine(), out i));
+            while (!long.TryParse(Console.ReadLine(), out i));
 
             return new object[] { i };
         }
