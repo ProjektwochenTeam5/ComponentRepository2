@@ -94,14 +94,8 @@ namespace UserInterface
 
         public MainWindow()
         {
-            /*
-            OpenFileDialog dlg = new OpenFileDialog();
-            dlg.Filter = "Atomic component|*.dll";
-            dlg.ShowDialog();
-            */
-
             this.app = (App)Application.Current;
-            this.app.OnComponentsReceived += App_OnComponentsReceived; //TODO component received
+            this.app.OnComponentsReceived += App_OnComponentsReceived;
 
             InitializeComponent();
 
@@ -109,50 +103,6 @@ namespace UserInterface
             this.lvFavorites.DataContext = this.favorites;
             this.lvMatchingIn.DataContext = this.matchingIn;
             this.lvMatchingOut.DataContext = this.matchingOut;
-
-            #region Test components TODO
-            lock (this.availableComps)
-            {
-                this.availableComps.Add(new MyComponent(new Component()
-                {
-                    FriendlyName = "Test-Komponente 12345678901234567890",
-                    InputHints = new string[] { "System.Int32", "System.String", "System.Int64", "System.Double", "System.String" },
-                    InputDescriptions = new string[] { "int", "str", "long", "double", "str2" },
-                    OutputHints = new string[] { "System.Int32", "System.Schiff" },
-                    OutputDescriptions = new string[] { "int", "schiff" }
-                }));
-
-                this.availableComps.Add(new MyComponent(new Component()
-                {
-                    FriendlyName = "Input",
-                    InputHints = new string[] { "System.String" },
-                    InputDescriptions = new string[] { "descr" },
-                    OutputHints = new string[] { "System.String" },
-                    OutputDescriptions = new string[] { "string" },
-                }));
-
-                this.availableComps.Add(new MyComponent(new Component()
-                {
-                    FriendlyName = "Output",
-                    InputHints = new string[] { "System.String" },
-                    InputDescriptions = new string[] { "string" },
-                }));
-
-                this.availableComps.Add(new MyComponent(new Component()
-                {
-                    FriendlyName = "Schiff-Output",
-                    InputHints = new string[] { "System.Schiff", "System.String" },
-                    InputDescriptions = new string[] { "schiff", "string" },
-                }));
-
-                this.availableComps.Add(new MyComponent(new Component()
-                {
-                    FriendlyName = "Schiff-Input",
-                    OutputHints = new string[] { "System.Schiff", "System.String" },
-                    OutputDescriptions = new string[] { "schiff", "string" },
-                }));
-            }
-            #endregion Test components
         }
 
         /// <summary>
@@ -163,7 +113,7 @@ namespace UserInterface
         /// <param name="e"></param>
         private void App_OnComponentsReceived(object sender, ComponentEventArgs e)
         {
-            //TODO component received
+            //TODO component received favorites
             
             List<Guid> prevFavoriteCompGuids = new List<Guid>();
 
@@ -193,7 +143,7 @@ namespace UserInterface
                 }
             }
 
-            MessageBox.Show("New components received.");
+            MessageBox.Show("New components received."); //TODO test output
         }
 
         /// <summary>
