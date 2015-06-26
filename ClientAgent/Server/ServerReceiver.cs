@@ -78,7 +78,7 @@ namespace Server
                         {
                             byte[] messageLength = new byte[4];
 
-                            for (int i = 0; i < 5; i++)
+                            for (int i = 0; i < 4; i++)
                             {
                                 messageLength[i] = buffer[1 + i];
                             }
