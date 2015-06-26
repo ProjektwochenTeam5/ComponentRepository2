@@ -18,7 +18,7 @@ namespace Differentiation
     /// <summary>
     /// This is the component class for differentiating numerical.
     /// </summary>
-    public class Differentiation
+    public class Differentiation : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Differentiation"/> class.

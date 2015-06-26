@@ -18,7 +18,7 @@ namespace PrimGenerator
     /// <summary>
     /// This is the component class for generating prime numbers.
     /// </summary>
-    public class PrimGenerator
+    public class PrimGenerator : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="PrimGenerator"/> class.

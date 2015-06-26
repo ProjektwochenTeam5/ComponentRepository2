@@ -18,7 +18,7 @@ namespace EFunction
     /// <summary>
     /// This is the component class for creating the number e.
     /// </summary>
-    public class EFunction
+    public class EFunction : IComponent
     {  
         /// <summary>
         /// Initializes a new instance of the <see cref="EFunction"/> class.

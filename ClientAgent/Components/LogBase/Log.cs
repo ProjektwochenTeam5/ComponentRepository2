@@ -18,7 +18,7 @@ namespace Log
     /// <summary>
     /// This is the component class to logarithmise with base.
     /// </summary>
-    public class Log
+    public class Log : IComponent
     {    
         /// <summary>
         /// Initializes a new instance of the <see cref="Log"/> class.

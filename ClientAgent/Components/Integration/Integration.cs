@@ -18,7 +18,7 @@ namespace Integration
     /// <summary>
     /// This is the component class for numerical integration.
     /// </summary>
-    public class Integration
+    public class Integration : IComponent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Integration"/> class.
