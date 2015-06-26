@@ -415,9 +415,16 @@ namespace ClientAgent
                 return;
             }
 
-            string filename = string.Format("temp\\{0}.dll", c.FriendlyName);
-            JobExecutor.StoreComponent(r.Component, filename);
-            this.StoredComponents.Add(c.ComponentGuid, c.FriendlyName + ".dll");
+            try
+            {
+                string filename = string.Format("temp\\{0}.dll", c.FriendlyName);
+                JobExecutor.StoreComponent(r.Component, filename);
+                this.StoredComponents.Add(c.ComponentGuid, c.FriendlyName + ".dll");
+            }
+            catch
+            {
+                this.OnReceivedLogEntry(new StringEventArgs(new[] { "Guid already exists" }));
+            }
         }
 
         /// <summary>
