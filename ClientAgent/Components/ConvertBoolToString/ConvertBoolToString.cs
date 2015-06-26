@@ -112,7 +112,7 @@ namespace ConvertBoolToString
                 b = item;
             }
 
-            string s = Convert.ToString(b);
+            string s = b.ToString();
 
             return new object[] { s };
         }

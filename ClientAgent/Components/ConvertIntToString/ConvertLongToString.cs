@@ -107,7 +107,12 @@ namespace ConvertLongToString
 
             long num = 0;
 
-            string s = Convert.ToString(num);
+            foreach (var item in values)
+            {
+                num += (long)num;
+            }
+
+            string s = num.ToString();
                      
             return new object[] { s };
         }

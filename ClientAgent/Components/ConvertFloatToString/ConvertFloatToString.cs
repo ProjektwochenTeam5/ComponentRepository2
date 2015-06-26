@@ -112,7 +112,7 @@ namespace ConvertFloatToString
                 f += (float)item;
             }
 
-            string s = Convert.ToString(f);
+            string s = f.ToString();
 
             return new object[] { s };
         }
