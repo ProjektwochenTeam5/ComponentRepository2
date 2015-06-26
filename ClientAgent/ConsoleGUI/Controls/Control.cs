@@ -112,7 +112,7 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// Gets the owner of the control.
+        /// Gets or sets the owner of the control.
         /// </summary>
         /// <value>
         ///     Contains the owner of the control.

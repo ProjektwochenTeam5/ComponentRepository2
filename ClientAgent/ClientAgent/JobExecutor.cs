@@ -18,32 +18,59 @@ namespace ClientAgent
     using System.IO;
     using System.IO.Pipes;
     using System.Linq;
-    using System.Reflection;
-    using Core.Component;
-    using System.Net.Sockets;
     using System.Net;
-    using System.Threading;
+    using System.Net.Sockets;
+    using System.Reflection;
     using System.Runtime.Serialization.Formatters.Binary;
-    using ClientServerCommunication;
+    using System.Threading;
     using ClientJobExecutor;
+    using ClientServerCommunication;
+    using Core.Component;
 
     /// <summary>
     /// Provides methods for executing a component.
     /// </summary>
     public static class JobExecutor
     {
+        /// <summary>
+        /// Contains the next port for the executor TCP connection.
+        /// </summary>
         private static int lastPort = 15000;
 
         /// <summary>
-        /// Gets the 
+        /// Gets the assemblies that are stored locally.
         /// </summary>
+        /// <value>
+        ///     Contains the assemblies that are stored locally.
+        /// </value>
         public static Dictionary<string, Assembly> Data { get; private set; }
 
         /// <summary>
-        /// 
+        /// Gets the path of the temporary directory.
         /// </summary>
-        /// <param name="args"></param>
-        /// <returns></returns>
+        /// <value>
+        ///     Contains the path of the temporary directory.
+        /// </value>
+        public static string StorePath
+        { 
+            get
+            {
+                return Path.Combine(Directory.GetCurrentDirectory(), "temp");
+            }
+        }
+
+        /// <summary>
+        /// Executes a specific component.
+        /// </summary>
+        /// <param name="dll">
+        ///     The file name of the component to execute.
+        /// </param>
+        /// <param name="args">
+        ///     The arguments passed to the component.
+        /// </param>
+        /// <returns>
+        ///     Returns an instance of <see cref="IEnumerable"/>&#x3c;object&#x3e; containing the result.
+        /// </returns>
         public static IEnumerable<object> Execute(string dll, IEnumerable<object> args)
         {
             Process client = new Process();
@@ -92,29 +119,17 @@ namespace ClientAgent
 
                 FileInfo dlli = new FileInfo("temp\\" + dll);
                 byte[] dllrd = new byte[dlli.Length];
-                using(FileStream fs = new FileStream("temp\\" + dll, FileMode.Open, FileAccess.Read, FileShare.Read))
+                using (FileStream fs = new FileStream("temp\\" + dll, FileMode.Open, FileAccess.Read, FileShare.Read))
                 {
                     fs.Read(dllrd, 0, (int)dlli.Length);
                 }
 
                 ExecuteRequest arg = new ExecuteRequest(dllrd, args.ToArray());
-                MemoryStream ms = new MemoryStream();
 
-                f.Serialize(ms, arg);
-                long length = ms.Length;
-
-                byte b1, b100, b10000, b1000000;
-
-                b1 = (byte)(length % 0x100);
-                b100 = (byte)((length / 0x100) % 0x100);
-                b10000 = (byte)((length / 0x10000) % 0x100);
-                b1000000 = (byte)((length / 0x1000000) % 0x100);
-
-                List<byte> send = new List<byte>(new byte[] { 0, 0, 0, 0, b1, b100, b10000, b1000000, (byte)arg.MessageType });
-                send.AddRange(ms.ToArray());
+                byte[] send = Client.SerializeMessage(arg);
 
                 NetworkStream nstr = cl.GetStream();
-                nstr.Write(send.ToArray(), 0, send.Count);
+                nstr.Write(send, 0, send.Length);
 
                 // wait for answer
                 while (nstr.CanRead && nstr.CanWrite)
@@ -162,18 +177,7 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
-        /// </summary>
-        public static string StorePath
-        { 
-            get
-            {
-                return Path.Combine(Directory.GetCurrentDirectory(), "temp");
-            }
-        }
-
-        /// <summary>
-        /// 
+        /// Reads all the component files stored in the temporary directory.
         /// </summary>
         public static void GetAssemblies()
         {
@@ -198,11 +202,17 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
+        /// Stores a component temporarily.
         /// </summary>
-        /// <param name="dll"></param>
-        /// <param name="filename"></param>
-        /// <returns></returns>
+        /// <param name="dll">
+        ///     The byte array of the component file to store.
+        /// </param>
+        /// <param name="filename">
+        ///     The file name where the component shall be stored.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the component was successfully stored.
+        /// </returns>
         public static bool StoreComponent(byte[] dll, string filename)
         {
             try
@@ -221,25 +231,6 @@ namespace ClientAgent
             {
                 throw;
             }
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="dll"></param>
-        /// <returns></returns>
-        private static IComponent ReadComponentInfoFromDll(Assembly dll)
-        {
-            Type componentInfo = null;
-
-            var result = from type in dll.GetTypes()
-                         where typeof(IComponent).IsAssignableFrom(type)
-                         select type;
-
-            componentInfo = result.Single();
-
-            IComponent comp = (IComponent)Activator.CreateInstance(componentInfo);
-            return comp;
         }
     }
 }

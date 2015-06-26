@@ -1,4 +1,15 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="DrawThreadArgs.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the <see cref="DrawThreadAgs"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ConsoleGUI.Controls
 {
     using ConsoleGUI.IO;

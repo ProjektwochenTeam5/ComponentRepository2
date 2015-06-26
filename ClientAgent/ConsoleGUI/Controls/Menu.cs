@@ -257,14 +257,14 @@ namespace ConsoleGUI.Controls
                 Rectangle draw = new ConsoleGUI.Rectangle(0, r.Height - 2, r.Width, 2);
 
                 // draw menus
-                Thread tMenu = new Thread(this.DrawThread);
-                DrawThreadArgs dMenu = new DrawThreadArgs(r, this.GetPixels(), draw);
-                tMenu.Start(dMenu);
+                Thread tmenu = new Thread(this.DrawThread);
+                DrawThreadArgs dmenu = new DrawThreadArgs(r, this.GetPixels(), draw);
+                tmenu.Start(dmenu);
 
                 // draw controls
-                Thread tControls = new Thread(this.DrawThread);
-                DrawThreadArgs dControls = new DrawThreadArgs(r, r.Render(this.Controls.ToArray()), draw);
-                tControls.Start(dControls);
+                Thread tcontrols = new Thread(this.DrawThread);
+                DrawThreadArgs dcontrols = new DrawThreadArgs(r, r.Render(this.Controls.ToArray()), draw);
+                tcontrols.Start(dcontrols);
             }
         }
 
@@ -280,7 +280,7 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// Sends a key to te menu.
+        /// Sends a key to the menu.
         /// </summary>
         /// <param name="k">
         ///     The key that shall be received.
@@ -395,7 +395,7 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Called when a color of the menu was changed.
         /// </summary>
         /// <param name="sender">
         ///     The sender of the event.
@@ -409,7 +409,7 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Called when the <see cref="VisibleChanged"/> event was raised.
         /// </summary>
         /// <param name="sender">
         ///     The sender of the event.

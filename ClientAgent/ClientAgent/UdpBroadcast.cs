@@ -1,4 +1,15 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="UdpBroadcast.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the static <see cref="UdpBroadcast"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ClientAgent
 {
     using System;
@@ -11,7 +22,7 @@ namespace ClientAgent
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Provides a method for boadcsting messages.
+    /// Provides a method for broadcasting messages.
     /// </summary>
     public static class UdpBroadcast
     {
@@ -19,10 +30,10 @@ namespace ClientAgent
         /// Sends a broadcast.
         /// </summary>
         /// <param name="port">
-        ///     
+        ///     The port where the broadcast shall be sent.
         /// </param>
         /// <param name="data">
-        ///     
+        ///     The byte array that shall be sent.
         /// </param>
         public static void SendBoadcast(int port, byte[] data)
         {
