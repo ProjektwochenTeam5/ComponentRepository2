@@ -141,7 +141,7 @@ namespace Server
             }
             finally
             {
-                client.Close();
+                //client.Close();
             }
         }
 
@@ -175,7 +175,7 @@ namespace Server
             }
             finally
             {
-                client.Close();
+                //client.Close();
             }
         }
 
@@ -221,7 +221,7 @@ namespace Server
             }
             finally
             {
-                tcpClient.Close();
+                //tcpClient.Close();
             }
         }
 
@@ -256,7 +256,7 @@ namespace Server
             }
             finally
             {
-                tcpClient.Close();
+                //tcpClient.Close();
             }
         }
 
@@ -281,7 +281,7 @@ namespace Server
             }
             finally
             {
-                tcpClient.Close();
+                //tcpClient.Close();
             }
         }
 
@@ -321,7 +321,7 @@ namespace Server
             }
             finally
             {
-                tcpClient.Close();
+                //tcpClient.Close();
             }
         }
 
@@ -348,7 +348,7 @@ namespace Server
                 Console.WriteLine(ex.Message);
             }
 
-            server.Close();
+            //server.Close();
         }
 
         internal void SendLogonRequest(IPEndPoint groupEP)
@@ -452,7 +452,7 @@ namespace Server
                 Console.WriteLine(ex.Message);
             }
 
-            client.Close();
+            //client.Close();
         }
 
         private bool SaveServerEndpoint(byte[] body, IPEndPoint client, Guid logonRequestGuid)
