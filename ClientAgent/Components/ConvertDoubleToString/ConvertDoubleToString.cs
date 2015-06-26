@@ -112,7 +112,7 @@ namespace ConvertDoubleToString
                 d += (double)item;
             }
 
-            string s = Convert.ToString(d);
+            string s = d.ToString();
             
             return new object[] { s };
         }

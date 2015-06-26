@@ -105,7 +105,7 @@ namespace Mul
                 yield return new object[] { new ArgumentException() };
             }
 
-            long result = (long)values.ElementAt(0);
+            long result = 1;
 
             foreach (var item in values)
             {

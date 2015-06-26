@@ -20,7 +20,7 @@ namespace ConsoleGUI.Controls
     using ConsoleGUI.IO;
 
     /// <summary>
-    /// 
+    /// Provides a text box displaying stacked lines.
     /// </summary>
     public class StackTextBox : Control
     {
@@ -32,7 +32,9 @@ namespace ConsoleGUI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="StackTextBox"/> class.
         /// </summary>
-        /// <param name="outputs"></param>
+        /// <param name="outputs">
+        ///     The output renderers for the control.
+        /// </param>
         public StackTextBox(ICollection<IRenderer> outputs)
             : base(outputs)
         {
@@ -78,7 +80,7 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// Appeds a line to the text.
+        /// Appends a line to the text.
         /// </summary>
         /// <param name="line">
         ///     The string that shall be appended.
@@ -87,7 +89,7 @@ namespace ConsoleGUI.Controls
         {
             string app = string.Empty;
 
-            foreach(string l in line.String)
+            foreach (string l in line.String)
             {
                 this.Lines.Add(string.Format("{0}: {1}", line.TimeStamp, l));
                 while (this.Lines.Count > this.Rectangle.Height)
@@ -102,9 +104,11 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Gets the display of the control.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>
+        ///     Returns a 2-dimensional <see cref="Pixel"/> array.
+        /// </returns>
         public override Pixel[,] GetPixels()
         {
             Pixel[,] ret = new Pixel[this.Rectangle.Width, this.Rectangle.Height];
@@ -128,20 +132,28 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Sends a key to the stack text box.
         /// </summary>
-        /// <param name="k"></param>
-        /// <returns></returns>
+        /// <param name="k">
+        ///     The key that shall be sent.
+        /// </param>
+        /// <returns>
+        ///     Returns false always.
+        /// </returns>
         public override bool Receive(ConsoleKeyInfo k)
         {
             return false;
         }
 
         /// <summary>
-        /// 
+        /// Sends a string to the stack text box.
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
+        /// <param name="s">
+        ///     The string that shall be received.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the string was accepted.
+        /// </returns>
         public override bool Receive(string s)
         {
             this.PushLines(new StringEventArgs(new[] { string.Format("{0}\n", s) }));
@@ -163,7 +175,7 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Called when the <see cref="TextApended"/> event was raised.
         /// </summary>
         /// <param name="sender">
         ///     The sender of the event.

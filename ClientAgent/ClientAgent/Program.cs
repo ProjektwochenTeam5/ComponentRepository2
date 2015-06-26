@@ -14,10 +14,10 @@ namespace ClientAgent
 {
     using System;
     using System.Net;
+    using System.Net.NetworkInformation;
     using System.Net.Sockets;
     using ConsoleGUI.IO;
     using UI;
-    using System.Net.NetworkInformation;
 
     /// <summary>
     /// Provides the main entry point of the client
@@ -51,18 +51,21 @@ namespace ClientAgent
             ConsoleRenderer r = new ConsoleRenderer();
 
             // Main Menu
-            mainMenu = new ClientMenu(new[] { r }, input, new TcpClient(new IPEndPoint(IPAddress.Any, 12345))
-            {
-                ReceiveBufferSize = ushort.MaxValue * 16,
-                SendBufferSize = ushort.MaxValue * 16,
-                SendTimeout = 30
-            });
+            mainMenu = new ClientMenu(
+                new[] { r },
+                input,
+                new TcpClient(/*new IPEndPoint(IPAddress.Any, 12345)*/)
+                {
+                    ReceiveBufferSize = ushort.MaxValue * 16,
+                    SendBufferSize = ushort.MaxValue * 16,
+                    SendTimeout = 30
+                });
+
             mainMenu.StartWork();
             mainMenu.Show();
 
             // Wait until closed
             mainMenu.WaitForClose();
-
             Environment.Exit(0);
         }
     }

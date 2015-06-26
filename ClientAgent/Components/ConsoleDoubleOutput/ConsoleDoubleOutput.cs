@@ -104,8 +104,8 @@ namespace ConsoleDoubleOutput
             {
                 return new object[] { new ArgumentException() };
             }
-            
-            double ioutput = 0;
+
+            double ioutput = (double)values.ElementAt(0);
             
             foreach (var item in values)
             {

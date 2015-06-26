@@ -1,11 +1,13 @@
-﻿
-// --------------------------------------------------------------
+﻿// --------------------------------------------------------------
 // <copyright file="Position.cs" company="David Eiwen">
 // (c) by David Eiwen. All Rights reserved.
 // </copyright>
 // <summary>
 // This file contains the <see cref="Position"/> struct.
 // </summary>
+// <author>
+// David Eiwen
+// </author>
 // --------------------------------------------------------------
 
 namespace ConsoleGUI

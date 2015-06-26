@@ -30,7 +30,7 @@ namespace ConsoleGUI.Controls
         /// <summary>
         /// Initializes a new instance of the <see cref="Label"/> class.
         /// </summary>
-        /// <param name="renderer">
+        /// <param name="renderers">
         ///     The renderer used for this label.
         /// </param>
         public Label(ICollection<IRenderer> renderers) : base(renderers)
@@ -110,20 +110,28 @@ namespace ConsoleGUI.Controls
         }
 
         /// <summary>
-        /// 
+        /// Sends a key to the label.
         /// </summary>
-        /// <param name="k"></param>
-        /// <returns></returns>
+        /// <param name="k">
+        ///     The key that shall be sent.
+        /// </param>
+        /// <returns>
+        ///     Returns false always.
+        /// </returns>
         public override bool Receive(ConsoleKeyInfo k)
         {
             return false;
         }
 
         /// <summary>
-        /// 
+        /// Sends a string to the label.
         /// </summary>
-        /// <param name="s"></param>
-        /// <returns></returns>
+        /// <param name="s">
+        ///     The string that shall be sent.
+        /// </param>
+        /// <returns>
+        ///     Returns false always.
+        /// </returns>
         public override bool Receive(string s)
         {
             return false;
@@ -150,7 +158,7 @@ namespace ConsoleGUI.Controls
         ///     The sender of the event.
         /// </param>
         /// <param name="e">
-        ///     Contains additional infomation for this event.
+        ///     Contains additional information for this event.
         /// </param>
         private void Label_TextChanged(object sender, EventArgs e)
         {

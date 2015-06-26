@@ -1,4 +1,15 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="ThreadArgs.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the <see cref="ThreadArgs"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ClientAgent
 {
     /// <summary>
