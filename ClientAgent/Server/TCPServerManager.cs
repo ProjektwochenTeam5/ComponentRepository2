@@ -132,12 +132,12 @@
                             this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
                             this.OnClientDisconnected(this, new ClientFetchedEventArgs(e.ClientInfo));
                             this.MyTCPServer.Clients.Remove(e.ClientInfo);
-                            Console.WriteLine("60 seconds over - Client deleted!");
+                            Console.WriteLine(this.MyTCPServer.GetTime + "60 seconds over - Client deleted!");
                             break;
                         }
                         catch (Exception ex)
                         {
-                            Console.WriteLine(ex.Message);
+                            Console.WriteLine(this.MyTCPServer.GetTime + ex.Message);
                         }
 
                     }
@@ -145,6 +145,8 @@
             }));
 
             t.Start();
+
+            Console.WriteLine(this.MyTCPServer.GetTime + "-------------------- TOTAL CLIENTS: {0} --------------------", this.MyTCPServer.Clients.Count);
         }
 
         private void IncrementClientKeepAlive(Guid clientguid)
@@ -374,7 +376,7 @@
 
             this.MyTCPServer.SendMessage(sendData, client);
             string s = this.MyTCPServer.Clients.Keys.Where(x => x.ClientGuid == client).SingleOrDefault().FriendlyName;
-            Console.WriteLine(this.MyTCPServer + "Sending TransferJobReqest to: " + s);
+            Console.WriteLine(this.MyTCPServer.GetTime + "Sending TransferJobReqest to: " + s);
 
             try
             {
@@ -416,7 +418,7 @@
                 case ClientServerCommunication.StatusCode.KeepAlive:
                     {
                         KeepAlive keepAlive = (KeepAlive)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                        Console.WriteLine(this.MyTCPServer + "Keep alive recieved from {0} || Terminate = {1} || Workload = {2}",e.Info.FriendlyName, keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
+                        Console.WriteLine(this.MyTCPServer.GetTime + "Keep alive recieved from {0} || Terminate = {1} || Workload = {2}",e.Info.FriendlyName, keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
                         this.CalculateClientLoads(keepAlive, e.Info.ClientGuid);
                         this.IncrementClientKeepAlive(e.Info.ClientGuid);
                         this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
@@ -430,7 +432,7 @@
                         bool contains = this.Components.Keys.Contains(request.ComponentID);
                         bool containscomplex = this.ComplexComponent.Keys.Contains(request.ComponentID);
 
-                        Console.WriteLine(this.MyTCPServer + "Transfer component request Recieved from {0}", e.Info.FriendlyName);
+                        Console.WriteLine(this.MyTCPServer.GetTime + "Transfer component request Recieved from {0}", e.Info.FriendlyName);
                         if (containscomplex)
                         {
 

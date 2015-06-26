@@ -32,7 +32,6 @@ namespace Server
             TCPServerManager tcpservermanager = new TCPServerManager(b);
             Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
             tcpTask.Start();
-
             //ServerBroadcast serverBroadcast = new ServerBroadcast();
             //Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());
             //serverBroadcastTask.Start();

@@ -58,7 +58,7 @@ namespace Server
             {
                 //////////// for testing
 
-                Console.WriteLine(e.Message);
+                Console.WriteLine(this.GetTime + e.Message);
             }
             finally
             {
@@ -84,7 +84,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(this.GetTime + ex.Message);
             }
         }
 
