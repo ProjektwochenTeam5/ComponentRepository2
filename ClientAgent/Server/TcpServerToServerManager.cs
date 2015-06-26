@@ -353,7 +353,7 @@ namespace Server
 
         internal void SendLogonRequest(IPEndPoint groupEP)
         {
-            groupEP.Port = 3654;
+            groupEP.Port = 8080;
 
             TcpClient client = new TcpClient();
             client.Connect(groupEP);
