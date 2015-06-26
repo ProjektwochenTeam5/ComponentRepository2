@@ -12,11 +12,6 @@
 
 namespace ClientAgent.UI
 {
-    using ClientServerCommunication;
-    using ConsoleGUI;
-    using ConsoleGUI.Controls;
-    using ConsoleGUI.IO;
-    using Core.Network;
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
@@ -26,6 +21,11 @@ namespace ClientAgent.UI
     using System.Net.Sockets;
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Threading;
+    using ClientServerCommunication;
+    using ConsoleGUI;
+    using ConsoleGUI.Controls;
+    using ConsoleGUI.IO;
+    using Core.Network;
 
     /// <summary>
     /// Provides the client's main menu.
@@ -158,9 +158,11 @@ namespace ClientAgent.UI
         }
 
         /// <summary>
-        /// Appends a line to the 
+        /// Appends lines to the text.
         /// </summary>
-        /// <param name="text"></param>
+        /// <param name="text">
+        ///     Contains information about the lines.
+        /// </param>
         public void PushLine(StringEventArgs text)
         {
             this.stacktextboxStatus.PushLines(text);
@@ -236,7 +238,7 @@ namespace ClientAgent.UI
 
                 string[] indescs = c.InputDescriptions.ToArray();
                 string[] inhints = c.InputHints.ToArray();
-                for(int n = 0; n < indescs.Length; n++)
+                for (int n = 0; n < indescs.Length; n++)
                 {
                     strs.Add(string.Format("\t\t{0} : {1}", indescs[n], inhints[n]));
                 }
@@ -277,12 +279,19 @@ namespace ClientAgent.UI
         }
 
         /// <summary>
-        /// 
+        /// The thread that handles the communication with the GUI application.
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="data">
+        ///     The arguments assed to the thread.
+        /// </param>
         private void GuiCommunication(object data)
         {
-            ThreadArgs args = (ThreadArgs)data;
+            ThreadArgs args = data as ThreadArgs;
+
+            if (args == null)
+            {
+                throw new ArgumentNullException("data", "The argument must have the ThreadArgs type or derive from it!");
+            }
 
             Process c = new Process();
             c.StartInfo.FileName = "UserInterface.exe";
@@ -312,109 +321,109 @@ namespace ClientAgent.UI
             c.Start();
             this.PushLine(new StringEventArgs(new[] { "Started GUI" }));
 
-            if (!c.HasExited)
+            if (c.HasExited)
             {
-                TcpClient cl = l.AcceptTcpClient();
-                cl.SendTimeout = 30;
-                cl.SendBufferSize = ushort.MaxValue * 16;
-                cl.ReceiveBufferSize = ushort.MaxValue * 16;
-
-                NetworkStream nstr = cl.GetStream();
-
-                EventHandler<MessageReceivedEventArgs> receivedCompInfo = delegate(object sender, MessageReceivedEventArgs e)
-                {
-                    byte[] msg = Client.SerializeMessage(e.ReceivedMessage);
-                    nstr.Write(msg, 0, msg.Length);
-                };
-
-                this.Manager.ReceivedSendComponentInfoMessage += receivedCompInfo;
-                BinaryFormatter f = new BinaryFormatter();
-
-                // send start components
-                SendComponentInfos sci = new SendComponentInfos();
-                sci.MetadataComponents = this.Manager.StoredComponentInfos.ToArray();
-                byte[] ci = Client.SerializeMessage(sci);
-
-                Thread.Sleep(500);
-                nstr.Write(ci, 0, ci.Length);
-                nstr.Flush();
-
-                // wait for answer
-                while (nstr.CanRead && nstr.CanWrite)
-                {
-                    if (nstr.DataAvailable)
-                    {
-                        byte[] hdr = new byte[9];
-
-                        nstr.Read(hdr, 0, 9);
-
-                        uint len;
-                        StatusCode sc;
-
-                        if (!Client.ParseHeader(hdr, out len, out sc))
-                        {
-                            continue;
-                        }
-
-                        byte[] body = new byte[len];
-
-                        int rcvbody = nstr.Read(body, 0, (int)len);
-
-                        do
-                        {
-                            Thread.Sleep(50);
-                        }
-                        while (rcvbody < len);
-
-                        using (MemoryStream nms = new MemoryStream(body))
-                        {
-                            Message rcv = (Message)f.Deserialize(nms);
-                            switch (rcv.MessageType)
-                            {
-                                case StatusCode.DoJobRequest:
-                                    DoJobRequest eq = rcv as DoJobRequest;
-                                    this.Client.SendMessage(eq);
-                                    
-                                    break;
-
-                                case StatusCode.StorComponent:
-                                    StoreComponent stc = rcv as StoreComponent;
-                                    stc.IsComplex = true;
-                                    this.Client.SendMessage(stc);
-                                    break;
-
-                                case StatusCode.KeepAlive:
-                                    KeepAlive ka = rcv as KeepAlive;
-                                    if (ka.Terminate)
-                                    {
-                                        nstr.Close();
-                                        cl.Close();
-                                    }
-
-                                    break;
-                            }
-                        }
-                    }
-
-                    Thread.Sleep(10);
-                }
-
-                try
-                {
-                    cl.Client.Disconnect(false);
-                }
-                catch
-                {
-                }
-                finally
-                {
-                    l.Stop();
-                }
-
-                c.WaitForExit();
+                l.Stop();
+                return;
             }
 
-            l.Stop();
+            TcpClient cl = l.AcceptTcpClient();
+            cl.SendTimeout = 30;
+            cl.SendBufferSize = ushort.MaxValue * 16;
+            cl.ReceiveBufferSize = ushort.MaxValue * 16;
+
+            NetworkStream nstr = cl.GetStream();
+
+            EventHandler<MessageReceivedEventArgs> receivedCompInfo = delegate(object sender, MessageReceivedEventArgs e)
+            {
+                byte[] msg = Client.SerializeMessage(e.ReceivedMessage);
+                nstr.Write(msg, 0, msg.Length);
+            };
+
+            this.Manager.ReceivedSendComponentInfoMessage += receivedCompInfo;
+            BinaryFormatter f = new BinaryFormatter();
+
+            // send start components
+            SendComponentInfos sci = new SendComponentInfos();
+            sci.MetadataComponents = this.Manager.StoredComponentInfos.ToArray();
+            byte[] ci = Client.SerializeMessage(sci);
+
+            Thread.Sleep(500);
+            nstr.Write(ci, 0, ci.Length);
+            nstr.Flush();
+
+            // wait for answer
+            while (nstr.CanRead && nstr.CanWrite && !c.HasExited && !args.Stopped)
+            {
+                if (nstr.DataAvailable)
+                {
+                    byte[] hdr = new byte[9];
+                    nstr.Read(hdr, 0, 9);
+
+                    uint len;
+                    StatusCode sc;
+
+                    if (!Client.ParseHeader(hdr, out len, out sc))
+                    {
+                        continue;
+                    }
+
+                    byte[] body = new byte[len];
+
+                    int rcvbody = nstr.Read(body, 0, (int)len);
+
+                    do
+                    {
+                        Thread.Sleep(50);
+                    }
+                    while (rcvbody < len);
+
+                    using (MemoryStream nms = new MemoryStream(body))
+                    {
+                        Message rcv = (Message)f.Deserialize(nms);
+                        switch (rcv.MessageType)
+                        {
+                            case StatusCode.DoJobRequest:
+                                DoJobRequest eq = rcv as DoJobRequest;
+                                this.Client.SendMessage(eq);
+                                break;
+
+                            case StatusCode.StorComponent:
+                                StoreComponent stc = rcv as StoreComponent;
+                                stc.IsComplex = true;
+                                this.Client.SendMessage(stc);
+                                break;
+
+                            case StatusCode.KeepAlive:
+                                KeepAlive ka = rcv as KeepAlive;
+                                if (ka.Terminate)
+                                {
+                                    nstr.Close();
+                                    cl.Close();
+                                    args.Stop();
+                                }
+
+                                break;
+                        }
+                    }
+                }
+
+                Thread.Sleep(10);
+            }
+
+            try
+            {
+                cl.Client.Disconnect(false);
+            }
+            catch
+            {
+            }
+            finally
+            {
+                l.Stop();
+            }
+
+            c.WaitForExit();
         }
 
         /// <summary>
