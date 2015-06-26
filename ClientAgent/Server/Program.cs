@@ -33,15 +33,15 @@ namespace Server
             Task tcpTask = new Task(() => tcpservermanager.RunMyServer());
             tcpTask.Start();
 
-            //ServerBroadcast serverBroadcast = new ServerBroadcast();
-            //Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());
-            //serverBroadcastTask.Start();
+            ServerBroadcast serverBroadcast = new ServerBroadcast();
+            Task serverBroadcastTask = new Task(() => serverBroadcast.SendBroadcast());
+            serverBroadcastTask.Start();
 
             TcpServerToServerManager tcpServerToServerManager = new TcpServerToServerManager(tcpservermanager);
 
-            //RecServerBroadcast sb = new RecServerBroadcast(tcpServerToServerManager);
-            //Task recServerBroadcast = new Task(() => sb.Recieve());
-            //recServerBroadcast.Start();
+            RecServerBroadcast sb = new RecServerBroadcast(tcpServerToServerManager);
+            Task recServerBroadcast = new Task(() => sb.Recieve());
+            recServerBroadcast.Start();
             
             Console.ReadLine();
         }
