@@ -133,7 +133,7 @@ namespace ClientAgent
         /// Gets the list of running jobs.
         /// </summary>
         /// <value>
-        ///     Contians the list of running jobs.
+        ///     Contains the list of running jobs.
         /// </value>
         public ReadOnlyCollection<Guid> ExecutingJobs
         {

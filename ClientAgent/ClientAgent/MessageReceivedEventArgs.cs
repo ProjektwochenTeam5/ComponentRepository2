@@ -1,4 +1,15 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="MessageReceivedEventArgs.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the <see cref="MessageReceivedEventArgs"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ClientAgent
 {
     using System;

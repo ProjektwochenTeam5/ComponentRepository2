@@ -1,4 +1,16 @@
-﻿using System.Reflection;
+﻿// --------------------------------------------------------------
+// <copyright file="AssemblyInfo.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains information about the assembly.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 

@@ -23,8 +23,8 @@ namespace ClientAgent
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Threading;
     using ClientServerCommunication;
-    using Core.Network;
     using ConsoleGUI;
+    using Core.Network;
 
     /// <summary>
     /// Provides an abstract view on a client.
@@ -147,10 +147,86 @@ namespace ClientAgent
         }
 
         /// <summary>
-        /// 
+        /// Parses a byte array and returns whether the byte array is a valid header.
         /// </summary>
-        /// <param name="m"></param>
-        /// <returns></returns>
+        /// <param name="header">
+        ///     The byte array that shall be parsed.
+        /// </param>
+        /// <param name="length">
+        ///     The length of the following body.
+        /// </param>
+        /// <param name="status">
+        ///     The message status.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the specified byte array is a valid header.
+        /// </returns>
+        public static bool ParseHeader(byte[] header, out uint length, out StatusCode status)
+        {
+            length = 0;
+            status = StatusCode.KeepAlive;
+
+            if (header.Length != 9)
+            {
+                return false;
+            }
+
+            if (header[0] != 1 || header[1] != 1 || header[2] != 1 || header[3] != 1)
+            {
+                return false;
+            }
+
+            length = (uint)(header[4] + (header[5] * 0x100) + (header[6] * 0x10000) + (header[7] * 0x1000000));
+            
+            status = (StatusCode)header[8];
+            return true;
+        }
+
+        /// <summary>
+        /// Parses a byte array and returns whether the byte array is a valid UDP server message header.
+        /// </summary>
+        /// <param name="header">
+        ///     The byte array that shall be parsed.
+        /// </param>
+        /// <param name="length">
+        ///     The length of the following body.
+        /// </param>
+        /// <param name="status">
+        ///     The message status.
+        /// </param>
+        /// <returns>
+        ///     Returns a value indicating whether the specified byte array is a valid UDP server message header.
+        /// </returns>
+        public static bool ParseUDPHeader(byte[] header, out uint length, out StatusCode status)
+        {
+            length = 0;
+            status = StatusCode.KeepAlive;
+
+            if (header.Length != 9)
+            {
+                return false;
+            }
+
+            if (header[0] != 1 || header[1] != 1 || header[2] != 1 || header[3] != 1)
+            {
+                return false;
+            }
+
+            length = (uint)(header[4] + (header[5] * 0x100) + (header[6] * 0x10000) + (header[7] * 0x1000000));
+
+            status = (StatusCode)header[8];
+            return true;
+        }
+
+        /// <summary>
+        /// Serializes a message to a client message.
+        /// </summary>
+        /// <param name="m">
+        ///     The message that shall be serialized.
+        /// </param>
+        /// <returns>
+        ///     Returns a <see cref="byte"/> array containing the serialized message and the message header.
+        /// </returns>
         public static byte[] SerializeMessage(Message m)
         {
             byte[] ret = null;
@@ -222,14 +298,18 @@ namespace ClientAgent
                     this.ConnectionClient.Connect(pt);
                     this.ConnectedEndPoint = pt;
                     this.OnConnected(EventArgs.Empty);
-                    this.OnReceivedLogEntry(new StringEventArgs(new[] { string.Format(
+                    this.OnReceivedLogEntry(new StringEventArgs(new[]
+                    {
+                        string.Format(
                         "Connected to {0}:{1}",
                         this.ConnectedEndPoint.Address,
-                        this.ConnectedEndPoint.Port) }));
+                        this.ConnectedEndPoint.Port)
+                    }));
                     break;
                 }
                 catch (SocketException)
                 {
+                    Thread.Sleep(5);
                 }
             }
         }
@@ -242,11 +322,13 @@ namespace ClientAgent
             this.SendMessage(new KeepAlive() { Terminate = true });
             this.ConnectionClient.Close();
             this.OnDisconnected(EventArgs.Empty);
-            this.OnReceivedLogEntry(new StringEventArgs(new[] {
+            this.OnReceivedLogEntry(new StringEventArgs(new[]
+            {
                 string.Format(
                 "Disconnected from {0}:{1}",
                 this.ConnectedEndPoint.Address,
-                this.ConnectedEndPoint.Port) }));
+                this.ConnectedEndPoint.Port)
+            }));
         }
 
         /// <summary>
@@ -381,7 +463,7 @@ namespace ClientAgent
                     {
                         break;
                     }
-                    
+
                     lastSend = DateTime.Now;
                 }
 
@@ -438,7 +520,7 @@ namespace ClientAgent
             cpu.CategoryName = "Processor";
             cpu.CounterName = "% Processor Time";
             cpu.InstanceName = "_Total";
-            
+
             while (!args.Stopped)
             {
                 // send keep alive
@@ -473,7 +555,6 @@ namespace ClientAgent
 
                     int rcvbody = str.Read(body, 0, (int)bodylen);
 
-
                     using (MemoryStream ms = new MemoryStream(body))
                     {
                         Message rcv = (Message)args.Client.formatter.Deserialize(ms);
@@ -485,78 +566,6 @@ namespace ClientAgent
             }
 
             args.Client.Disconnect();
-        }
-
-        /// <summary>
-        /// Parses a byte array and returns whether the byte array is a valid header.
-        /// </summary>
-        /// <param name="header">
-        ///     The byte array that shall be parsed.
-        /// </param>
-        /// <param name="length">
-        ///     The length of the following body.
-        /// </param>
-        /// <param name="status">
-        ///     The message status.
-        /// </param>
-        /// <returns>
-        ///     Returns a value indicating whether the specified byte array is a valid header.
-        /// </returns>
-        public static bool ParseHeader(byte[] header, out uint length, out StatusCode status)
-        {
-            length = 0;
-            status = StatusCode.KeepAlive;
-
-            if (header.Length != 9)
-            {
-                return false;
-            }
-
-            if (header[0] != 1 || header[1] != 1 || header[2] != 1 || header[3] != 1)
-            {
-                return false;
-            }
-
-            length = (uint)(header[4] + (header[5] * 0x100) + (header[6] * 0x10000) + (header[7] * 0x1000000));
-            
-            status = (StatusCode)header[8];
-            return true;
-        }
-
-        /// <summary>
-        /// Parses a byte array and returns whether the byte array is a valid UDP server message header.
-        /// </summary>
-        /// <param name="header">
-        ///     The byte array that shall be parsed.
-        /// </param>
-        /// <param name="length">
-        ///     The length of the following body.
-        /// </param>
-        /// <param name="status">
-        ///     The message status.
-        /// </param>
-        /// <returns>
-        ///     Returns a value indicating whether the specified byte array is a valid UDP server message header.
-        /// </returns>
-        public static bool ParseUDPHeader(byte[] header, out uint length, out StatusCode status)
-        {
-            length = 0;
-            status = StatusCode.KeepAlive;
-
-            if (header.Length != 9)
-            {
-                return false;
-            }
-
-            if (header[0] != 1 || header[1] != 1 || header[2] != 1 || header[3] != 1)
-            {
-                return false;
-            }
-
-            length = (uint)(header[4] + (header[5] * 0x100) + (header[6] * 0x10000) + (header[7] * 0x1000000));
-
-            status = (StatusCode)header[8];
-            return true;
         }
 
         /// <summary>
@@ -583,7 +592,6 @@ namespace ClientAgent
             mes.AddRange(ms.ToArray());
 
             UdpBroadcast.SendBoadcast(1233, mes.ToArray());
-            ////cl.Send(msg.ToArray(), msg.Count, new IPEndPoint(IPAddress.Broadcast, 1234));
         }
 
         /// <summary>
