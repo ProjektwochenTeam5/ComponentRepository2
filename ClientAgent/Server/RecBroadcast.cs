@@ -15,6 +15,9 @@ namespace Server
     {
         public int UdpClientPort { get { return 1233; } }
 
+        public string GetTime { get { return DateTime.Now.ToLongTimeString() + " --> "; } }
+
+
         public event EventHandler<UdpClientDiscoverRecievedEventArgs> OnUdpClientDiscovered;
 
         public void Recieve()
@@ -24,7 +27,7 @@ namespace Server
             IPEndPoint groupEP = new IPEndPoint(IPAddress.Any, this.UdpClientPort);
             UdpClient client = new UdpClient(groupEP);
             client.EnableBroadcast = true;
-            Console.WriteLine("--> UDP waiting for Broadcast!");
+            Console.WriteLine(this.GetTime + "UDP waiting for Broadcast!");
 
             try
             {
@@ -37,10 +40,9 @@ namespace Server
                         if (bytes[8] == (byte)1)
                         {
                             byte[] body = bytes.SubArray(9, bytes.Length - 9);
-                            Console.WriteLine("Recieved broadcast from {0} - {1}", groupEP.ToString(), Encoding.ASCII.GetString(body, 0, body.Length));
+                            Console.WriteLine(this.GetTime + "Recieved broadcast from {0}", groupEP.ToString());
 
                             AgentDiscover discover = (AgentDiscover)DataConverter.ConvertByteArrayToMessage(body);
-
                             if (discover != null)
                             {
                                 this.FireOnClientDiscovered(new UdpClientDiscoverRecievedEventArgs(groupEP.Address.ToString(), discover.FriendlyName));
@@ -78,7 +80,7 @@ namespace Server
             try
             {
                 client.Send(send, send.Length, ipendpoint);
-                Console.WriteLine("sending ip + {0}", send.Length + "bytes");
+                Console.WriteLine(this.GetTime + "Sending ip + {0}", send.Length + "bytes");
             }
             catch (Exception ex)
             {

@@ -227,8 +227,14 @@
             return senddata;
         }
 
+        private void DeleteComplexJobs()
+        {
+            this.MyTCPServer.Wrapper.DeleteComplex();
+        }
+
         public void RunMyServer()
         {
+            this.DeleteComplexJobs();
             this.MyTCPServer.Wrapper.ReadData();
             this.Dlls = new Dictionary<Guid, string>();
 
@@ -336,13 +342,13 @@
                 {
                     try
                     {
-                        Console.WriteLine("Answer from Client matches Request! Result is: " + e.Data.Result.ElementAt(0));
+                        Console.WriteLine(this.MyTCPServer.GetTime + "Answer from Client matches Request! Result is: " + e.Data.Result.ElementAt(0));
                         resp = e.Data;
                         waiting = false;
                     }
                     catch (ArgumentOutOfRangeException ex)
                     {
-                        Console.WriteLine(ex.Message);
+                        Console.WriteLine(this.MyTCPServer.GetTime + ex.Message);
                     }
 
                 }
@@ -368,7 +374,7 @@
 
             this.MyTCPServer.SendMessage(sendData, client);
             string s = this.MyTCPServer.Clients.Keys.Where(x => x.ClientGuid == client).SingleOrDefault().FriendlyName;
-            Console.WriteLine("Sending TransferJobReqest to: " + s);
+            Console.WriteLine(this.MyTCPServer + "Sending TransferJobReqest to: " + s);
 
             try
             {
@@ -410,7 +416,7 @@
                 case ClientServerCommunication.StatusCode.KeepAlive:
                     {
                         KeepAlive keepAlive = (KeepAlive)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
-                        Console.WriteLine("Keep alive recieved from {0} || Terminate = {1} || Workload = {2}",e.Info.FriendlyName, keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
+                        Console.WriteLine(this.MyTCPServer + "Keep alive recieved from {0} || Terminate = {1} || Workload = {2}",e.Info.FriendlyName, keepAlive.Terminate.ToString(), keepAlive.CPUWorkload.ToString());
                         this.CalculateClientLoads(keepAlive, e.Info.ClientGuid);
                         this.IncrementClientKeepAlive(e.Info.ClientGuid);
                         this.CheckIfDeleteClientAndDelete(keepAlive, e.Info);
@@ -424,7 +430,7 @@
                         bool contains = this.Components.Keys.Contains(request.ComponentID);
                         bool containscomplex = this.ComplexComponent.Keys.Contains(request.ComponentID);
 
-                        Console.WriteLine("--------Transfer component request Recieved");
+                        Console.WriteLine(this.MyTCPServer + "Transfer component request Recieved from {0}", e.Info.FriendlyName);
                         if (containscomplex)
                         {
 
@@ -459,7 +465,7 @@
                         DoJobRequest request = (DoJobRequest)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
                         this.MyTCPServer.SendAck(e.Info, request.MessageID);
 
-                        Console.WriteLine("DoJobRequest recieved!");
+                        Console.WriteLine(this.MyTCPServer.GetTime + "DoJobRequest recieved from {0}!", e.Info.FriendlyName);
                         try
                         {
 
@@ -501,7 +507,7 @@
 
                 case ClientServerCommunication.StatusCode.StorComponent:
                     {
-                        Console.WriteLine("StoreComponent recieved!");
+                        Console.WriteLine(this.MyTCPServer.GetTime + "StoreComponent recieved from {0}!", e.Info.FriendlyName);
                         StoreComponent storecomponent = (StoreComponent)DataConverter.ConvertByteArrayToMessage(e.MessageBody);
 
                         if (!storecomponent.IsComplex)
@@ -561,7 +567,7 @@
             }
             catch (Exception)
             {
-                Console.WriteLine("We don't have this dll");
+                Console.WriteLine(this.MyTCPServer.GetTime + "We don't have this dll");
                 return;
             }
 
@@ -573,7 +579,7 @@
             byte[] body = DataConverter.ConvertObjectToByteArray(response);
 
             byte[] send = DataConverter.ConvertMessageToByteArray(4, body);
-            Console.WriteLine("sending: " + path);
+            Console.WriteLine(this.MyTCPServer.GetTime + "Sending: {0} to {1}" ,path, clientInfo.FriendlyName);
             this.MyTCPServer.SendMessage(send, clientInfo.ClientGuid);
         }
 
@@ -587,7 +593,8 @@
             }
             catch (Exception)
             {
-                Console.WriteLine("We don't have this dll");
+                Console.WriteLine(this.MyTCPServer.GetTime + "We don't have this dll");
+
                 return;
             }
 
@@ -600,7 +607,8 @@
             byte[] body = DataConverter.ConvertObjectToByteArray(response);
 
             byte[] send = DataConverter.ConvertMessageToByteArray(4, body);
-            Console.WriteLine("sending: " + name);
+            Console.WriteLine(this.MyTCPServer.GetTime + "Sending: {0} to {1}", name, clientInfo.FriendlyName);
+
             this.MyTCPServer.SendMessage(send, clientInfo.ClientGuid);
         }
 
@@ -622,7 +630,7 @@
                 this.MyTCPServer.Clients.Remove(info);
                 this.OnClientDisconnected(this, new ClientFetchedEventArgs(info));
                 this.IpAdressFriendlyName.Remove(info.IpAddress.ToString());
-                Console.WriteLine("Client deleted!");
+                Console.WriteLine(this.MyTCPServer.GetTime + "{0} deleted!", info.FriendlyName);
             }
             else
             {

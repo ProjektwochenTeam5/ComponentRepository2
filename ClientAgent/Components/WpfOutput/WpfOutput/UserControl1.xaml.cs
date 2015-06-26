@@ -16,6 +16,7 @@
     using System.Windows.Navigation;
     using System.Windows.Shapes;
     using Core.Component;
+    using System.Windows.Threading;
 
     /// <summary>
     /// Interaction logic for UserControl.
@@ -27,7 +28,8 @@
         /// </summary>
         public UserControl1()
         {
-            InitializeComponent();
+            this.Dispatcher.BeginInvoke(DispatcherPriority.Normal, new Action(() =>
+            InitializeComponent()));
             this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(string).ToString() });
             this.OutputHints = new List<string>();

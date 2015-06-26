@@ -152,5 +152,15 @@
                 }
             }
         }
+
+        internal void DeleteComplex()
+        {
+            DirectoryInfo d = new DirectoryInfo(this.StorePath);
+
+            foreach (var item in d.GetFiles().Where(x => x.Extension == ".dat"))
+            {
+                item.Delete();
+            }
+        }
     }
 }

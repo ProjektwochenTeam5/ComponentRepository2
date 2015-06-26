@@ -34,6 +34,8 @@ namespace Server
         public event EventHandler<MessageRecievedEventArgs> OnMessageRecieved;
 
         public event EventHandler<ClientFetchedEventArgs> OnClientFetched;
+
+        public string GetTime { get { return DateTime.Now.ToLongTimeString() + " --> "; } }
         
         public TCPServer()
         {
@@ -52,7 +54,7 @@ namespace Server
             try
             {
                 this.MyListener.Start();
-                Console.WriteLine("--> TCP Listener started");
+                Console.WriteLine(this.GetTime + "TCP Listener started");
 
                 while (true)
                 {
@@ -65,7 +67,7 @@ namespace Server
             catch (Exception e)
             {
 
-                Console.WriteLine("exception at starting listener: " + e.Message);
+                Console.WriteLine(this.GetTime + "Exception at starting listener: " + e.Message);
             }
         }
 
@@ -83,7 +85,7 @@ namespace Server
             NetworkStream ns = client.GetStream();
 
             this.FireOnClientFetched(new ClientFetchedEventArgs(clientInfo));
-            Console.WriteLine("----> Client fetched! FriendlyName: {0} - ClientID: {1}", clientInfo.FriendlyName, clientInfo.ClientGuid);
+            Console.WriteLine(this.GetTime + "Client fetched! FriendlyName: {0} - ClientID: {1}", clientInfo.FriendlyName, clientInfo.ClientGuid);
 
             while (true)
             {
@@ -165,7 +167,7 @@ namespace Server
             return true;
         }
 
-        private void SendAckToClient(NetworkStream ns, Guid belongingmessageid)
+        private void SendAckToClient(NetworkStream ns, Guid belongingmessageid, string friendlyname)
         {
             Acknowledge ack = new Acknowledge();
             ack.BelongsTo = belongingmessageid;
@@ -175,7 +177,7 @@ namespace Server
             try
             {
                 ns.Write(send, 0, send.Length);
-                Console.WriteLine("Acknowledge sent");
+                Console.WriteLine(this.GetTime + "Acknowledge sent to: {0}", friendlyname);
             }
             catch (Exception ex)
             {
@@ -185,7 +187,7 @@ namespace Server
             ns.Flush();
         }
 
-        private void SendErrorToClient(NetworkStream ns, Guid belongingmessageid)
+        private void SendErrorToClient(NetworkStream ns, Guid belongingmessageid, string friendlyname)
         {
             Error err = new Error();
             err.BelongsTo = belongingmessageid;
@@ -194,6 +196,7 @@ namespace Server
             try
             {
                 ns.Write(send, 0, send.Length);
+                Console.WriteLine(this.GetTime + "Error sent to: {0}", friendlyname);
             }
             catch (Exception ex)
             {
@@ -222,7 +225,7 @@ namespace Server
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();
 
-            this.SendAckToClient(ns, belongingmessageid);
+            this.SendAckToClient(ns, belongingmessageid, clientinfo.FriendlyName);
         }
 
         public void SendError(ClientInfo clientinfo, Guid belongingmessageid)
@@ -230,16 +233,18 @@ namespace Server
             TcpClient client = this.Clients[clientinfo];
             NetworkStream ns = client.GetStream();
 
-            this.SendErrorToClient(ns, belongingmessageid);
+            this.SendErrorToClient(ns, belongingmessageid, clientinfo.FriendlyName);
         }
 
         public void SendMessage(byte[] message, Guid clientID)
         {
             TcpClient client = null;
             NetworkStream stream = null;
-
+            string friendlyname = string.Empty;
             try
             {
+                 friendlyname = this.Clients.Where(x => x.Key.ClientGuid == clientID).SingleOrDefault().Key.FriendlyName;
+
                  client = this.Clients.Where(x => x.Key.ClientGuid == clientID).SingleOrDefault().Value;
                  stream = client.GetStream();
             }
@@ -257,7 +262,7 @@ namespace Server
                 stream.Write(message, 0, message.Length);
                 stream.Flush();
 
-                Console.WriteLine("Sending Message! + {0} bytes!", message.Length);
+                Console.WriteLine(this.GetTime + "Sending Message to {0}! - {1} bytes!", friendlyname, message.Length);
             }
             catch (Exception ex)
             {
@@ -274,7 +279,7 @@ namespace Server
                 {
                     stream.Write(message, 0, message.Length);
                     stream.Flush();
-                    Console.WriteLine("Sending Message!");
+                    Console.WriteLine(this.GetTime + "Sending Message to all! - {0}bytes!", message.Length);
                 }
                 catch (Exception ex)
                 {
