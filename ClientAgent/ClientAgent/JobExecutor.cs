@@ -192,11 +192,18 @@ namespace ClientAgent
                 }
 
                 long len = new FileInfo(dll).Length;
-                using (FileStream fs = new FileStream(dll, FileMode.Open, FileAccess.Read, FileShare.Read))
+                try
                 {
-                    byte[] rd = new byte[len];
-                    fs.Read(rd, 0, (int)len);
-                    Data.Add(fn, Assembly.Load(rd));
+                    using (FileStream fs = new FileStream(dll, FileMode.Open, FileAccess.Read, FileShare.Read))
+                    {
+                        byte[] rd = new byte[len];
+                        fs.Read(rd, 0, (int)len);
+                        Data.Add(fn, Assembly.Load(rd));
+                    }
+                }
+                catch
+                {
+
                 }
             }
         }
@@ -229,7 +236,7 @@ namespace ClientAgent
             }
             catch
             {
-                throw;
+                return false;
             }
         }
     }
