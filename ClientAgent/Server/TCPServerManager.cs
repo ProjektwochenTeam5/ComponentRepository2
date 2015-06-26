@@ -123,7 +123,7 @@
                 while (true)
                 {
                     uint old = this.ClientPing[e.ClientInfo.ClientGuid];
-                    Thread.Sleep(60000);
+                    Thread.Sleep(20000);
                     if (old == this.ClientPing[e.ClientInfo.ClientGuid])
                     {
                         try
@@ -132,7 +132,7 @@
                             this.IpAdressFriendlyName.Remove(e.ClientInfo.IpAddress.ToString());
                             this.OnClientDisconnected(this, new ClientFetchedEventArgs(e.ClientInfo));
                             this.MyTCPServer.Clients.Remove(e.ClientInfo);
-                            Console.WriteLine(this.MyTCPServer.GetTime + "60 seconds over - Client deleted!");
+                            Console.WriteLine(this.MyTCPServer.GetTime + "20 seconds over - Client deleted!");
                             break;
                         }
                         catch (Exception ex)
@@ -147,6 +147,13 @@
             t.Start();
 
             Console.WriteLine(this.MyTCPServer.GetTime + "-------------------- TOTAL CLIENTS: {0} --------------------", this.MyTCPServer.Clients.Count);
+
+            foreach (var item in this.MyTCPServer.Clients)
+            {
+                Console.WriteLine("             ----------------->" + item.Key.FriendlyName);
+            }
+
+            Console.WriteLine(this.MyTCPServer.GetTime + "-----------------------------------------------------------------");
         }
 
         private void IncrementClientKeepAlive(Guid clientguid)
@@ -630,7 +637,11 @@
             {
                 this.MyTCPServer.Clients[info].Close();
                 this.MyTCPServer.Clients.Remove(info);
-                this.OnClientDisconnected(this, new ClientFetchedEventArgs(info));
+                if (this.OnClientDisconnected != null)
+                {
+                    this.OnClientDisconnected(this, new ClientFetchedEventArgs(info));
+                }
+
                 this.IpAdressFriendlyName.Remove(info.IpAddress.ToString());
                 Console.WriteLine(this.MyTCPServer.GetTime + "{0} deleted!", info.FriendlyName);
             }
