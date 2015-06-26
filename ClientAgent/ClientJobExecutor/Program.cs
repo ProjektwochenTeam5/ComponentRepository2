@@ -1,4 +1,15 @@
-﻿
+﻿// --------------------------------------------------------------
+// <copyright file="Program.cs" company="David Eiwen">
+// (c) by David Eiwen. All Rights reserved.
+// </copyright>
+// <summary>
+// This file contains the <see cref="Program"/> class.
+// </summary>
+// <author>
+// David Eiwen
+// </author>
+// --------------------------------------------------------------
+
 namespace ClientJobExecutor
 {
     using System;
@@ -7,27 +18,29 @@ namespace ClientJobExecutor
     using System.Linq;
     using System.Net;
     using System.Net.Sockets;
+    using System.Reflection;
     using System.Runtime.Serialization.Formatters.Binary;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using Core.Component;
     using ClientServerCommunication;
-    using System.Reflection;
+    using Core.Component;
 
     /// <summary>
-    /// 
+    /// Provides the main entry point for the executor.
     /// </summary>
     public class Program
     {
         /// <summary>
-        /// 
+        /// The main entry point of the application.
         /// </summary>
-        /// <param name="args"></param>
-        static void Main(string[] args)
+        /// <param name="args">
+        ///     The command line args.
+        /// </param>
+        public static void Main(string[] args)
         {
             int port;
-            if(!int.TryParse(args[0], out port))
+            if (!int.TryParse(args[0], out port))
             {
                 return;
             }
@@ -63,7 +76,7 @@ namespace ClientJobExecutor
                     byte[] rd = new byte[length];
                     str.Read(rd, 0, (int)length);
 
-                    using(MemoryStream ms = new MemoryStream(rd))
+                    using (MemoryStream ms = new MemoryStream(rd))
                     {
                         Message m = (Message)f.Deserialize(ms);
                         if (m.MessageType == StatusCode.ExecuteJob)
