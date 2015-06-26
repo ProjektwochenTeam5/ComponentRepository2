@@ -28,7 +28,7 @@ namespace Mod
             this.ComponentGuid = Guid.NewGuid();
             this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString(), typeof(long).ToString() });
             this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
-            this.InputDescriptions = new List<string>(new[] { "num1", "num2" });
+            this.InputDescriptions = new List<string>(new[] { "Dividend", "Divisor" });
             this.OutputDescriptions = new List<string>(new[] { "result" });
         }
 

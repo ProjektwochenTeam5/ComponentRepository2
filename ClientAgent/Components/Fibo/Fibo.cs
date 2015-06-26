@@ -26,10 +26,10 @@ namespace Fibo
         public Fibo()
         {
             this.ComponentGuid = Guid.NewGuid();
-            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
-            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(uint).ToString() });
-            this.InputDescriptions = new List<string>(new[] { "uint" });
-            this.OutputDescriptions = new List<string>(new[] { "uint" });            
+            this.InputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
+            this.OutputHints = new ReadOnlyCollection<string>(new[] { typeof(long).ToString() });
+            this.InputDescriptions = new List<string>(new[] { "long" });
+            this.OutputDescriptions = new List<string>(new[] { "long" });            
         }
 
         /// <summary>
@@ -105,13 +105,13 @@ namespace Fibo
                 return new object[] { new ArgumentException() };
             }
            
-            uint a = 0;
-            uint b = 1;
-            uint n = 0;
+            long a = 0;
+            long b = 1;
+            long n = 0;
 
-            for (uint i = 0; i < n; i++)
+            for (int i = 0; i < n; i++)
             {
-                uint temp = a;
+                long temp = a;
                 a = b;
                 b = temp + b;
             }
