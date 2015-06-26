@@ -183,9 +183,9 @@ namespace ClientServerCommunication
                 send[i] = length[i - 1];
             }
 
-            for (int i = 5; i < send.Length; i++)
+            for (int i = 0; i < jsonbytes.Length; i++)
             {
-                send[i] = jsonbytes[i];
+                send[i+5] = jsonbytes[i];
             }
 
             return send;
