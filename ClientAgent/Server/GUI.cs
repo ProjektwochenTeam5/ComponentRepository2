@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using ConsoleGUI.Controls;
 using ConsoleGUI.IO;
+using System.Threading;
 
 namespace Server
 {
     public static class GUI
     {
+        public static object locker = new object();
+
         public static void Do()
         {
             Random r = new Random();
@@ -29,6 +32,23 @@ namespace Server
 
             Console.SetWindowSize(Console.LargestWindowWidth - 90, Console.LargestWindowHeight - 35);
             Console.SetCursorPosition(0, 0);
+
+            Task t = new Task(new Action(() => 
+            {
+                while (true)
+                {
+                    Thread.Sleep(10000);
+
+                    lock (locker)
+                    {
+                        Console.Write("\n");
+                        Console.WriteLine("------------------------------------------------------------------------------------------------------------------------");
+                        Console.Write("\n");
+                    }
+                }
+            }));
+
+            t.Start();
         }
     }
 }

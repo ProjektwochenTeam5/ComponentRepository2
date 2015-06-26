@@ -195,7 +195,7 @@ namespace Server
                 // 2. output ........
             }
 
-            Console.WriteLine("Split is through!");
+            Console.WriteLine(this.Manager.MyTCPServer.GetTime + "Split is through!");
             return ResultList;
         }
 
@@ -245,7 +245,15 @@ namespace Server
 
                         for (int i = 0; i < resultlist.Count; i++)
                         {
-                            edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid).ToArray()[i].ComponentResult = resultlist[i];
+                            try
+                            {
+                                edges.Where(x => x.InternalOutputComponentGuid == nextCompGuid).ToArray()[i].ComponentResult = resultlist[i];
+
+                            }
+                            catch (Exception)
+                            {
+                                return;
+                            }
                         }
                     }
                     else

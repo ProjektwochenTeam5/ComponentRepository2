@@ -27,6 +27,7 @@ namespace ClientServerCommunication
             {
                 send[index] = check[i];
                 index++;
+
             }
 
             for (int i = 0; i < length.Length; i++)

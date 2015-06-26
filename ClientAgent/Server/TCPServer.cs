@@ -181,7 +181,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(this.GetTime + ex.Message);
             }
 
             ns.Flush();
@@ -200,7 +200,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(this.GetTime + ex.Message);
             }
         }
 
@@ -266,7 +266,7 @@ namespace Server
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Console.WriteLine(this.GetTime + ex.Message);
             }
         }
 
@@ -283,7 +283,7 @@ namespace Server
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.Message);
+                    Console.WriteLine(this.GetTime + ex.Message);
                 }
             }
         }
